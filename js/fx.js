@@ -11,10 +11,11 @@ const FX = (() => {
 
   // ---------- blood ----------
   function blood(x, y, n, dirx = 0, power = 1, spread = 1) {
+    n = Math.round(n * 1.5);
     for (let i = 0; i < n; i++) {
       const sp = rnd(60, 260) * power;
       const a = -PI / 2 + rnd(-1.1, 1.1) * spread + dirx * 0.9;
-      parts.push({ k: 'b', x: x + rnd(-2, 2), y: y + rnd(-2, 2), vx: Math.sin(a + PI / 2) * sp * 0.2 + dirx * sp * 0.9 + rnd(-30, 30), vy: -Math.cos(a + PI / 2) * sp * 0 - rnd(40, 220) * power, r: rnd(0.8, 2.4), life: 3, fz: FLOOR + rnd(-4, 10) });
+      parts.push({ k: 'b', x: x + rnd(-2, 2), y: y + rnd(-2, 2), vx: Math.sin(a + PI / 2) * sp * 0.2 + dirx * sp * 0.9 + rnd(-30, 30), vy: -Math.cos(a + PI / 2) * sp * 0 - rnd(40, 220) * power, r: rnd(0.9, 3.0), life: 3, fz: FLOOR + rnd(-4, 10) });
     }
   }
   // a steady arterial stream (neck stumps and such)
@@ -43,6 +44,8 @@ const FX = (() => {
     return g;
   }
   function burst(x, y, n, kinds, power = 1) {
+    blood(x, y, n * 2, 0, power * 1.2, 1.2);
+    for (let i = 0; i < Math.ceil(n / 2); i++) gib('chunk', x, y, rnd(-200, 200) * power, rnd(-340, -80) * power);
     for (let i = 0; i < n; i++) gib(kinds[i % kinds.length], x, y, rnd(-180, 180) * power, rnd(-320, -80) * power);
   }
 
@@ -57,7 +60,7 @@ const FX = (() => {
       else { p.vy += (p.k === 'd' ? -20 : 300) * dt; p.x += p.vx * dt; p.y += p.vy * dt; }
       if (p.life <= 0) parts.splice(i, 1);
     }
-    if (parts.length > 900) parts.splice(0, parts.length - 900);
+    if (parts.length > 1500) parts.splice(0, parts.length - 1500);
     for (const g of gibs) {
       g.t += dt;
       if (g.stuck) continue;
@@ -79,9 +82,9 @@ const FX = (() => {
     for (let i = screenDrops.length - 1; i >= 0; i--) { const d = screenDrops[i]; d.life -= dt; if (d.life <= 0) screenDrops.splice(i, 1); }
   }
   function addDecal(x, y, r) {
-    for (const d of decals) if (Math.abs(d.x - x) < d.rx * 0.6 && Math.abs(d.y - y) < 3 && d.rx < 22) { d.rx += r * 0.25; d.ry = Math.min(4.5, d.ry + r * 0.04); return; }
+    for (const d of decals) if (Math.abs(d.x - x) < d.rx * 0.6 && Math.abs(d.y - y) < 3 && d.rx < 30) { d.rx += r * 0.3; d.ry = Math.min(4.5, d.ry + r * 0.04); return; }
     decals.push({ x, y, rx: r * 1.6 + 1, ry: Math.max(1, r * 0.45), c: Math.random() < 0.5 ? '#6a0008' : '#8a000c' });
-    if (decals.length > 260) decals.shift();
+    if (decals.length > 400) decals.shift();
   }
 
   // ---------- drawing ----------

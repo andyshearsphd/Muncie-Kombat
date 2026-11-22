@@ -5,7 +5,7 @@
   const ctx = cv.getContext('2d', { willReadFrequently: true });
   const H = 240;
   let W = 480;
-  const AW = STAGES.AW, FLOOR = STAGES.FLOOR, GRAV = 1500;
+  const AW = STAGES.AW, FLOOR = STAGES.FLOOR, GRAV = 2300;
   const R = RIG, P = RIG.P, PI = Math.PI;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const rnd = (a, b) => a + Math.random() * (b - a);
@@ -25,30 +25,31 @@
     block: P({ hy: 4, lean: 0.0, head: -0.2, aF: [1.25, 2.3], aB: [1.15, 2.45], fF: [12, 0], fB: [-14, 0] }),
     cblock: P({ hyL: 0.4, lean: 0.2, aF: [1.35, 2.3], aB: [1.25, 2.4], fF: [15, 0], fB: [-13, 0] }),
     jump: P({ hy: -2, lean: 0.1, aF: [1.2, 1.6], aB: [0.9, 1.8], lF: [1.5, 2.4], lB: [0.9, 2.3] }),
-    jab: P({ hy: 4, lean: 0.3, aF: [1.57, 0.05], aB: [0.5, 2.1], fF: [17, 0], fB: [-13, 0] }),
-    jab2: P({ hy: 4, lean: 0.38, aF: [0.8, 1.9], aB: [1.6, 0.05], fF: [17, 0], fB: [-13, 0] }),
-    up0: P({ hyL: 0.35, lean: 0.35, aF: [0.3, 0.9], aB: [0.8, 1.9], fF: [15, 0], fB: [-12, 0] }),
-    up1: P({ hy: -4, lean: -0.15, aF: [2.95, 0.15], aB: [0.6, 1.6], fF: [10, 0], fB: [-12, -3] }),
-    kick0: P({ hy: 2, lean: -0.1, aF: [0.9, 1.6], aB: [0.6, 1.8], lF: [1.6, 2.2], fB: [-6, 0] }),
-    kick1: P({ hy: 0, lean: -0.4, aF: [0.7, 1.5], aB: [0.9, 1.4], lF: [1.95, 0.1], fB: [-6, 0] }),
-    sw0: P({ hyL: 0.45, lean: 0.45, aF: [0.2, 0.2], aB: [0.1, 0.3], fF: [10, 0], fB: [-12, 0] }),
-    sw1: P({ hyL: 0.5, lean: 0.5, aF: [0.15, 0.1], aB: [0.05, 0.2], lF: [1.45, 0.05], fB: [-10, 0] }),
-    round: P({ hy: -2, lean: -0.55, aF: [1.6, 0.3], aB: [1.3, 0.3], lF: [2.25, 0.05], fB: [-4, 0] }),
-    jkick: P({ hy: -2, lean: -0.3, aF: [1.4, 1.2], aB: [1.0, 1.4], lF: [1.75, 0.1], lB: [0.9, 2.3] }),
-    jpunch: P({ hy: -2, lean: 0.25, aF: [1.9, 0.1], aB: [1.0, 1.5], lF: [1.4, 2.3], lB: [0.8, 2.2] }),
+    jab: P({ hy: 4, lean: 0.38, head: 0.1, aF: [1.64, 0.0], aB: [0.45, 2.2], fF: [20, 0], fB: [-13, 0] }),
+    jab2: P({ hy: 4, lean: 0.48, head: 0.1, aF: [0.8, 2.0], aB: [1.64, 0.0], fF: [20, 0], fB: [-12, 0] }),
+    up0: P({ hyL: 0.44, lean: 0.5, aF: [0.15, 0.5], aB: [0.9, 1.9], fF: [16, 0], fB: [-12, 0] }),
+    up1: P({ hy: -7, lean: -0.15, head: -0.2, aF: [2.7, 0.02], aB: [0.4, 1.7], fF: [10, -5], fB: [-13, 0] }),
+    up2: P({ hy: -5, lean: -0.25, head: -0.3, aF: [3.1, 0.02], aB: [0.4, 1.7], fF: [9, -3], fB: [-13, 0] }),
+    kick0: P({ hy: 1, lean: -0.35, aF: [0.55, 2.3], aB: [0.35, 2.4], lF: [1.8, 2.6], fB: [-5, 0] }),
+    kick1: P({ hy: 0, lean: -0.7, head: 0.3, aF: [0.55, 2.35], aB: [0.3, 2.4], lF: [2.12, 0.0], fB: [-3, 0] }),
+    sw0: P({ hyL: 0.5, lean: 0.55, aF: [0.1, 0.1], aB: [-0.1, 0.2], fF: [10, 0], fB: [-12, 0] }),
+    sw1: P({ hyL: 0.55, lean: 0.6, aF: [0.1, 0.05], aB: [-0.05, 0.15], lF: [1.5, 0.0], fB: [-10, 0] }),
+    round: P({ hy: -2, lean: -0.95, head: 0.4, aF: [1.1, 1.4], aB: [0.7, 1.5], lF: [2.55, 0.0], fB: [-2, 0] }),
+    jkick: P({ hy: -2, lean: -0.5, head: 0.3, aF: [0.8, 2.2], aB: [0.6, 2.3], lF: [1.9, 0.0], lB: [0.6, 2.4] }),
+    jpunch: P({ hy: -2, lean: 0.35, aF: [1.25, 0.0], aB: [0.8, 1.9], lF: [1.3, 2.3], lB: [0.7, 2.2] }),
     grab: P({ hy: 4, lean: 0.35, aF: [1.6, 0.4], aB: [1.5, 0.5], fF: [16, 0], fB: [-12, 0] }),
     toss: P({ hy: 4, lean: -0.4, aF: [2.9, 0.2], aB: [2.6, 0.3], fF: [8, 0], fB: [-16, 0] }),
     proj0: P({ hy: 4, lean: -0.1, aF: [0.4, 1.2], aB: [0.3, 1.3], fF: [12, 0], fB: [-14, 0] }),
     proj1: P({ hy: 4, lean: 0.35, aF: [1.62, 0.05], aB: [1.5, 0.1], fF: [18, 0], fB: [-14, 0] }),
-    hitHigh: P({ hy: 4, lean: -0.4, head: -0.6, aF: [0.5, 0.6], aB: [0.3, 0.7], fF: [10, 0], fB: [-16, 0] }),
-    hitLow: P({ hy: 8, lean: 0.55, head: 0.3, aF: [0.6, 0.4], aB: [0.4, 0.6], fF: [12, 0], fB: [-12, 0] }),
+    hitHigh: P({ hy: 5, lean: -0.6, head: -0.9, aF: [0.7, 0.4], aB: [0.2, 0.6], fF: [10, 0], fB: [-17, 0] }),
+    hitLow: P({ hy: 10, lean: 0.8, head: 0.6, aF: [0.9, 0.5], aB: [0.6, 0.7], fF: [12, 0], fB: [-12, 0] }),
     rush: ph => P({ hy: 6, lean: 0.75, head: 0.6, aF: [0.5, 0.4], aB: [0.3, 0.5], fF: [10 + Math.sin(ph) * 14, -Math.max(0, Math.cos(ph)) * 8], fB: [10 - Math.sin(ph) * 14, -Math.max(0, -Math.cos(ph)) * 8] }),
     slide: P({ hyL: 0.72, lean: -0.95, aF: [0.9, 0.3], aB: [0.6, 0.3], lF: [1.55, 0.05], lB: [1.1, 1.4] }),
     dive: P({ lean: 0.6, aF: [1.2, 2.5], aB: [1.6, 0.2], lF: [1.0, 1.6], lB: [0.6, 1.8] }),
     tuck: P({ lean: 0.9, aF: [1.5, 2.4], aB: [1.3, 2.4], lF: [1.7, 2.6], lB: [1.5, 2.6] }),
     win: t => P({ hy: 2 + Math.sin(t * 6) * 1.5, lean: -0.1, aF: [3.0 + Math.sin(t * 6) * 0.1, 0.1], aB: [0.6, 1.9], fF: [11, 0], fB: [-11, 0] }),
     dizzy: t => P({ hy: 6, lean: -0.05 + Math.sin(t * 2.2) * 0.16, head: Math.sin(t * 2.7) * 0.6, aF: [0.15, 0.25], aB: [0.12, 0.3], fF: [9 + Math.sin(t * 2.2) * 3, 0], fB: [-9, 0] }),
-    air: rot => P({ lean: -0.2, aF: [2.2, 0.5], aB: [1.8, 0.6], lF: [0.7, 0.5], lB: [0.2, 0.3], rot }),
+    air: (rot, t = 0) => P({ lean: -0.25, head: -0.4, aF: [2.4 + Math.sin(t * 17) * 0.5, 0.4], aB: [1.9 + Math.cos(t * 15) * 0.5, 0.6], lF: [0.9 + Math.sin(t * 13) * 0.3, 0.6], lB: [0.2, 0.4], rot, piv: 2 }),
   };
   PS.down = f => { const L = f.d.thigh + f.d.shin; return P({ rot: -PI / 2, hyA: L * 0.96 - f.d.back * 0.75, aF: [0.9, 0.4], aB: [0.6, 0.3], lF: [0.15, 0.1], lB: [-0.05, 0.15], head: 0.2 }); };
   PS.downFace = f => { const L = f.d.thigh + f.d.shin; return P({ rot: PI / 2, hyA: L * 0.96 - f.d.belly * 0.75, aF: [2.6, 0.2], aB: [2.4, 0.3], lF: [0.1, 0.4], lB: [-0.1, 0.5], head: -0.3 }); };
@@ -57,24 +58,24 @@
   // ---------- moves ----------
   // t: [startup, active, recovery]; box: [x0, x1, y0, y1] px ahead of / above the root (scaled by size)
   const MV = {
-    jab: { t: [0.06, 0.07, 0.12], dmg: 5, box: [4, 42, 64, 94], fx: 'stun', stun: 0.26, push: 70, snd: 'punch', keys: K([0, STANCE], [0.06, PS.jab], [0.13, PS.jab], [0.25, STANCE]) },
-    jab2: { t: [0.06, 0.07, 0.12], dmg: 5, box: [4, 42, 64, 94], fx: 'stun', stun: 0.26, push: 70, snd: 'punch', keys: K([0, STANCE], [0.06, PS.jab2], [0.13, PS.jab2], [0.25, STANCE]) },
-    upper: { t: [0.13, 0.08, 0.38], dmg: 13, box: [0, 36, 60, 126], fx: 'launch', vy: -560, vx: 140, snd: 'big', upper: 1, keys: K([0, PS.crouch], [0.09, PS.up0], [0.16, PS.up1], [0.3, PS.up1], [0.59, STANCE]) },
-    kick: { t: [0.1, 0.08, 0.2], dmg: 8, box: [8, 58, 56, 100], fx: 'stun', stun: 0.32, push: 120, snd: 'kick', keys: K([0, STANCE], [0.07, PS.kick0], [0.12, PS.kick1], [0.2, PS.kick1], [0.38, STANCE]) },
-    sweep: { t: [0.1, 0.1, 0.3], dmg: 7, box: [8, 62, 0, 18], fx: 'trip', low: 1, snd: 'kick', crouchEnd: 1, keys: K([0, PS.crouch], [0.08, PS.sw0], [0.14, PS.sw1], [0.22, PS.sw1], [0.5, PS.crouch]) },
-    round: { t: [0.16, 0.1, 0.32], dmg: 10, box: [6, 62, 62, 110], fx: 'knock', vy: -300, vx: 240, snd: 'kick', keys: K([0, STANCE], [0.12, PS.kick0], [0.2, PS.round], [0.28, PS.round], [0.58, STANCE]) },
-    jkick: { air: 1, t: [0.05, 0.6, 0], dmg: 9, box: [0, 46, 14, 64], fx: 'knock', vy: -200, vx: 200, snd: 'kick', pose: PS.jkick },
-    jpunch: { air: 1, t: [0.04, 0.4, 0], dmg: 7, box: [0, 40, 40, 84], fx: 'stun', stun: 0.3, push: 60, snd: 'punch', pose: PS.jpunch },
-    grab: { t: [0.08, 0.04, 0.3], grab: 1, keys: K([0, STANCE], [0.08, PS.grab], [0.2, PS.toss], [0.42, STANCE]) },
-    proj: { t: [0.26, 0.02, 0.3], spawn: 1, keys: K([0, STANCE], [0.18, PS.proj0], [0.26, PS.proj1], [0.45, PS.proj1], [0.58, STANCE]) },
+    jab: { t: [0.045, 0.06, 0.1], dmg: 5, limb: 'handFx', rad: 5, lunge: 110, fx: 'stun', stun: 0.24, push: 170, snd: 'punch', keys: K([0, STANCE], [0.045, PS.jab], [0.105, PS.jab], [0.2, STANCE]) },
+    jab2: { t: [0.045, 0.06, 0.1], dmg: 5, limb: 'handBx', rad: 5, lunge: 110, fx: 'stun', stun: 0.24, push: 170, snd: 'punch', keys: K([0, STANCE], [0.045, PS.jab2], [0.105, PS.jab2], [0.2, STANCE]) },
+    upper: { t: [0.08, 0.1, 0.3], dmg: 14, limb: 'handFx', rad: 10, lunge: 150, fx: 'launch', vy: -800, vx: 190, spin: 18, snd: 'big', upper: 1, keys: K([0, PS.crouch], [0.06, PS.up0], [0.12, PS.up1], [0.2, PS.up2], [0.48, STANCE]) },
+    kick: { t: [0.08, 0.07, 0.16], dmg: 8, limb: 'toeF', rad: 6, lunge: 90, fx: 'stun', stun: 0.3, push: 230, snd: 'kick', keys: K([0, STANCE], [0.05, PS.kick0], [0.09, PS.kick1], [0.16, PS.kick1], [0.31, STANCE]) },
+    sweep: { t: [0.09, 0.09, 0.24], dmg: 7, limb: 'toeF', rad: 7, lunge: 60, fx: 'trip', low: 1, snd: 'kick', crouchEnd: 1, keys: K([0, PS.crouch], [0.06, PS.sw0], [0.11, PS.sw1], [0.19, PS.sw1], [0.42, PS.crouch]) },
+    round: { t: [0.13, 0.09, 0.26], dmg: 11, limb: 'toeF', rad: 7, lunge: 70, fx: 'knock', vy: -480, vx: 280, spin: 7, snd: 'kick', keys: K([0, STANCE], [0.08, PS.kick0], [0.15, PS.round], [0.23, PS.round], [0.48, STANCE]) },
+    jkick: { air: 1, t: [0.04, 0.6, 0], dmg: 10, limb: 'toeF', rad: 7, fx: 'knock', vy: -380, vx: 260, spin: 6, snd: 'kick', pose: PS.jkick },
+    jpunch: { air: 1, t: [0.04, 0.4, 0], dmg: 8, limb: 'handFx', rad: 6, fx: 'stun', stun: 0.3, push: 140, snd: 'punch', pose: PS.jpunch },
+    grab: { t: [0.07, 0.04, 0.26], grab: 1, keys: K([0, STANCE], [0.08, PS.grab], [0.2, PS.toss], [0.42, STANCE]) },
+    proj: { t: [0.2, 0.02, 0.24], spawn: 1, keys: K([0, STANCE], [0.13, PS.proj0], [0.2, PS.proj1], [0.36, PS.proj1], [0.46, STANCE]) },
   };
   const SP2 = {
-    rush: { t: [0.12, 0.43, 0.2], dmg: 11, box: [0, 38, 20, 96], fx: 'knock', vy: -320, vx: 280, speed: 330, snd: 'big' },
-    roll: { t: [0.1, 0.45, 0.2], dmg: 10, box: [-10, 30, 0, 44], fx: 'knock', vy: -300, vx: 240, speed: 340, snd: 'big' },
+    rush: { t: [0.1, 0.43, 0.2], dmg: 12, box: [0, 38, 20, 96], fx: 'knock', vy: -460, vx: 320, spin: 7, speed: 330, snd: 'big' },
+    roll: { t: [0.1, 0.45, 0.2], dmg: 11, box: [-10, 30, 0, 44], fx: 'knock', vy: -500, vx: 260, spin: 10, speed: 340, snd: 'big' },
     slide: { t: [0.1, 0.4, 0.25], dmg: 9, box: [0, 54, 0, 24], fx: 'trip', low: 1, speed: 360, snd: 'kick' },
-    leap: { t: [0.1, 0.9, 0.18], dmg: 12, box: [-6, 40, 0, 70], fx: 'knock', vy: -260, vx: 220, snd: 'big' },
+    leap: { t: [0.08, 0.9, 0.16], dmg: 13, box: [-6, 40, 0, 70], fx: 'knock', vy: -420, vx: 280, spin: 7, snd: 'big' },
     cloud: { t: [0.2, 0.3, 0.3], dmg: 5, box: [14, 74, 36, 104], fx: 'daze', snd: 'splat' },
-    burrow: { t: [0.6, 0.2, 0.3], dmg: 11, box: [-16, 32, 0, 120], fx: 'launch', vy: -520, vx: 120, snd: 'big' },
+    burrow: { t: [0.6, 0.2, 0.3], dmg: 12, box: [-16, 32, 0, 120], fx: 'launch', vy: -850, vx: 140, spin: 14, snd: 'big' },
   };
 
   // ---------- state ----------
@@ -116,8 +117,20 @@
     if (v.def.id === 'gertie') for (let i = 0; i < 3; i++) FX.gib('feather', x, y, rnd(-60, 60), rnd(-160, -40), { grav: 120, vr: rnd(-4, 4) });
   }
 
+  // extra gore on every connecting hit: wounds that stay on the body, teeth, chunks
+  function gore(v, x, y, dir, dmg, mv) {
+    if (v.def.id === 'golem') return;
+    const hh = hurtH(v), rel = (v.y - y) / hh;
+    const j = rel > 0.8 ? 'head' : rel > 0.55 ? 'chest' : rel > 0.35 ? 'belly' : 'leg';
+    const w = v.st2.wounds || (v.st2.wounds = []);
+    if (w.length < 18) w.push({ j: j === 'leg' ? 'knee' : j, dx: rnd(-4, 8), dy: rnd(-5, 5), r: rnd(1.4, 2.6) + dmg * 0.08, a: rnd(0, 3), drip: rnd(2, 7) });
+    if (j === 'head' && Math.random() < 0.5) for (let i = 0; i < 1 + (dmg > 9 ? 2 : 0); i++) FX.gib('tooth', x, y, dir * rnd(60, 200), rnd(-260, -120));
+    if (dmg >= 9) { for (let i = 0; i < (mv.upper ? 4 : 2); i++) FX.gib('chunk', x, y, dir * rnd(40, 220), rnd(-360, -120)); }
+    if (mv.upper || dmg >= 12) FX.blood(x, y, 30, dir, 2.2, 0.6);
+    if (Math.random() < 0.08 * dmg / 5) FX.drops(1 + (mv.upper ? 2 : 0));
+  }
   function startMove(f, mv) {
-    f.state = 'attack'; f.move = mv; f.mt = 0; f.hitDone = false; f.claws = 0;
+    f.state = 'attack'; f.move = mv; f.mt = 0; f.hitDone = false; f.claws = 0; f.snapPose = true;
     if (!mv.spawn && !mv.grab) SFX.whoosh();
   }
   function startSP2(f) {
@@ -128,7 +141,7 @@
     if (kind === 'cloud') SFX.splat();
   }
   function doJump(f, dirx) {
-    f.state = 'jump'; f.vy = -450; f.vx = dirx * 125 * f.def.stats.speed; f.airAtk = null; f.at = 0; SFX.whoosh();
+    f.state = 'jump'; f.vy = -660; f.vx = dirx * 165 * f.def.stats.speed; f.airAtk = null; f.at = 0; SFX.whoosh();
   }
 
   function applyHit(a, v, mv, blocked, cx, cy, proj) {
@@ -145,22 +158,23 @@
     if (v.state === 'dizzy' && game.phase === 'finish') { finishBlow(a, v, mv); return; }
     damage(v, dmg, a);
     SFX[mv.snd || 'punch']();
-    bleed(v, cx, cy, Math.round(dmg * 2.2), dir, mv.upper ? 1.6 : 1);
-    game.freeze = mv.upper ? 0.09 : 0.05;
+    bleed(v, cx, cy, Math.round(dmg * 5), dir, mv.upper ? 1.9 : 1.2);
+    gore(v, cx, cy, dir, dmg, mv);
+    game.freeze = mv.upper ? 0.11 : dmg >= 10 ? 0.08 : 0.055;
     if (mv.upper) { game.shake = 5; if (Math.random() < 0.14 && !game.toasty) { game.toasty = 1.4; SFX.squeak(); } }
     const heavy = v.def.stats.armor && (mv.fx === 'stun') && v.hp > 0;
     let fx = mv.fx;
     if (heavy) { v.flashT = 0.1; return; }
     if (v.state === 'air' || v.state === 'jump' || (v.state === 'attack' && v.move && v.move.airborne)) fx = fx === 'trip' ? 'trip' : fx === 'daze' ? 'knock' : (fx === 'stun' ? 'knock' : fx);
     const wt = v.def.stats.weight;
-    if (fx === 'stun') { v.state = 'hit'; v.st = 0; v.stunT = mv.stun; v.vx = dir * mv.push / wt; v.low = !!mv.low; v.move = null; }
+    if (fx === 'stun') { v.state = 'hit'; v.snapPose = true; v.st = 0; v.stunT = mv.stun; v.vx = dir * mv.push / wt; v.low = !!mv.low; v.move = null; }
     else if (fx === 'daze') { v.state = 'hit'; v.st = 0; v.vx = 0; v.daze = true; v.move = null; }
-    else if (fx === 'launch' || fx === 'knock') { launch(v, dir * (mv.vx != null ? mv.vx : 110) / wt, (mv.vy != null ? mv.vy : -240) / Math.sqrt(wt) * Math.pow(0.8, v.juggle)); }
-    else if (fx === 'trip') { launch(v, dir * 40, -170); v.spinRate = 14; }
+    else if (fx === 'launch' || fx === 'knock') { launch(v, dir * (mv.vx != null ? mv.vx : 160) / wt, (mv.vy != null ? mv.vy : -380) / Math.sqrt(wt) * Math.pow(0.82, v.juggle), mv.spin || 6); }
+    else if (fx === 'trip') { launch(v, dir * 70, -330, 9); }
     if (v.hp <= 0 && !v.finishing && game.phase !== 'fight' && game.phase !== 'finishwait') v.dead = true;
   }
-  function launch(v, vx, vy) {
-    v.state = 'air'; v.st = 0; v.vx = vx; v.vy = vy; v.juggle++; v.move = null; v.spinRate = 6 + rnd(0, 4); v.hidden = false; v.sink = 0;
+  function launch(v, vx, vy, spin = 7) {
+    v.state = 'air'; v.st = 0; v.vx = vx; v.vy = vy; v.juggle++; v.move = null; v.spinRate = spin * (0.9 + Math.random() * 0.2); v.hidden = false; v.sink = 0; v.bounced = false;
     if (v.y >= FLOOR - 0.5) v.y = FLOOR - 1;
   }
   function damage(v, amt, a) {
@@ -401,8 +415,8 @@
     const fwd = Math.sign(dx) * f.face >= 0 ? 'F' : 'B';
     if (game.phase === 'finish' && game.winner === f) {
       c.fatalT += dt;
-      if (c.fatalT > 1.1) {
-        if (c.fatalT < 1.15) c.doFatal = !!f.def.fatal && Math.random() < 0.65;
+      if (c.fatalT > 0.9) {
+        if (c.fatalT < 1.15) c.doFatal = !!f.def.fatal;
         if (c.doFatal) { startFatality(f, o); return out; }
         if (dist > 50) out.tok = 'F'; else out.P = true;
       }
@@ -467,20 +481,24 @@
     if (grounded(f) && (actionable(f) || f.state === 'dizzy') && Math.abs(o.x - f.x) > 2 && o.state !== 'held') f.face = Math.sign(o.x - f.x);
     switch (f.state) {
       case 'idle': case 'crouch': case 'block': case 'cblock': f.vx = 0; break;
-      case 'walk': f.vx = f.wdir * f.face * (f.wdir > 0 ? 95 : 80) * sp; f.wph += dt * 9 * sp * f.wdir; break;
+      case 'walk': f.vx = f.wdir * f.face * (f.wdir > 0 ? 140 : 118) * sp; f.wph += dt * 13 * sp * f.wdir; break;
       case 'jump': case 'air': {
         f.vy += GRAV * dt; f.x += f.vx * dt; f.y += f.vy * dt;
         if (f.state === 'air') f.spin += dt * (f.spinRate || 6);
         if (f.state === 'jump' && f.airAtk) { f.at += dt; const m = f.airAtk; if (!f.airHit && f.at > m.t[0] && f.at < m.t[0] + m.t[1]) tryHit(f, o, m); }
         if (f.y >= FLOOR && f.vy > 0) {
           f.y = FLOOR;
-          if (f.state === 'air') { f.state = 'down'; f.st = 0; f.vx = 0; SFX.thud(); FX.dust(f.x, FLOOR, 10); game.shake = Math.max(game.shake, 3); f.juggle = 0; if (f.hp <= 0 || f.dead) FX.blood(f.x, FLOOR - 4, 8, 0, 0.5); }
+          if (f.state === 'air') {
+            SFX.thud(); FX.dust(f.x, FLOOR, 14); FX.blood(f.x, FLOOR - 6, 18, Math.sign(f.vx), 0.9); game.shake = Math.max(game.shake, 4);
+            if (!f.bounced && f.vy > 420) { f.bounced = true; f.vy = -f.vy * 0.3; f.vx *= 0.65; f.spinRate *= 0.45; f.y = FLOOR - 1; }
+            else { f.state = 'down'; f.st = 0; f.vx *= 0.6; f.juggle = 0; }
+          }
           else { f.state = 'idle'; f.airAtk = null; SFX.land(); }
         }
         break;
       }
       case 'hit': f.vx *= 1 - dt * 8; if (f.st >= (f.daze ? 1.1 : f.stunT || 0.26)) { f.state = 'idle'; f.daze = false; } break;
-      case 'down': if (f.dead && !f.finishing) break; if (f.st > (f.finishing ? 0.9 : 0.7)) { f.state = 'getup'; f.st = 0; } break;
+      case 'down': f.vx *= 1 - dt * 6; if (f.dead && !f.finishing) break; if (f.st > (f.finishing ? 0.9 : 0.7)) { f.state = 'getup'; f.st = 0; } break;
       case 'getup': if (f.st > 0.35) { f.state = 'idle'; } break;
       case 'attack': updateAttack(f, o, dt); break;
       case 'held': break;
@@ -489,7 +507,7 @@
     }
     if (f.state === 'hit' && f.stunT == null) f.stunT = 0.26;
     if (f.bst > 0) { f.bst -= dt; f.x += f.bvx * dt; f.bvx *= 1 - dt * 10; }
-    if (!['jump', 'air'].includes(f.state)) f.x += f.vx * dt;
+    if (!['jump', 'air', 'attack'].includes(f.state) || (f.state === 'attack' && f.move && f.move.lunge)) f.x += f.vx * dt;
     if (f.finishing && ['idle', 'walk', 'crouch', 'block', 'cblock'].includes(f.state)) {
       if (f.bossDie) bossDeath(f);
       else { f.state = 'dizzy'; f.st = 0; game.phase = 'finish'; game.pt = 0; banner(f.def.him === 'IT' ? 'FINISH IT!' : 'FINISH ' + f.def.him + '!', { size: 34, fill: 'blood', life: 2.2 }); say('finish ' + f.def.him.toLowerCase()); }
@@ -519,6 +537,8 @@
       if (f.mt >= su + ac + rc) { f.state = 'idle'; f.grabbed = false; }
       return;
     }
+    if (m.lunge) f.vx = f.mt < su + ac ? f.face * m.lunge * (1 - f.mt / (su + ac)) : f.vx * (1 - dt * 12);
+    if (m.limb && !f.hitDone && f.mt >= su && f.mt <= su + ac) tryHit(f, o, m);
     if (m.spawn && !f.spawned && f.mt >= su) { f.spawned = true; spawnProj(f); }
     if (!m.spawn) f.spawned = false;
     if (k === 'rush' || k === 'roll' || k === 'slide') {
@@ -552,12 +572,25 @@
       if (m.airborne) { m.airborne = false; f.state = 'jump'; f.airAtk = MV.jkick; f.at = 9; }
     }
   }
+  // body targets for contact checks, built from the defender's current pose
+  const TGT = [['head', 10], ['chest', 12], ['belly', 12], ['hip', 11], ['kneeF', 7], ['kneeB', 7], ['footF', 6], ['footB', 6]];
+  function contact(f, o, m) {
+    const pose = m.keys ? R.track(f.d, m.keys, f.mt) : m.pose || f.pose;
+    const sp = R.jointWorld(f, pose, m.limb), k = f.d.k, ok = o.d.k;
+    let best = null, bd = 1e9;
+    for (const [j, r] of TGT) {
+      const p = R.jointWorld(o, o.pose, j), d = Math.hypot(p[0] - sp[0], p[1] - sp[1]) - (r * ok + m.rad * k);
+      if (d < bd) { bd = d; best = [(p[0] + sp[0]) / 2, (p[1] + sp[1]) / 2]; }
+    }
+    return bd < 0 ? best : null;
+  }
   function tryHit(f, o, m) {
     if (invuln(o) || o.state === 'script' || o.state === 'held') return;
-    const a = atkbox(f, m.box), b = hurtbox(o);
-    if (!overlap(a, b)) return;
+    let cx, cy;
+    if (m.limb) { const c = contact(f, o, m); if (!c) return; cx = c[0]; cy = c[1]; }
+    else { const a = atkbox(f, m.box), b = hurtbox(o); if (!overlap(a, b)) return; cx = (Math.max(a.x0, b.x0) + Math.min(a.x1, b.x1)) / 2; cy = (Math.max(a.y0, b.y0) + Math.min(a.y1, b.y1)) / 2; }
     if (m.air) f.airHit = true; else f.hitDone = true;
-    const cx = (Math.max(a.x0, b.x0) + Math.min(a.x1, b.x1)) / 2, cy = (Math.max(a.y0, b.y0) + Math.min(a.y1, b.y1)) / 2;
+    f.vx = 0;
     const facing = Math.sign(f.x - o.x) === o.face || Math.abs(f.x - o.x) < 3;
     const blocked = (o.state === 'block' || o.state === 'cblock') && facing && !(m.low && o.state === 'block' && false);
     applyHit(f, o, m, blocked, cx, cy);
@@ -632,7 +665,7 @@
       case 'cblock': return PS.cblock;
       case 'jump': return f.airAtk && f.at < f.airAtk.t[0] + f.airAtk.t[1] + 0.1 ? f.airAtk.pose : PS.jump;
       case 'hit': return f.daze ? PS.dizzy(t * 2) : f.low ? PS.hitLow : PS.hitHigh;
-      case 'air': return PS.air(-f.spin);
+      case 'air': return PS.air(-f.spin, f.t);
       case 'held': return PS.air(f.spin);
       case 'down': return PS.down(f);
       case 'getup': return PS.crouch;
@@ -655,14 +688,16 @@
   }
   function updatePose(f, dt) {
     const tgt = targetPose(f);
-    const fast = f.state === 'attack' || f.state === 'air' || f.state === 'held' || f.state === 'script' || f.state === 'jump';
-    const rate = f.snapPose ? 1 : Math.min(1, dt * (fast ? 32 : 16));
+    const fast = f.state === 'air' || f.state === 'held' || f.state === 'script' || f.state === 'jump' || f.state === 'hit';
+    const snap = f.snapPose || (f.state === 'attack' && f.move && f.move.keys) || f.state === 'air';
+    const rate = snap ? 1 : Math.min(1, dt * (fast ? 40 : 24));
     f.snapPose = false;
     const tr = R.resolve(f.d, tgt);
-    // spin angles should not blend the long way around
-    if (Math.abs(tr.rot - f.pose.rot) > PI) f.pose.rot = tr.rot;
+    // spin angles take the short way round
+    while (tr.rot - f.pose.rot > PI) f.pose.rot += 2 * PI;
+    while (tr.rot - f.pose.rot < -PI) f.pose.rot -= 2 * PI;
     f.pose = R.lerp(f.d, f.pose, tr, rate);
-    f.st2 = Object.assign(f.st2 || {}, { t: f.t, dead: f.dead && f.state !== 'script' ? true : f.st2.dead, hurt: ['hit', 'air', 'down'].includes(f.state) && !f.dead, claws: f.state === 'attack' });
+    f.st2 = Object.assign(f.st2 || {}, { wounds: f.st2.wounds || [], t: f.t, dead: f.dead && f.state !== 'script' ? true : f.st2.dead, hurt: ['hit', 'air', 'down'].includes(f.state) && !f.dead, claws: f.state === 'attack' });
   }
   function separate() {
     if (!p1 || !p2) return;
@@ -670,7 +705,7 @@
     const both = ['script', 'held'];
     if (both.includes(a.state) || both.includes(b.state) || a.hidden || b.hidden) return;
     const ha = a.y < FLOOR - 40 || b.y < FLOOR - 40;
-    const minD = halfW(a) + halfW(b) - 4;
+    const minD = (halfW(a) + halfW(b)) * 0.78;
     const dx = b.x - a.x;
     if (!ha && Math.abs(dx) < minD) {
       const push = (minD - Math.abs(dx)) / 2, s = dx >= 0 ? 1 : -1;
@@ -680,10 +715,11 @@
   function updateCam(dt) {
     if (game.phase === 'fatality') return;
     const mid = (p1.x + p2.x) / 2;
-    cam += (clamp(mid - W / 2, 0, AW - W) - cam) * Math.min(1, dt * 6);
+    cam += (clamp(mid - W / 2, 0, AW - W) - cam) * Math.min(1, dt * 10);
     for (const f of [p1, p2]) {
       if (f.state === 'script' || f.state === 'held') continue;
-      f.x = clamp(f.x, Math.max(14, cam + 12), Math.min(AW - 14, cam + W - 12));
+      const ext = (f.state === 'down' || f.state === 'air') ? -f.face * hurtH(f) * 0.45 : 0;
+      f.x = clamp(f.x + ext, Math.max(14, cam + W * 0.27), Math.min(AW - 14, cam + W * 0.73)) - ext;
     }
   }
 
@@ -780,7 +816,10 @@
     if (!f.ro.noShadow) { g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.ellipse(f.x, FLOOR + 1, halfW(f) * 1.4 * (1 - Math.min(0.6, (FLOOR - f.y) / 200)), 3.5, 0, 0, PI * 2); g.fill(); }
     const ro = Object.assign({}, f.ro);
     if (f.ro.scale) ro.scale = f.ro.scale;
-    R.draw(g, { def: f.def, d: f.d, x: f.x + (f.ro.dx || 0), y: f.y + (f.ro.dy || 0), face: f.face, t: f.t, st: f.st2 }, f.pose, ro);
+    const fx = f.x + (f.ro.dx || 0), fy = f.y + (f.ro.dy || 0);
+    R.digi(g, fx, fy, gg => R.draw(gg, { def: f.def, d: f.d, x: fx, y: fy, face: f.face, t: f.t, st: f.st2 }, f.pose, ro), { box: [50, 20, 280, 310], tint: f.ro.char ? [0.45, 0.35, 0.3] : null });
+    // the wounded keep bleeding
+    if (!f.hidden && f.hp < 70 && Math.random() < (1 - f.hp / 70) * 0.25 && f.state !== 'script') { const hp = R.jointWorld(f, f.pose, Math.random() < 0.5 ? 'head' : 'chest'); FX.blood(hp[0], hp[1], 1, 0, 0.15); }
     if (f.state === 'dizzy' || (f.state === 'hit' && f.daze)) {
       const hp = R.jointWorld(f, f.pose, 'head');
       for (let i = 0; i < 3; i++) { const a = f.t * 4 + i * 2.1; g.fillStyle = '#ffe040'; g.font = '9px Anton, Impact, sans-serif'; g.fillText('*', hp[0] + Math.cos(a) * 12 - 2, hp[1] - 12 + Math.sin(a) * 3); }
@@ -846,7 +885,7 @@
     }
     if (game.toasty > 0) {
       const u = game.toasty > 1.1 ? (1.4 - game.toasty) / 0.3 : game.toasty < 0.3 ? game.toasty / 0.3 : 1;
-      const x = W - 46 * u + 8, y = H - 50;
+      const x = W - 46 * u + 8, y = H - 128;
       R.drawHeadAt(ctx, { def: ROSTER.ALL.hippo, d: ROSTER.ALL.hippo.dk }, x, y + 34, -0.2, 1.4, { t: game.time });
       TXT.draw(ctx, 'SQUARE SLICED!', x - 6, y - 6, { size: 11, align: 'right', fill: 'purple' });
     }
@@ -922,7 +961,7 @@
     // big preview on the left
     const f = { def, d: def.dk, x: 66, y: 196, face: 1, t };
     g.fillStyle = 'rgba(0,0,0,0.5)'; g.beginPath(); g.ellipse(66, 197, 30, 5, 0, 0, PI * 2); g.fill();
-    R.draw(g, f, PS.stance(t), {});
+    R.digi(g, f.x, f.y, gg => R.draw(gg, f, PS.stance(t), {}));
     TXT.draw(g, def.name, gx + 2 * (cw + 4) - 2, gy + 2 * (chh + 4) + 2, { size: 17, align: 'center', fill: 'fire' });
     const words = def.bio.split(' '); let line = '', ly = gy + 2 * (chh + 4) + 26; const maxW = 4 * (cw + 4) - 6;
     for (const wd of words) { const tr = line ? line + ' ' + wd : wd; if (TXT.width(g, tr, 9) > maxW) { TXT.draw(g, line, gx + 2 * (cw + 4) - 2, ly, { size: 9, align: 'center', fill: 'white', italic: false }); line = wd; ly += 12; } else line = tr; }
@@ -969,7 +1008,7 @@
     }
     const me = ROSTER.FIGHTERS[ladder.pick], op = ladder.opps[ladder.rung];
     const f1 = { def: me, d: me.dk, x: 70, y: 196, face: 1, t }, f2 = { def: op, d: op.dk, x: 230, y: 196, face: -1, t: t + 1 };
-    R.draw(g, f1, PS.stance(t)); R.draw(g, f2, PS.stance(t + 1));
+    R.digi(g, f1.x, f1.y, gg => R.draw(gg, f1, PS.stance(t))); R.digi(g, f2.x, f2.y, gg => R.draw(gg, f2, PS.stance(t + 1)));
     TXT.draw(g, 'VS', 150, 110, { size: 30, align: 'center', fill: 'fire' });
     TXT.draw(g, 'BATTLE ' + (ladder.rung + 1) + ' OF ' + n, 150, 34, { size: 14, align: 'center', fill: 'white' });
     TXT.draw(g, STAGES.get(ladder.stages[ladder.rung]).name, 150, 52, { size: 11, align: 'center', fill: 'purple' });
@@ -995,7 +1034,7 @@
     const g = ctx, t = game.time, def = ROSTER.FIGHTERS[ladder.pick];
     if (Math.random() < 0.6) FX.blood(rnd(0, W), -4, 1, 0, 0.2);
     FX.setFloor(H + 20); FX.update(1 / 60); FX.drawParts(g); FX.setFloor(FLOOR);
-    R.draw(g, { def, d: def.dk, x: W / 2, y: 206, face: 1, t }, PS.win(t));
+    R.digi(g, W / 2, 206, gg => R.draw(gg, { def, d: def.dk, x: W / 2, y: 206, face: 1, t }, PS.win(t)));
     TXT.draw(g, def.name, W / 2, 10, { size: 30, align: 'center', fill: 'fire' });
     TXT.draw(g, 'IS THE CHAMPION OF', W / 2, 46, { size: 14, align: 'center', fill: 'white' });
     TXT.draw(g, 'MUNCIE KOMBAT', W / 2, 62, { size: 24, align: 'center', fill: 'blood' });

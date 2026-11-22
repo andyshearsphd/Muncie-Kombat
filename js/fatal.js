@@ -105,7 +105,8 @@ const FATAL = (() => {
     s.at(0.6, () => {
       A.scriptPose = raise(2.75); A.snapPose = true;
       const hh = api.hurtH(V);
-      easel = prop({ layer: 'back', x: A.x + A.face * 108 * k, y: F - 82, splats: [], draw(g, p) {
+      const hd = R.jointWorld(A, R.resolve(A.d, raise(2.75)), 'handF'), Lh = hh * 0.95;
+      easel = prop({ layer: 'back', x: hd[0] + A.face * (Math.sin(1.2) * Lh + 12), y: hd[1] + Math.cos(1.2) * Lh + 2, splats: [], draw(g, p) {
         g.fillStyle = '#5a3a1a';
         R.line(g, p.x - 12, F, p.x - 4, p.y - 26, '#6a4422', 2.5); R.line(g, p.x + 12, F, p.x + 4, p.y - 26, '#6a4422', 2.5); R.line(g, p.x, F - 4, p.x, p.y - 30, '#5a3a1a', 2);
         g.fillStyle = '#f4f0e4'; g.fillRect(p.x - 17, p.y - 22, 34, 40);
@@ -430,6 +431,69 @@ const FATAL = (() => {
       if (t < 2.9) { fallU = Math.min(1, ((t - 2.1) / 0.8) ** 2); A.scriptPose = PS.stance(A.t); V.scriptPose = P({ rot: -PI / 2 * fallU, piv: 1, hy: 0, lean: 0, aF: [2.5, 0.2], aB: [2.3, 0.3], fF: [6, 0], fB: [-6, 0] }); return; }
       if (t < 4.6) { A.scriptPose = PS.stance(A.t); V.scriptPose = P({ rot: -PI / 2, piv: 1, hy: 0, aF: [2.5, 0.2], aB: [2.3, 0.3], fF: [6, 0], fB: [-6, 0] }); return; }
       A.scriptPose = PS.win(A.t);
+    };
+  };
+
+
+  // ---------- BALL JAR GOLEM: Canning Season ----------
+  S.golem = (s, A, V, api) => {
+    const PS = api.PS, k = A.d.k, F = api.FLOOR;
+    let lifted = false, slammed = false;
+    s.at(0.6, () => { lifted = true; api.sfx('scream'); });
+    s.at(0.95, () => { A.scriptPose = P({ hy: 2, lean: 0.35, aF: [1.0, 0.2], aB: [0.8, 1.4], fF: [16, 0], fB: [-12, 0] }); A.snapPose = true; api.sfx('big'); FX.blood(V.x, V.y - api.hurtH(V) * 0.85, 30, A.face, 1.3); FX.gib('tooth', V.x, V.y - 100, A.face * 150, -250); });
+    s.at(1.2, () => {
+      lifted = false; slammed = true; V.x = A.x + A.face * 10 * k; V.y = F; V.scriptPose = PS.down(V); V.snapPose = true;
+      api.sfx('thud'); api.sfx('crunch'); api.shake(8); FX.blood(V.x + A.face * 20, F - 6, 40, 0, 1.2); FX.dust(V.x, F, 20);
+    });
+    const stomp = (t0, big) => s.at(t0, () => {
+      api.sfx('thud'); api.sfx('crunch'); api.sfx('splat'); api.shake(big ? 11 : 7); api.flash();
+      V.ro.flat = big ? 0.16 : 0.5;
+      const x = V.x + A.face * 30 * V.d.k;
+      FX.blood(x, F - 4, big ? 130 : 50, 0, 1.6, 1.4); FX.blood(x, F - 4, 40, A.face, 1.4); FX.blood(x, F - 4, 40, -A.face, 1.4);
+      if (big) { FX.burst(x, F - 6, 18, ['eye', 'eye', 'guts', 'guts', 'heart', 'brain', 'skullfrag', 'bone', 'chunk', 'liver', 'kidney', 'tooth'], 1.3); FX.drops(6); }
+    });
+    stomp(2.0, false); stomp(2.7, true);
+    s.at(3.3, () => api.bubble('PRESERVED.', A.x, F - 190, { size: 15, fill: 'white', life: 1.8 }));
+    s.at(4.6, () => { s.done = true; });
+    const raise = P({ hy: 0, lean: -0.15, aF: [1.2, 1.2], aB: [0.8, 1.4], lF: [1.7, 1.5], fB: [-8, 0] });
+    const plant = P({ hy: 4, lean: 0.2, aF: [0.9, 1.3], aB: [0.6, 1.5], fF: [24, 0], fB: [-10, 0] });
+    s.tick = (t, dt) => {
+      if (t < 0.6) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 30 * k, dt, api, 80); return; }
+      if (lifted) { A.scriptPose = P({ hy: 2, lean: 0.1, aF: [2.2, 0.3], aB: [0.8, 1.4], fF: [14, 0], fB: [-12, 0] }); V.scriptPose = PS.hitHigh || PS.dizzy(V.t); return; }
+      if (!slammed) return;
+      if (t < 1.75) { A.scriptPose = P({ hy: 6, lean: 0.4, aF: [1.0, 0.3], aB: [0.8, 0.4], fF: [14, 0], fB: [-12, 0] }); return; }
+      if (t < 2.0 || (t > 2.25 && t < 2.7)) { A.scriptPose = raise; return; }
+      A.scriptPose = t < 3.2 ? plant : PS.win(A.t);
+      if (t < 3.4 && Math.random() < 0.3) FX.blood(V.x + A.face * 30 * V.d.k, F - 3, 2, 0, 0.4);
+    };
+  };
+
+  // ---------- DEVIL DAN: Hellfire Pillar ----------
+  S.dan = (s, A, V, api) => {
+    const PS = api.PS, F = api.FLOOR;
+    s.at(0.5, () => { api.sfx('fire'); api.sfx('scream'); api.shake(4); });
+    s.at(1.2, () => { V.ro.char = true; api.sfx('fire'); });
+    s.at(2.0, () => { V.ro.skeleton = true; V.ro.gore = true; api.sfx('crunch'); });
+    s.at(2.8, () => {
+      V.hidden = true; api.sfx('crunch'); api.shake(5);
+      const hh = api.hurtH(V);
+      for (let i = 0; i < 16; i++) FX.gib(i % 5 ? 'bone' : 'skullfrag', V.x + FX.rnd(-8, 8), F - FX.rnd(10, hh), FX.rnd(-90, 90), FX.rnd(-160, -20));
+      FX.gib('skull', V.x, F - hh * 0.8, A.face * -40, -120, { draw: (g) => R.skull(g, 0, 0, 7 * V.d.k, 0) });
+      FX.puff(V.x, F - 30, 'rgba(40,30,30,0.8)', 30, 7);
+    });
+    s.at(3.2, () => api.bubble('YOUR SOUL IS MINE.', A.x, F - 175, { size: 13, fill: 'fire', life: 2 }));
+    s.at(4.6, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (t < 0.4) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 70, dt, api, 80); return; }
+      A.scriptPose = P({ hy: 2, lean: -0.2, aF: [2.7 + Math.sin(t * 6) * 0.1, 0.4], aB: [2.6, 0.4], fF: [12, 0], fB: [-12, 0] });
+      if (t < 2.6) {
+        const hh = api.hurtH(V);
+        for (let i = 0; i < 6; i++) FX.fire(V.x + FX.rnd(-14, 14), F - FX.rnd(0, hh * 1.1), 1, 1.5);
+        FX.fire(V.x, F, 3, 2);
+        if (Math.random() < 0.3) FX.blood(V.x, F - hh * 0.6, 2, 0, 0.6);
+        V.ro.dx = FX.rnd(-1.5, 1.5);
+        V.scriptPose = t < 2.0 ? P({ hy: 4, lean: -0.3, head: -0.6, aF: [2.6 + Math.sin(t * 19) * 0.5, 0.4], aB: [2.4 + Math.cos(t * 17) * 0.5, 0.5], fF: [9, 0], fB: [-9, 0] }) : P({ hy: 10 + (t - 2) * 20, lean: 0.3, aF: [0.4, 0.3], aB: [0.3, 0.3], fF: [9, 0], fB: [-9, 0] });
+      }
     };
   };
 
