@@ -249,6 +249,13 @@ const RIG = (() => {
     const gr = g.createLinearGradient(0, -h, 0, h * 1.4); gr.addColorStop(0, shade(c, 0.25)); gr.addColorStop(0.5, c); gr.addColorStop(1, shade(c, -0.6));
     g.fillStyle = gr;
     if (def.webbed) { g.beginPath(); g.moveTo(-h * 0.3, -h * 0.3); g.lineTo(l * 0.95, h * 0.9); g.lineTo(l * 0.6, h * 1.2); g.lineTo(l * 0.75, h * 1.5); g.lineTo(-h * 0.5, h * 0.8); g.closePath(); g.fill(); }
+    else if (def.talons) {
+      g.strokeStyle = c; g.lineCap = 'round';
+      for (let i = 0; i < 3; i++) { g.lineWidth = h * 0.62; g.beginPath(); g.moveTo(0, h * 0.4); g.lineTo(l * (0.75 + i * 0.12), h * (0.5 + i * 0.32)); g.stroke(); }
+      g.beginPath(); g.moveTo(0, h * 0.4); g.lineTo(-l * 0.35, h * 1.0); g.stroke();
+      g.strokeStyle = '#141010'; g.lineWidth = 0.9; for (let i = 0; i < 3; i++) { const tx = l * (0.75 + i * 0.12), ty = h * (0.5 + i * 0.32); g.beginPath(); g.moveTo(tx, ty); g.lineTo(tx + 2.2, ty + 1.6); g.stroke(); }
+      g.beginPath(); g.moveTo(-l * 0.35, h * 1.0); g.lineTo(-l * 0.35 - 2, h * 1.0 + 1.4); g.stroke(); g.lineCap = 'butt';
+    }
     else if (def.paws) { g.beginPath(); g.ellipse(l * 0.35, h * 0.55, l * 0.58, h * 0.85, 0.08, 0, PI * 2); g.fill(); g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 0.6; for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(l * 0.7 + i * 1.3, h * 0.1); g.lineTo(l * 0.75 + i * 1.3, h * 1.2); g.stroke(); } }
     else {
       g.beginPath(); g.moveTo(-h * 0.9, -h * 0.6); g.quadraticCurveTo(l * 0.2, -h * 1.0, l * 0.55, -h * 0.2); g.quadraticCurveTo(l * 0.95, h * 0.2, l * 0.95, h * 0.9); g.lineTo(-h * 0.9, h * 1.0); g.closePath(); g.fill();
@@ -409,11 +416,13 @@ const RIG = (() => {
         dd[i] = Math.round(r / step) * step; dd[i + 1] = Math.round(gg / step) * step; dd[i + 2] = Math.round(b / step) * step;
       }
     }
-    // darken the outer edge pixels so sprites read like cut-out photos
     for (let yy = 1; yy < bh - 1; yy++) for (let xx = 1; xx < bw - 1; xx++) {
       const i = (yy * bw + xx) * 4;
       if (!dd[i + 3]) continue;
-      if (!dd[i + 3 - 4] || !dd[i + 3 + 4] || !dd[i + 3 - bw * 4] || !dd[i + 3 + bw * 4]) { dd[i] *= 0.45; dd[i + 1] *= 0.45; dd[i + 2] *= 0.45; }
+      // a cool rim light on the outline keeps dark fighters readable against dark arenas
+      const up = !dd[i + 3 - bw * 4] || (yy > 1 && !dd[i + 3 - bw * 8]), side = !dd[i + 3 - 4] || !dd[i + 3 + 4], down = !dd[i + 3 + bw * 4];
+      if (up || side) { const k = up ? 0.55 : 0.4; dd[i] += (190 - dd[i]) * k; dd[i + 1] += (198 - dd[i + 1]) * k; dd[i + 2] += (220 - dd[i + 2]) * k; }
+      else if (down) { dd[i] *= 0.5; dd[i + 1] *= 0.5; dd[i + 2] *= 0.5; }
     }
     dg.putImageData(img, bx0, by0);
     g.drawImage(dcv, Math.round(x) - DAX, Math.round(y) - DAY);
@@ -443,7 +452,14 @@ const RIG = (() => {
   function skull(g, x, y, r, rot, type) {
     g.save(); g.translate(x, y); g.rotate(rot || 0);
     const D = '#1a1010', socket = (sx, sy, rx, ry) => { g.fillStyle = D; g.beginPath(); g.ellipse(sx, sy, rx, ry, 0, 0, PI * 2); g.fill(); };
-    if (type === 'goose') {
+    if (type === 'cardinal' || type === 'turkey') {
+      ball(g, 0, -r * 0.15, r * 0.85, BONE);
+      const bl = type === 'cardinal' ? 1.35 : 1.2;
+      poly(g, [[r * 0.5, -r * 0.55], [r * (0.6 + bl), -r * 0.05], [r * 0.55, r * 0.35]], BONE);
+      poly(g, [[r * 0.5, r * 0.35], [r * (0.4 + bl * 0.8), r * 0.05], [r * 0.4, r * 0.6]], '#d8ceb4');
+      if (type === 'turkey') poly(g, [[r * (0.5 + bl), -r * 0.1], [r * (0.65 + bl), r * 0.15], [r * (0.45 + bl), r * 0.1]], BONE);
+      socket(r * 0.1, -r * 0.2, r * 0.42, r * 0.4);
+    } else if (type === 'goose') {
       ball(g, 0, -r * 0.1, r * 0.75, BONE);
       poly(g, [[r * 0.4, -r * 0.45], [r * 2.6, -r * 0.05], [r * 2.7, r * 0.12], [r * 0.5, r * 0.25]], BONE);
       poly(g, [[r * 0.5, r * 0.3], [r * 2.4, r * 0.2], [r * 0.4, r * 0.55]], '#d8ceb4');

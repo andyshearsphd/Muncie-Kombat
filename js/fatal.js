@@ -327,36 +327,56 @@ const FATAL = (() => {
     };
   };
 
-  // ---------- ROCKY: Rabies ----------
+  // ---------- ROCKY: Rabies (drag the leftovers to the dumpster) ----------
   S.rocky = (s, A, V, api) => {
-    const PS = api.PS, F = api.FLOOR;
-    let x0, nextChomp = 0.6, dump = null, tossed = null;
+    const PS = api.PS, F = api.FLOOR, k = A.d.k;
+    let x0, nextChomp = 0.6, dragFrom = 0, skel = null, nextFoam = 0;
+    const dumpX = Math.max(api.cam + 56, Math.min(api.cam + api.W - 56, A.x - A.face * 130));
+    const DW = 44, DH = 46, back = -A.face;
+    const dump = { x: dumpX, lid: 0 };
+    const box = (g, x) => {
+      g.fillStyle = '#1e4a2a'; g.fillRect(x - DW, F - DH, DW * 2, DH);
+      g.fillStyle = '#2a6a3a'; g.fillRect(x - DW - 2, F - DH, DW * 2 + 4, 4);
+      g.fillStyle = '#143220'; for (let i = -DW + 6; i < DW; i += 9) g.fillRect(x + i, F - DH + 7, 1.6, DH - 12);
+      g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(x - DW, F - 8, DW * 2, 8);
+      g.fillStyle = '#3a2a10'; g.fillRect(x - 20, F - 30, 40, 9);
+      g.fillStyle = '#e8e0c0'; g.font = '7px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillText('CITY OF MUNCIE', x, F - 23); g.textAlign = 'left';
+      R.ball(g, x - DW + 6, F - 2, 3, '#111'); R.ball(g, x + DW - 6, F - 2, 3, '#111');
+    };
+    // lid raised behind the box, then the box face in front (so whatever goes in disappears)
+    prop({ layer: 'back', draw(g) {
+      g.fillStyle = '#0c140e'; g.fillRect(dump.x - DW, F - DH - 2, DW * 2, 4);
+      if (dump.lid > 0.05) { g.save(); g.translate(dump.x + back * DW, F - DH); g.rotate(back * dump.lid * 1.5); g.fillStyle = '#2a2a2e'; g.fillRect(back > 0 ? -DW * 2 - 2 : 0, -3, DW * 2 + 2, 4); g.restore(); }
+    } });
+    prop({ layer: 'front', draw(g) {
+      box(g, dump.x);
+      if (dump.lid <= 0.05) { g.fillStyle = '#2a2a2e'; g.fillRect(dump.x - DW - 2, F - DH - 4, DW * 2 + 4, 4); }
+    } });
     s.at(0.25, () => { x0 = A.x; api.sfx('scream'); });
     s.at(2.4, () => {
       V.ro.skeleton = true; V.ro.gore = true; api.sfx('crunch'); api.shake(5);
       const c = J(V, 'chest'); FX.blood(c[0], c[1], 50, 0, 1.3); FX.burst(c[0], c[1], 10, ['chunk', 'chunk', 'guts', 'heart', 'eye'], 1);
-      A.y = F; A.x = V.x - A.face * 26; A.snapPose = true;
+      A.y = F; A.x = V.x - A.face * 30; A.snapPose = true;
     });
-    s.at(2.7, () => {
-      dump = prop({ layer: 'back', x: Math.max(api.cam + 40, Math.min(api.cam + api.W - 40, A.x - A.face * 76)), y: -60, lid: 0, update(p, dt) { if (p.y < F) { p.y = Math.min(F, p.y + dt * 600); if (p.y >= F) { api.sfx('clang'); api.shake(5); FX.dust(p.x, F, 14); } } }, draw(g, p) {
-        const y = p.y;
-        g.fillStyle = '#1e4a2a'; g.fillRect(p.x - 30, y - 40, 60, 40); g.fillStyle = '#2a6a3a'; g.fillRect(p.x - 30, y - 40, 60, 4);
-        g.fillStyle = '#143220'; for (let i = -24; i < 30; i += 8) g.fillRect(p.x + i, y - 34, 1.5, 32);
-        g.fillStyle = '#f0f0f0'; g.font = '7px Anton, Impact, sans-serif'; g.fillText('CITY OF MUNCIE', p.x - 24, y - 16);
-        g.save(); g.translate(p.x - 31, y - 41); g.rotate(-p.lid * 1.2); g.fillStyle = '#2a2a2e'; g.fillRect(0, -3, 62, 4); g.restore();
+    s.at(2.5, () => { V.scriptPose = PS.down(V); });
+    s.at(2.95, () => { api.sfx('thud'); FX.dust(V.x, F, 10); });
+    s.at(3.05, () => { dragFrom = A.x; api.sfx('squeak'); });
+    s.at(4.35, () => { A.face = back; A.snapPose = true; dump.lid = 1; api.sfx('clang'); });
+    s.at(4.4, () => {
+      V.hidden = true;
+      const hh = api.hurtH(V), pose = P({ aF: [2.7, 0.3], aB: [2.4, 0.4], lF: [0.15, 0.1], lB: [-0.1, 0.15], head: 0.2 });
+      skel = FX.gib('skel', V.x, F - 6, 0, 0, { trail: false, draw: (g, o) => { g.save(); g.rotate(-o.rot); g.translate(-o.x, -o.y); g.beginPath(); g.rect(o.x - 300, o.y - 400, 600, 400 + (F - 3 - o.y)); g.clip(); g.translate(o.x, o.y); g.rotate(o.rot); R.draw(g, { def: V.def, d: V.d, x: 0, y: hh * 0.5, face: 1, t: 0 }, pose, { skeleton: true, gore: true }); g.restore(); }, follow: () => {
+        const t = s.t, hd = J(A, 'head'), over = [A.x + A.face * 6, hd[1] - 22 * k], top = [dump.x, F - DH - 26], bot = [dump.x, F + hh * 0.45];
+        if (t < 4.85) { const u = ease((t - 4.4) / 0.45); return [lerp(V.x, over[0], u), lerp(F - 6, over[1], u), lerp(-A.face * PI / 2, A.face * PI / 2, u)]; }
+        if (t < 5.2) { const u = ease((t - 4.85) / 0.35); return [lerp(over[0], top[0], u), lerp(over[1], top[1], u), A.face * (PI / 2 + u * 0.75)]; }
+        const u = Math.min(1, ((t - 5.2) / 0.5) ** 1.6); return [top[0], lerp(top[1], bot[1], u), A.face * (PI / 2 + 0.75 + u * 0.75)];
       } });
     });
-    s.at(3.0, () => { A.face = -A.face; });
-    s.at(4.0, () => {
-      V.hidden = true; api.sfx('whoosh');
-      const hh = api.hurtH(V);
-      const pose = P({ aF: [2.6, 0.5], aB: [2.2, 0.6], lF: [0.5, 0.4], lB: [-0.3, 0.4] });
-      tossed = FX.gib('skel', V.x, F - hh * 0.5, (dump.x - V.x) / 0.55, -420, { grav: 1300, vr: 8, trail: false, draw: (g) => R.draw(g, { def: V.def, d: V.d, x: 0, y: hh * 0.5, face: 1, t: 0 }, pose, { skeleton: true, gore: true }), onUpdate: (o) => { if (o.vy > 0 && o.y > F - 46 && Math.abs(o.x - dump.x) < 40) { o.dead = true; api.sfx('crunch'); } } });
-      dump.lid = 1;
-    });
-    s.at(4.7, () => { dump.lid = 0; api.sfx('clang'); api.shake(4); });
-    s.at(5.0, () => { A.x = dump.x; A.y = F - 40; A.face = -A.face; A.snapPose = true; api.bubble('HEH HEH HEH', A.x, F - 130, { size: 12, fill: 'white', life: 1.4 }); });
-    s.at(6.0, () => { s.done = true; });
+    s.at(5.6, () => { api.sfx('crunch'); api.shake(4); FX.blood(dump.x, F - DH, 16, 0, 0.8); FX.gib('bone', dump.x, F - DH - 4, rnd(-90, 90), -260, { s: 0.5 }); });
+    s.at(5.9, () => { dump.lid = 0; api.sfx('clang'); api.shake(5); if (skel) skel.dead = true; });
+    s.at(6.4, () => { api.sfx('land'); api.shake(2); });
+    s.at(6.55, () => api.bubble('HEH HEH HEH', dump.x, F - 150, { size: 12, fill: 'white', life: 1.6 }));
+    s.at(7.6, () => { s.done = true; });
     s.tick = (t, dt) => {
       if (t < 0.25) { V.scriptPose = PS.dizzy(V.t); A.scriptPose = PS.crouch; return; }
       const hh = api.hurtH(V);
@@ -373,15 +393,177 @@ const FATAL = (() => {
         return;
       }
       V.ro.dx = 0; A.ro.claws = false;
-      if (t < 3.0) { A.scriptPose = PS.stance(A.t); V.scriptPose = P({ hy: 8, lean: 0.1, aF: [0.3, 0.2], aB: [0.2, 0.2], fF: [9, 0], fB: [-10, 0] }); return; }
-      if (t < 4.0 && dump) {
-        walkTo(A, dump.x + A.face * -36, dt, api, 70);
-        V.x = A.x - A.face * 26; V.scriptPose = P({ rot: V.face * 0, lean: -0.5, hy: 4, aF: [2.6, 0.2], aB: [0.3, 0.2], fF: [14, -2], fB: [6, -2] });
-        A.scriptPose = Object.assign({}, A.scriptPose, { aB: [1.9, 0.2] });
+      const grip = () => { const fp = J(V, 'footF'), hp = J(A, 'handF'); V.x += hp[0] - fp[0]; };
+      if (t < 3.05) {
+        // the skeleton folds to the ground, Rocky steps to its feet and reaches for an ankle
+        if (t > 2.5) { const fp = J(V, 'footF'); walkTo(A, fp[0] - A.face * 14 * k, dt, api, 90); }
+        if (t > 2.85) A.scriptPose = P({ hy: 12, lean: 0.8, head: 0.3, aF: [0.45, 0.2], aB: [1.0, 1.2], fF: [12, 0], fB: [-14, 0] });
         return;
       }
-      if (t < 5.0) { A.scriptPose = PS.win(A.t); return; }
-      A.scriptPose = PS.stance(A.t);
+      if (t < 4.35) {
+        // drag it backward to the dumpster by one ankle
+        const u = ease((t - 3.05) / 1.3), tx = dump.x - back * (DW + 22 * k);
+        A.x = lerp(dragFrom, tx, u);
+        A.wph = (A.wph || 0) - dt * 7;
+        A.scriptPose = Object.assign({}, PS.walk(A.wph), { hy: 12, lean: 0.75 + Math.sin(t * 14) * 0.05, head: 0.3, aF: [0.5, 0.15], aB: [1.1, 1.3] });
+        grip();
+        if (Math.random() < 0.5) FX.dust(V.x, F, 1);
+        if (Math.random() < 0.25) FX.blood(V.x, F - 3, 1, 0, 0.3);
+        return;
+      }
+      if (t < 5.2) { A.scriptPose = P({ hy: 4, lean: -0.15 + (t > 4.85 ? 0.35 : 0), head: 0.1, aF: [2.85 - (t > 4.85 ? 0.5 : 0), 0.15], aB: [2.75 - (t > 4.85 ? 0.5 : 0), 0.2], fF: [13, 0], fB: [-14, 0] }); return; }
+      if (t < 6.1) { A.scriptPose = P({ hy: 6, lean: 0.45, head: 0.3, aF: [2.0, 0.4], aB: [1.9, 0.4], fF: [13, 0], fB: [-14, 0] }); return; }
+      if (t < 6.4) {
+        const u = (t - 6.1) / 0.3, sx = dump.x - back * (DW + 22 * k);
+        A.x = lerp(sx, dump.x, u); A.y = lerp(F, F - DH - 4, u) - Math.sin(u * PI) * 36; A.scriptPose = PS.jump; return;
+      }
+      A.x = dump.x; A.y = F - DH - 4;
+      A.scriptPose = P({ hy: 6, lean: 0.2 + Math.sin(t * 9) * 0.06, head: -0.2, jaw: 0.4 + Math.abs(Math.sin(t * 7)) * 0.4, aF: [1.6 + Math.sin(t * 8) * 0.3, 0.8], aB: [1.4, 1.0], fF: [12, 0], fB: [-12, 0] });
+      if (t > nextFoam) { nextFoam = t + 0.06; const h = J(A, 'head'); FX.puff(h[0] + A.face * 9 * k, h[1] + 4, 'rgba(240,240,230,0.9)', 1, 1.2); FX.gib('chunk', h[0] + A.face * 9 * k, h[1] + 4, rnd(-30, 30), rnd(-60, 0), { s: 0.25, draw: (g) => R.ball(g, 0, 0, 1.6, '#f4f4ea') }); }
+    };
+  };
+
+  // ---------- CHUCKY: Early Bird ----------
+  S.chucky = (s, A, V, api) => {
+    const PS = api.PS, F = api.FLOOR, k = A.d.k;
+    let rope = 0, slurp = 0, fell = false, nextTug = 1.3, out = false, from = 0;
+    const beak = () => { const h = J(A, 'head'); return [h[0] + A.face * 15 * k, h[1] - 1 * k]; };
+    prop({ layer: 'front', draw(g) {
+      if (!out) return;
+      const b = beak(), e0 = J(V, 'belly'), e = [lerp(e0[0], b[0], slurp), lerp(e0[1], b[1], slurp)];
+      const dist = Math.hypot(b[0] - e[0], b[1] - e[1]), sag = Math.max(2, rope - dist) * 0.8 + 3;
+      const mx = (b[0] + e[0]) / 2, my = Math.max(b[1], e[1]) + sag;
+      for (const [w, c] of [[4.2, '#5a0a14'], [3, '#c8606a'], [1, 'rgba(255,200,200,0.6)']]) {
+        g.strokeStyle = c; g.lineWidth = w; g.lineCap = 'round'; g.beginPath(); g.moveTo(e[0], e[1]);
+        for (let i = 1; i <= 16; i++) { const u = i / 16, x = (1 - u) * (1 - u) * e[0] + 2 * (1 - u) * u * mx + u * u * b[0], y = (1 - u) * (1 - u) * e[1] + 2 * (1 - u) * u * my + u * u * b[1] + Math.sin(u * 18 + s.t * 20) * 1.2; g.lineTo(x, y); }
+        g.stroke();
+      }
+      g.lineCap = 'butt';
+      if (Math.random() < 0.3) FX.blood(e[0], e[1], 1, 0, 0.3);
+    } });
+    s.at(0.8, () => { api.sfx('chirp'); });
+    s.at(1.05, () => { out = true; api.sfx('slash'); api.sfx('splat'); api.shake(5); const b = J(V, 'belly'); FX.blood(b[0], b[1], 40, -A.face, 1.3); FX.spurt(b[0], b[1], -A.face, 1); V.ro.gore = true; from = A.x; });
+    s.at(2.6, () => { fell = true; V.scriptPose = PS.downFace(V); api.sfx('thud'); });
+    s.at(3.0, () => { FX.dust(V.x, F, 14); api.shake(4); });
+    s.at(3.15, () => { api.sfx('slurp'); });
+    s.at(4.0, () => { out = false; api.sfx('gulp'); api.sfx('chirp'); });
+    s.at(4.3, () => api.bubble('THE EARLY BIRD GETS THE WORM.', A.x, F - 140, { size: 11, fill: 'white', life: 2 }));
+    s.at(5.6, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (t < 0.55) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 30 * k, dt, api, 110); return; }
+      if (t < 1.05) { A.scriptPose = P({ hy: 6, lean: -0.35, head: -0.5, aF: [1.0, 1.4], aB: [0.4, 1.6], fF: [14, 0], fB: [-16, 0] }); return; }
+      if (!fell) {
+        V.scriptPose = P({ hy: 8, lean: 0.35, head: 0.4, aF: [1.3 + Math.sin(t * 13) * 0.2, 1.6], aB: [1.1, 1.8], fF: [10, 0], fB: [-10, 0] });
+        V.ro.dx = rnd(-0.8, 0.8);
+      } else V.ro.dx = 0;
+      if (t < 1.3) { A.scriptPose = P({ hy: 10, lean: 1.0, head: 0.6, aF: [0.9, 0.3], aB: [0.6, 0.4], fF: [18, 0], fB: [-12, 0] }); rope = 8; return; }
+      if (t < 3.15) {
+        // back-pedal and tug, the worm stretching out of the belly
+        const u = ease((t - 1.3) / 1.3); A.x = from - A.face * 60 * u;
+        rope = 20 + 70 * u;
+        const tug = t > nextTug ? (nextTug = t + 0.35, 1) : 0;
+        if (tug) { api.sfx('squeak'); api.shake(2); const b = J(V, 'belly'); FX.blood(b[0], b[1], 8, -A.face, 0.8); if (!fell) V.ro.dx = A.face * -3; }
+        A.wph = (A.wph || 0) - dt * 5;
+        A.scriptPose = Object.assign({}, PS.walk(A.wph), { hy: 10, lean: -0.35 + Math.sin(t * 17) * 0.06, head: -0.3, aF: [0.9, 1.2], aB: [0.5, 1.4] });
+        if (fell) { A.x = from - A.face * 60; rope = Math.max(rope, Math.hypot(beak()[0] - J(V, 'belly')[0], beak()[1] - J(V, 'belly')[1])); }
+        return;
+      }
+      if (t < 4.0) {
+        // slurp it down like spaghetti
+        slurp = ease((t - 3.15) / 0.85);
+        A.scriptPose = P({ hy: 6, lean: -0.3, head: -0.75 + Math.sin(t * 30) * 0.06, aF: [0.6, 0.8], aB: [0.4, 0.9], fF: [12, 0], fB: [-13, 0] });
+        return;
+      }
+      A.scriptPose = PS.win(A.t);
+    };
+  };
+
+  // ---------- MAD TURKEY: Carved ----------
+  S.turkey = (s, A, V, api) => {
+    const PS = api.PS, F = api.FLOOR, k = A.d.k;
+    let tools = false, sliceA = 0;
+    const px = Math.max(api.cam + 40, Math.min(api.cam + api.W - 40, A.x - A.face * 70)), py = F - 2;
+    const plat = prop({ layer: 'front', fly: [], items: [], head: null, apple: false, draw(g, p) {
+      // a big oval serving platter on a low stand
+      g.fillStyle = '#5a4a3a'; g.fillRect(px - 4, py - 6, 8, 6);
+      g.fillStyle = '#c8ccd4'; g.beginPath(); g.ellipse(px, py - 8, 40, 5, 0, 0, PI * 2); g.fill();
+      g.fillStyle = '#e8ecf4'; g.beginPath(); g.ellipse(px, py - 9, 34, 3.6, 0, 0, PI * 2); g.fill();
+      for (const it of p.items) slab(g, it.x, it.y, it.r);
+      for (const f of p.fly) if (f.kind === 'slab') slab(g, f.x, f.y, f.r);
+      if (p.head) { g.save(); g.translate(p.head.x, p.head.y); g.rotate(p.head.r); R.drawHeadAt(g, { def: V.def, d: V.d }, 0, 0, 0, 1, { dead: true, t: 0, jaw: 0.6 }); g.restore(); }
+      if (p.apple) { const h = p.head, ax = h.x + 12 * V.d.k, ay = h.y - 5 * V.d.k; R.ball(g, ax, ay, 4.2, '#c01818'); R.ball(g, ax - 1.2, ay - 1.4, 1.4, '#ff8080'); R.line(g, ax, ay - 4, ax + 1, ay - 6.5, '#4a2a10', 1); }
+      // garnish
+      for (let i = 0; i < 6; i++) R.ball(g, px - 30 + i * 12, py - 10, 2.4, i % 2 ? '#3a8a2a' : '#2a6a1a');
+    }, update(p, dt) {
+      for (const f of p.fly) {
+        f.t += dt; const u = Math.min(1, f.t / f.d);
+        f.x = lerp(f.x0, f.tx, u); f.y = lerp(f.y0, f.ty, u) - Math.sin(u * PI) * f.h; f.r = f.r0 + u * f.spin;
+        if (u >= 1) { f.done = 1; if (f.kind === 'slab') { p.items.push({ x: f.tx, y: f.ty, r: f.rt }); api.sfx('splat'); } else { p.head = { x: f.tx, y: f.ty, r: 0 }; api.sfx('thud'); } }
+      }
+      p.fly = p.fly.filter(f => !f.done);
+      if (p.fly.some(f => f.kind === 'head')) { const f = p.fly.find(f => f.kind === 'head'); p.headFly = f; } else p.headFly = null;
+    } });
+    function slab(g, x, y, r) {
+      g.save(); g.translate(x, y); g.rotate(r);
+      g.fillStyle = '#e0a090'; g.beginPath(); g.ellipse(0, 0, 7, 3, 0, 0, PI * 2); g.fill();
+      g.fillStyle = '#a8303a'; g.beginPath(); g.ellipse(0.5, -0.4, 5.4, 2, 0, 0, PI * 2); g.fill();
+      g.strokeStyle = '#7a4a2a'; g.lineWidth = 1; g.beginPath(); g.ellipse(0, 0, 7, 3, 0, PI, PI * 2); g.stroke();
+      g.restore();
+    }
+    // flying head is drawn by a gib so it stays in front during the arc
+    prop({ layer: 'front', draw(g) {
+      const f = plat.headFly; if (!f) return;
+      g.save(); g.translate(f.x, f.y); g.rotate(f.r); R.drawHeadAt(g, { def: V.def, d: V.d }, 0, 0, 0, 1, { dead: true, t: 0 }); g.restore();
+    } });
+    // carving knife and fork in the wing tips
+    prop({ layer: 'front', draw(g) {
+      if (!tools) return;
+      const hf = J(A, 'handF'), hb = J(A, 'handB');
+      g.save(); g.translate(hf[0], hf[1]); g.rotate(sliceA); g.scale(A.face, 1);
+      g.fillStyle = '#3a2416'; g.fillRect(-2, -3, 4, 8); g.fillStyle = '#dfe4ec'; g.beginPath(); g.moveTo(-1.6, -3); g.lineTo(-1.2, -26); g.quadraticCurveTo(3, -22, 2.2, -3); g.fill();
+      g.fillStyle = 'rgba(160,0,10,0.8)'; g.fillRect(-1, -18, 2.6, 7); g.restore();
+      g.save(); g.translate(hb[0], hb[1]); g.scale(A.face, 1);
+      g.fillStyle = '#3a2416'; g.fillRect(-1.5, -2, 3, 7); R.line(g, 0, -2, 4, -16, '#c8ccd4', 1.2); for (const o of [-1.4, 1.4]) R.line(g, 4 + o, -16, 5 + o, -22, '#c8ccd4', 0.8);
+      g.restore();
+    } });
+    const launch = (kind, x, y, tx, ty, o = {}) => plat.fly.push(Object.assign({ kind, x0: x, y0: y, x, y, tx, ty, t: 0, d: 0.55, h: 60, r0: 0, r: 0, spin: rnd(-6, 6), rt: rnd(-0.4, 0.4) }, o));
+    s.at(0.55, () => { tools = true; api.sfx('slash'); api.sfx('gobble'); });
+    const cuts = [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5];
+    cuts.forEach((c, i) => s.at(c, () => {
+      const parts = ['chest', 'belly', 'chest', 'hip', 'belly', 'elbowF', 'kneeF'], p = J(V, parts[i]);
+      api.sfx('slash'); api.sfx('crunch'); api.shake(2);
+      FX.blood(p[0], p[1], 14, -A.face, 1); V.ro.gore = true;
+      const n = plat.items.length + plat.fly.length;
+      launch('slab', p[0], p[1], px - 22 + (n % 5) * 11, py - 12 - Math.floor(n / 5) * 3);
+    }));
+    s.at(2.85, () => {
+      V.ro.skeleton = true; V.ro.noHead = true; api.sfx('splat'); api.shake(4);
+      const h = J(V, 'head'); FX.blood(h[0], h[1], 40, 0, 1.2); FX.spurt(h[0], h[1], 0, 1.2);
+      launch('head', h[0], h[1], px - 6, py - 12, { d: 0.7, h: 80, spin: 0, r0: 0 });
+    });
+    s.at(3.5, () => {
+      V.hidden = true; api.sfx('crunch'); api.shake(5);
+      const b = J(V, 'hip');
+      FX.burst(b[0], F - 20, 14, ['bone', 'bone', 'bone', 'guts', 'chunk', 'liver', 'bone'], 0.7);
+      FX.blood(b[0], F - 10, 40, 0, 0.8);
+    });
+    s.at(3.9, () => { plat.apple = true; api.sfx('select'); });
+    s.at(4.3, () => { api.sfx('gobble'); api.bubble('HAPPY THANKSGIVING.', A.x, F - 140, { size: 12, fill: 'gold', life: 2 }); });
+    s.at(5.8, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (t < 0.55) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 40 * k, dt, api, 110); return; }
+      if (t < 2.85) {
+        const ph = ((t - 0.95) / 0.25) % 1, cut = t > 0.95 ? Math.sin(ph * PI) : 0;
+        sliceA = A.face * (-0.6 + cut * 1.8);
+        A.scriptPose = P({ hy: 6, lean: 0.25, head: 0.2, aF: [1.6 + cut * 0.9, 0.4 + cut * 0.4], aB: [1.4, 0.6], fF: [14, 0], fB: [-14, 0] });
+        V.scriptPose = P({ hy: 5, lean: -0.15, head: Math.sin(t * 11) * 0.2, aF: [0.5, 0.3], aB: [0.4, 0.3], fF: [9, 0], fB: [-10, 0] });
+        V.ro.dx = cut > 0.8 ? rnd(-1.2, 1.2) : 0;
+        return;
+      }
+      V.ro.dx = 0;
+      if (t < 3.5) { V.scriptPose = P({ hy: 18 * ease((t - 2.85) / 0.65), lean: 0.2, aF: [0.3, 0.2], aB: [0.2, 0.2], fF: [9, 0], fB: [-10, 0] }); A.scriptPose = PS.stance(A.t); return; }
+      if (t < 4.3) { sliceA = 0; A.scriptPose = PS.stance(A.t); return; }
+      tools = t < 4.3; A.scriptPose = PS.win(A.t);
     };
   };
 

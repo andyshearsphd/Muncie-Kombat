@@ -13,21 +13,23 @@ const TXT = (() => {
     blood: ['#ff8a7a', '#d0101a', '#5a0006'],
     steel: ['#ffffff', '#c8ccd8', '#5a6070'],
   };
-  function font(size) { return `${size}px ${FAMILY}`; }
-  function width(ctx, str, size) { ctx.save(); ctx.font = font(size); const w = ctx.measureText(str).width; ctx.restore(); return w; }
+  const BLOOD = 'Nosifer, Anton, Impact, sans-serif';
+  function font(size, fam) { return `${size}px ${fam || FAMILY}`; }
+  function width(ctx, str, size, fam) { ctx.save(); ctx.font = font(size, fam); const w = ctx.measureText(str).width; ctx.restore(); return w; }
   // opt: size, align, fill (css color or a GRADS key), stroke, italic, shadow
   function draw(ctx, str, x, y, opt = {}) {
     str = String(str);
     const size = opt.size || 12;
     ctx.save();
-    ctx.font = font(size);
+    const fam = opt.blood ? BLOOD : null;
+    ctx.font = font(size, fam);
     ctx.textBaseline = 'top';
     ctx.lineJoin = 'round';
     const w = ctx.measureText(str).width;
     let dx = x;
     if (opt.align === 'center') dx = x - w / 2; else if (opt.align === 'right') dx = x - w;
     ctx.translate(Math.round(dx), Math.round(y));
-    if (opt.italic !== false) ctx.transform(1, 0, -0.16, 1, size * 0.16, 0);
+    if (opt.italic !== false && !opt.blood) ctx.transform(1, 0, -0.16, 1, size * 0.16, 0);
     const sw = opt.strokeW != null ? opt.strokeW : Math.max(1.5, size * 0.16);
     if (opt.shadow !== false) {
       ctx.fillStyle = 'rgba(0,0,0,0.75)';
@@ -45,6 +47,6 @@ const TXT = (() => {
     ctx.restore();
     return w;
   }
-  const ready = (document.fonts && document.fonts.load) ? document.fonts.load('20px Anton').catch(() => {}) : Promise.resolve();
-  return { draw, width, font, ready, GRADS };
+  const ready = (document.fonts && document.fonts.load) ? Promise.all([document.fonts.load('20px Anton'), document.fonts.load('20px Nosifer')]).catch(() => {}) : Promise.resolve();
+  return { draw, width, font, ready, GRADS, BLOOD };
 })();

@@ -525,6 +525,87 @@ const STAGES = (() => {
     for (const x of [230, 640, 1050].map(v => v - 90)) { F.save(); F.globalCompositeOperation = 'lighter'; const gr = F.createRadialGradient(x, FY + 8, 0, x, FY + 8, 120); gr.addColorStop(0, 'rgba(255,110,20,0.3)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); F.fillStyle = gr; F.fillRect(x - 120, FY, 240, H - FY); F.restore(); }
   }
 
+  // ---------- THE VILLAGE: the strip of shops by Ball State, late on a Friday ----------
+  function village(B, F) {
+    vg(B, 0, 0, BW, H, ['#04030a', '#0c0a1e', '#22142e', '#3a1c2a']);
+    stars(B, 40, 60); clouds(B, 6, 60, 10, 'rgba(30,20,40,0.6)', 'rgba(120,80,110,0.25)', -1);
+    seed = 211;
+    // distant campus: dorm towers and a water tower
+    for (let i = 0; i < 9; i++) { const x = 40 + i * 140 + rr(-20, 20), w = rr(40, 70), h = rr(50, 90); B.fillStyle = '#0e0c18'; B.fillRect(x, FY - 60 - h, w, h + 60); for (let r = 0; r < 6; r++) for (let c = 0; c < 4; c++) if (rand() < 0.35) { B.fillStyle = rand() < 0.5 ? 'rgba(255,210,140,0.5)' : 'rgba(180,200,255,0.4)'; B.fillRect(x + 5 + c * (w - 10) / 4, FY - 54 - h + r * 12, 4, 5); } }
+    fog(B, 70, 60, 'rgba(60,30,60,0.4)');
+    // one long two-story brick building, storefronts on the ground floor
+    const top = FY - 118, sf = FY - 66, x0 = -10, x1 = BW + 10;
+    bricks(B, x0, top, x1 - x0, sf - top, '#6a2a22', '#1a0806', 7, 3.2);
+    vg(B, x0, top, x1 - x0, sf - top, ['rgba(0,0,0,0.45)', 'rgba(0,0,0,0.1)', 'rgba(255,150,90,0.12)']);
+    B.fillStyle = '#2a1a16'; B.fillRect(x0, top - 6, x1 - x0, 7); B.fillStyle = '#8a7a6a'; B.fillRect(x0, top - 7, x1 - x0, 2);
+    for (let x = 14; x < BW; x += 34) { win(B, x, top + 12, 14, 20, rand() < 0.45, rand() < 0.3 ? '#a0c0ff' : '#ffc070', '#1a1412'); B.fillStyle = '#9a8a7a'; B.fillRect(x - 2, top + 32, 18, 2.4); }
+    const shops = [
+      { n: 'MIDNIGHT COOKIES', aw: '#c8402a', neon: '#ffb0d0', fill: (x, w) => { for (let i = 0; i < 6; i++) { R.ball(B, x + 12 + i * (w - 24) / 5, sf + 38, 5, '#c08040'); R.ball(B, x + 11 + i * (w - 24) / 5, sf + 37, 1.2, '#3a1a08'); } B.fillStyle = '#e8e0d0'; B.fillRect(x + 6, sf + 43, w - 12, 3); } },
+      { n: 'BEAN THERE COFFEE', aw: '#2a5a3a', neon: '#a0ffc0', fill: (x, w) => { B.fillStyle = '#3a2416'; B.fillRect(x + 6, sf + 36, w - 12, 12); for (let i = 0; i < 4; i++) { B.fillStyle = '#f0ece0'; B.fillRect(x + 12 + i * 12, sf + 31, 5, 5); } B.fillStyle = '#1a1a1a'; B.fillRect(x + w - 24, sf + 22, 12, 14); } },
+      { n: 'CLOUD 9 VAPE', aw: '#3a2a7a', neon: '#80e8ff', fill: (x, w) => { for (let r = 0; r < 3; r++) for (let i = 0; i < 7; i++) { B.fillStyle = ['#40c0ff', '#ff40c0', '#c0ff40'][(i + r) % 3]; B.fillRect(x + 8 + i * (w - 16) / 7, sf + 22 + r * 9, 3, 6); } } },
+      { n: 'THIRD EYE HEAD SHOP', aw: '#6a2a6a', neon: '#d0a0ff', fill: (x, w) => { B.fillStyle = '#5a1a6a'; B.fillRect(x + 6, sf + 18, w * 0.4, 24); B.fillStyle = '#e0c020'; B.beginPath(); B.arc(x + 6 + w * 0.2, sf + 30, 7, 0, PI * 2); B.fill(); B.fillStyle = '#5a1a6a'; B.beginPath(); B.arc(x + 6 + w * 0.2, sf + 30, 3, 0, PI * 2); B.fill(); for (let i = 0; i < 4; i++) { B.fillStyle = 'rgba(120,220,255,0.6)'; B.fillRect(x + w * 0.55 + i * 9, sf + 30 - i * 3, 4, 16 + i * 3); } } },
+    ];
+    let x = 12, i = 0;
+    while (x < BW) {
+      const s = shops[i % 4], w = 132;
+      // pilasters between storefronts
+      B.fillStyle = '#4a1c16'; B.fillRect(x - 6, sf - 2, 6, 66);
+      // big lit shop window
+      vg(B, x, sf + 10, w, 44, ['#ffd8a0', '#e0a060', '#8a5030']);
+      s.fill(x, w);
+      B.fillStyle = 'rgba(255,255,255,0.12)'; B.beginPath(); B.moveTo(x + 10, sf + 10); B.lineTo(x + 30, sf + 10); B.lineTo(x + 10, sf + 40); B.fill();
+      B.strokeStyle = '#140c0a'; B.lineWidth = 2; B.strokeRect(x, sf + 10, w, 44); B.fillStyle = '#140c0a'; B.fillRect(x + w * 0.7, sf + 10, 2, 44);
+      // door
+      B.fillStyle = '#1a100c'; B.fillRect(x + w + 2, sf + 14, 20, 50); win(B, x + w + 5, sf + 18, 14, 20, true, '#ffd090', '#1a100c');
+      // striped awning
+      for (let k = 0; k < 12; k++) { B.fillStyle = k % 2 ? s.aw : '#e8e0d0'; B.beginPath(); B.moveTo(x - 4 + k * (w + 30) / 12, sf + 2); B.lineTo(x - 4 + (k + 1) * (w + 30) / 12, sf + 2); B.lineTo(x - 2 + (k + 1) * (w + 30) / 12, sf + 10); B.lineTo(x - 2 + k * (w + 30) / 12, sf + 10); B.fill(); }
+      B.fillStyle = 'rgba(0,0,0,0.35)'; B.fillRect(x - 4, sf + 10, w + 30, 2);
+      // neon sign above the awning
+      B.fillStyle = '#0a0608'; B.fillRect(x + 6, sf - 16, w - 12, 15);
+      glow(B, x + w / 2, sf - 9, 50, 'rgba(255,255,255,0.12)', 0.5);
+      B.font = '10px Anton, Impact, sans-serif'; B.textAlign = 'center';
+      B.fillStyle = s.neon; B.shadowColor = s.neon; B.shadowBlur = 8; B.fillText(s.n, x + w / 2, sf - 4); B.shadowBlur = 0; B.textAlign = 'left';
+      x += w + 34; i++;
+      if (i === 4) { // THE VILLAGE arch sign mid-block
+        B.fillStyle = '#1a0a08'; B.fillRect(x - 4, top - 30, 120, 24); B.strokeStyle = '#c8b060'; B.lineWidth = 1.5; B.strokeRect(x - 3, top - 29, 118, 22);
+        B.font = '14px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillStyle = '#ff3030'; B.shadowColor = '#ff2020'; B.shadowBlur = 10; B.fillText('THE VILLAGE', x + 56, top - 12); B.shadowBlur = 0; B.textAlign = 'left';
+      }
+    }
+    grime(B, 0, top, BW, FY - top, 30, 0.2);
+    // sidewalk
+    vg(B, 0, FY - 4, BW, 6, ['#6a6460', '#4a4440']); for (let x = 0; x < BW; x += 22) { B.fillStyle = 'rgba(0,0,0,0.3)'; B.fillRect(x, FY - 4, 1, 6); }
+    // parking meters and a trash can
+    for (let x = 90; x < BW; x += 220) { B.fillStyle = '#1a1a1e'; B.fillRect(x, FY - 22, 2, 20); B.fillStyle = '#6a6a72'; B.fillRect(x - 3, FY - 28, 8, 8); }
+    fog(B, FY - 50, 50, 'rgba(70,40,70,0.35)');
+    vignette(B, BW);
+    // street: wet asphalt, curb at the back, double yellow up the middle
+    pfloor(F, 'stone', '#2a2a30', '#121216', { rows: 8, span: 60, wet: true, edge: '#8a8478' });
+    F.fillStyle = 'rgba(0,0,0,0.25)'; F.fillRect(0, FY, AWX, H - FY);
+    F.fillStyle = 'rgba(230,190,60,0.6)'; F.fillRect(0, H - 22, AWX, 1.6); F.fillRect(0, H - 19, AWX, 1.6);
+    for (let i = 0; i < 26; i++) { F.fillStyle = ['#c8c0a0', '#a02020', '#3a6a3a', '#d8d8d8'][i % 4]; F.fillRect(rr(0, AWX), rr(FY + 6, H - 4), rr(2, 5), rr(1, 2)); }
+    for (const x of [140, 540, 960]) lamp(F, x, FY + 3, 78, 'rgba(255,200,140,0.9)');
+  }
+  // the crowd of bros on the sidewalk (back-layer coords), drawn faded every frame
+  const BROS = (() => { const a = []; let s = 77; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; for (let i = 0; i < 16; i++) a.push({ x: 80 + i * 72 + r() * 30, h: 40 + r() * 8, ph: r() * 6, cap: r() < 0.7, can: r() < 0.75, col: ['#5a2a2a', '#2a3a5a', '#4a4a4a', '#5a4a2a', '#2a4a3a'][i % 5] }); return a; })();
+  function bros(g, t) {
+    g.save(); g.globalAlpha = 0.55;
+    for (const b of BROS) {
+      const bob = Math.abs(Math.sin(t * 5 + b.ph)) * 3, x = b.x, y = FY - 2 - bob, h = b.h, up = Math.sin(t * 2.5 + b.ph) > 0;
+      g.fillStyle = b.col; g.fillRect(x - 7, y - h * 0.62, 14, h * 0.32);
+      g.fillStyle = '#1a1a24'; g.fillRect(x - 6, y - h * 0.32, 5, h * 0.32); g.fillRect(x + 1, y - h * 0.32, 5, h * 0.32);
+      g.fillStyle = '#c89070'; g.beginPath(); g.arc(x, y - h * 0.72, 5, 0, PI * 2); g.fill();
+      if (b.cap) { g.fillStyle = b.col; g.fillRect(x - 5, y - h * 0.8, 10, 3.5); g.fillRect(x - 9, y - h * 0.77, 5, 1.6); }
+      // arms: one pumping, one holding a can up
+      const ay = y - h * 0.58, a1 = up ? -2.2 : -1.2, a2 = up ? -1.0 : -2.4;
+      g.strokeStyle = b.col; g.lineWidth = 3;
+      g.beginPath(); g.moveTo(x - 6, ay); g.lineTo(x - 6 + Math.cos(a1) * 12, ay + Math.sin(a1) * 12); g.stroke();
+      g.beginPath(); g.moveTo(x + 6, ay); g.lineTo(x + 6 - Math.cos(a2) * 12, ay + Math.sin(a2) * 12); g.stroke();
+      if (b.can) { g.fillStyle = '#c8c8d0'; g.fillRect(x + 6 - Math.cos(a2) * 12 - 1.5, ay + Math.sin(a2) * 12 - 5, 3.5, 5); }
+    }
+    g.restore();
+    fog(g, FY - 60, 64, 'rgba(60,40,70,0.4)');
+  }
+
   const DEFS = {
     cityhall: { name: 'CITY HALL', draw: (B, F) => cityhall(B, F, false) },
     hell: { name: 'CITY HALL', draw: (B, F) => cityhall(B, F, true) },
@@ -536,6 +617,7 @@ const STAGES = (() => {
     shedtown: { name: 'SHEDTOWN DRIVE-IN', draw: shedtown },
     cornbread: { name: 'CORNBREAD ROAD', draw: cornbread },
     glassworks: { name: 'BALL GLASS WORKS', draw: glassworks },
+    village: { name: 'THE VILLAGE', draw: village },
   };
   const cache = {};
   function get(id) {
@@ -570,6 +652,7 @@ const STAGES = (() => {
         for (let k = 0; k < 4; k++) glow(g, x - 12 + k * 8, y + 1, 4, (Math.floor(t * 8) + k) % 2 ? 'rgba(255,60,60,1)' : 'rgba(80,255,120,1)');
       }
     }
+    if (id === 'village') { bros(g, t); for (let i = 0; i < 4; i++) { const on = Math.sin(t * 3 + i * 2) > -0.7; if (on) glow(g, 78 + i * 166, FY - 75, 30, 'rgba(255,120,200,0.1)'); } }
     if (id === 'glassworks') for (const x of [230, 640, 1050]) glow(g, x, 160, 40 + Math.sin(t * 6 + x) * 8, 'rgba(255,140,40,0.3)');
     if (id === 'benny') { for (const d of [-78, 78]) glow(g, CX + d, FY - 158, 14 + Math.sin(t * 9 + d) * 2, 'rgba(255,220,150,0.35)'); }
     if (id === 'bridge') { for (let i = 0; i < 30; i++) { g.fillStyle = `rgba(230,230,210,${0.1 + 0.25 * Math.abs(Math.sin(t * 2 + i))})`; g.fillRect(800 + Math.sin(i * 7.1) * 70 * (1 + i / 30), 175 + i * 2, 8 + (i % 4) * 4, 0.8); } }
@@ -602,5 +685,5 @@ const STAGES = (() => {
     }
   }
 
-  return { AW: AWX, H, FLOOR, get, name, live, drawBelow, drawTrain, ROTATION: ['benny', 'bridge', 'minnetrista', 'westend', 'greenway', 'shedtown', 'cornbread', 'cityhall'] };
+  return { AW: AWX, H, FLOOR, get, name, live, drawBelow, drawTrain, ROTATION: ['benny', 'bridge', 'minnetrista', 'westend', 'greenway', 'shedtown', 'cornbread', 'cityhall', 'village'] };
 })();
