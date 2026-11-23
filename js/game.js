@@ -269,7 +269,8 @@
     for (let i = others.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [others[i], others[j]] = [others[j], others[i]]; }
     ladder.opps = others.concat(ROSTER.BOSSES);
     const rot = STAGES.ROTATION.slice();
-    ladder.stages = others.map((f, i) => rot[i % rot.length]).concat(['glassworks', 'hell']);
+    for (let i = rot.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [rot[i], rot[j]] = [rot[j], rot[i]]; }
+    ladder.stages = others.map((f, i) => rot[i % rot.length]).concat(['industry', 'hell']);
     ladder.rung = 0;
   }
 
@@ -895,8 +896,8 @@
     if (game.scene) { game.scene(g, W, H); g.restore(); return; }
     g.imageSmoothingEnabled = false;
     g.translate(0, FLOOR * (1 - zoom)); g.scale(zoom, zoom); g.translate(-cam, 0);
-    const bx = Math.round(cam * 0.4) - 40;
-    g.drawImage(stage.back, 0, 0, AW, 2, bx, -160, AW, 162);
+    const bx = Math.round(cam * 0.4) + (stage.bxOff || -40), bw = stage.back.width;
+    g.drawImage(stage.back, 0, 0, bw, 2, bx, -160, bw, 162);
     g.drawImage(stage.back, bx, 0);
     g.save(); g.translate(bx, 0); STAGES.live(g, stage.id, game.time); g.restore();
     g.drawImage(stage.front, 0, 0);
@@ -1037,7 +1038,7 @@
     const rows = [
       ['PUNCH', 'Jab (tap again for a combo)'], ['DOWN + PUNCH', 'Uppercut'], ['TOWARD + PUNCH (close)', 'Throw'],
       ['KICK', 'Kick'], ['DOWN + KICK', 'Sweep'], ['BACK + KICK', 'Roundhouse'], ['UP', 'Jump (punch or kick in the air)'], ['BLOCK (hold)', 'Block (hold DOWN too to block low)'],
-      ['BACK, FORWARD + PUNCH', def.proj.name], ['DOWN, FORWARD + KICK', def.sp2.name], ['FINISH: DOWN, DOWN + PUNCH', 'FATALITY: ' + def.fatal.name], ['FINISH on the TRESTLE: DOWN + PUNCH', 'Stage fatality'],
+      ['BACK, FORWARD + PUNCH', def.proj.name], ['DOWN, FORWARD + KICK', def.sp2.name], ['FINISH: DOWN, DOWN + PUNCH', 'FATALITY: ' + def.fatal.name], ['FINISH at WHITE RIVER GREENWAY: DOWN + PUNCH', 'Stage fatality'],
     ];
     rows.forEach((r, i) => {
       const y = 32 + i * 16.2, hl = i >= 8;
@@ -1068,7 +1069,7 @@
     R.digi(g, f1.x, f1.y, gg => R.draw(gg, f1, PS.stance(t))); R.digi(g, f2.x, f2.y, gg => R.draw(gg, f2, PS.stance(t + 1)));
     TXT.draw(g, 'VS', 150, 110, { size: 30, align: 'center', fill: 'fire' });
     TXT.draw(g, 'BATTLE ' + (ladder.rung + 1) + ' OF ' + n, 150, 34, { size: 14, align: 'center', fill: 'white' });
-    TXT.draw(g, STAGES.get(ladder.stages[ladder.rung]).name, 150, 52, { size: 11, align: 'center', fill: 'purple' });
+    TXT.draw(g, STAGES.name(ladder.stages[ladder.rung]), 150, 52, { size: 11, align: 'center', fill: 'purple' });
     if (op.boss) TXT.draw(g, op.bio, 150, 206, { size: 8, align: 'center', fill: 'gold', italic: false });
     if (Math.sin(t * 5) > -0.3) TXT.draw(g, 'TAP TO FIGHT', 150, 218, { size: 13, align: 'center', fill: 'white' });
     ui.push({ x: 0, y: 0, w: W, h: H, fn: () => { SFX.gong(); startMatch(); } });
@@ -1163,5 +1164,5 @@
 
   window.MK = { game, ladder, sel, get p1() { return p1; }, get p2() { return p2; }, get screen() { return screen; }, set screen(v) { screen = v; }, startMatch, newLadder, startFatality, PS, MV,
     set paused(v) { paused = v; }, get cam() { return cam; }, set cam(v) { cam = v; }, act, applyHit, projs: () => projs };
-  if (AUTO) { const q = new URLSearchParams(location.search); ladder.pick = +(q.get('p') || 0); newLadder(); if (q.get('o')) { const o = ROSTER.ALL[q.get('o')]; ladder.opps[0] = o; } if (q.get('s')) ladder.stages[0] = q.get('s'); startMatch(); }
+  if (AUTO) setTimeout(() => { const q = new URLSearchParams(location.search); ladder.pick = +(q.get('p') || 0); newLadder(); if (q.get('o')) { const o = ROSTER.ALL[q.get('o')]; ladder.opps[0] = o; } if (q.get('s')) ladder.stages[0] = q.get('s'); startMatch(); }, 600);
 })();

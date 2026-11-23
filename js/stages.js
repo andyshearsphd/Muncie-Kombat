@@ -242,9 +242,40 @@ const STAGES = (() => {
     glassworks: { name: 'THE OLD GLASS WORKS', draw: glassworks },
     hell: { name: 'CITY HALL', draw: (B, F) => cityhall(B, F, true) },
   };
+  // Arenas painted from the Muncie Hippo Hole Patrol backgrounds (stages/*.png), roughed up for Kombat
+  const HP = {
+    benny: { name: 'BENEFICENCE' }, bridge: { name: 'WHITE RIVER GREENWAY', pit: true }, minnetrista: { name: 'MINNETRISTA' },
+    shedtown: { name: 'SHEDTOWN' }, greenway: { name: 'CARDINAL GREENWAY' }, westend: { name: 'OLD WEST END' },
+    cityhall: { name: 'CITY HALL' }, industry: { name: 'INDUSTRY', src: 'industry' }, cornbread: { name: 'CORNBREAD ROAD' },
+    mcgalliard: { name: 'MCGALLIARD ROAD' }, hell: { name: 'CITY HALL', src: 'cityhall', hell: true },
+  };
+  const IMG = {};
+  for (const id of ['benny', 'bridge', 'minnetrista', 'shedtown', 'greenway', 'westend', 'cityhall', 'industry', 'cornbread', 'mcgalliard']) {
+    const b = new Image(), f = new Image(); b.src = 'stages/' + id + '_back.png'; f.src = 'stages/' + id + '_front.png'; IMG[id] = { b, f };
+  }
+  const ready = im => im && im.complete && im.naturalWidth > 0;
+  function fromHP(id) {
+    const def = HP[id], src = IMG[def.src || id];
+    if (!src || !ready(src.b) || !ready(src.f)) return null;
+    const back = document.createElement('canvas'); back.width = src.b.naturalWidth; back.height = H;
+    const bg = back.getContext('2d'); bg.drawImage(src.b, 0, 0);
+    // dim and dirty the far layer so the fighters stay on top of it
+    bg.fillStyle = def.hell ? 'rgba(60,0,0,0.2)' : 'rgba(10,6,14,0.3)'; bg.fillRect(0, 0, back.width, H);
+    if (def.hell) { bg.globalCompositeOperation = 'multiply'; bg.fillStyle = '#ff8a6a'; bg.fillRect(0, 0, back.width, H); bg.globalCompositeOperation = 'source-over'; const hg = bg.createLinearGradient(0, 0, 0, H); hg.addColorStop(0, 'rgba(80,0,0,0.4)'); hg.addColorStop(1, 'rgba(255,80,20,0.25)'); bg.fillStyle = hg; bg.fillRect(0, 0, back.width, H); }
+    const vg = bg.createLinearGradient(0, 0, 0, H); vg.addColorStop(0, 'rgba(0,0,0,0.35)'); vg.addColorStop(0.5, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.15)'); bg.fillStyle = vg; bg.fillRect(0, 0, back.width, H);
+    const front = document.createElement('canvas'); front.width = AWX; front.height = H;
+    const fg = front.getContext('2d'); fg.drawImage(src.f, 0, 0, AWX, H);
+    fg.globalCompositeOperation = 'source-atop'; fg.fillStyle = def.hell ? 'rgba(120,10,0,0.25)' : 'rgba(10,6,14,0.12)'; fg.fillRect(0, 0, AWX, H); fg.globalCompositeOperation = 'source-over';
+    grit(back, 14); grit(front, 16);
+    return { id, name: def.name, pit: !!def.pit, back, front, bxOff: -206, hp: true };
+  }
   const cache = {};
   function get(id) {
     if (cache[id]) return cache[id];
+    if (HP[id]) { const s = fromHP(id); if (s) return (cache[id] = s); }
+    const want = id;
+    if (!DEFS[id]) id = HP[id] && HP[id].hell ? 'hell' : 'cityhall';
+    if (HP[want]) { const pit = !!HP[want].pit; void pit; }
     seed = 11 + id.length * 97;
     const back = mk(), front = mk();
     DEFS[id].draw(back.getContext('2d'), front.getContext('2d'));
@@ -257,11 +288,14 @@ const STAGES = (() => {
       g.save(); g.scale(-1, 1); g.drawImage(c, 0, 0, PAD, H, -PAD, 0, PAD, H); g.drawImage(c, AW - PAD, 0, PAD, H, -AWX, 0, PAD, H); g.restore();
       return w;
     };
-    cache[id] = { id, name: DEFS[id].name, pit: !!DEFS[id].pit, back: widen(back), front: widen(front) };
-    return cache[id];
+    const st = { id, name: DEFS[id].name, pit: !!DEFS[id].pit, back: widen(back), front: widen(front), bxOff: -40 };
+    if (!HP[id]) cache[id] = st;
+    return st;
   }
+  function name(id) { return (HP[id] || DEFS[id] || {}).name || ''; }
   // animated bits drawn each frame on top of the far layer (world coords, already scrolled)
   function live(g, id, t) {
+    if (cache[id] && cache[id].hp) { if (id === 'hell') live0(g, id, t); return; }
     g.save(); g.translate(PAD, 0); live0(g, id, t); g.restore();
   }
   function live0(g, id, t) {
@@ -270,5 +304,5 @@ const STAGES = (() => {
     if (id === 'hell') { for (let i = 0; i < 6; i++) { const x = (i * 131 + t * 20) % AW; g.fillStyle = 'rgba(255,90,20,0.5)'; g.beginPath(); g.arc(x, 194 - Math.abs(Math.sin(t * 4 + i)) * 10, 4, 0, PI * 2); g.fill(); } }
     if (id === 'fieldhouse') { g.fillStyle = 'rgba(255,255,255,0.05)'; if (Math.sin(t * 13) > 0.97) g.fillRect(0, 0, AW, 190); }
   }
-  return { AW: AWX, H, FLOOR, get, live, drawBelow, drawTrain, ROTATION: ['fieldhouse', 'benny', 'bridge', 'minnetrista', 'shedtown', 'cityhall'] };
+  return { AW: AWX, H, FLOOR, get, name, live, drawBelow, drawTrain, ROTATION: ['benny', 'bridge', 'minnetrista', 'shedtown', 'greenway', 'westend', 'cornbread', 'mcgalliard'] };
 })();
