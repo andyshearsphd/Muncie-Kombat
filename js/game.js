@@ -270,7 +270,7 @@
     ladder.opps = others.concat(ROSTER.BOSSES);
     const rot = STAGES.ROTATION.slice();
     for (let i = rot.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [rot[i], rot[j]] = [rot[j], rot[i]]; }
-    ladder.stages = others.map((f, i) => rot[i % rot.length]).concat(['industry', 'hell']);
+    ladder.stages = others.map((f, i) => rot[i % rot.length]).concat(['glassworks', 'hell']);
     ladder.rung = 0;
   }
 
