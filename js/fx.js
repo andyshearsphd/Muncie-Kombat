@@ -127,10 +127,10 @@ const FX = (() => {
   };
 
   // spine with skull attached (Top Ten List #1)
-  function drawSpine(g, len, k = 1) {
+  function drawSpine(g, len, k = 1, type) {
     for (let i = 0; i < 11; i++) { R.ball(g, 0, i * len / 11, 2.2 * k, i % 2 ? '#d8ccb0' : R.BONE); }
     g.fillStyle = '#9a0010'; for (let i = 0; i < 5; i++) g.fillRect(-2 + (i % 2) * 2, len * 0.2 + i * 6, 2, 3);
-    R.skull(g, 1, -7 * k, 7.5 * k, 0);
+    R.skull(g, 1, -7 * k, 7.5 * k, 0, type);
     g.fillStyle = '#9a0010'; g.fillRect(-3, len - 2, 6, 4);
   }
 

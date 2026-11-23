@@ -2,7 +2,7 @@
 'use strict';
 const STAGES = (() => {
   const R = RIG, PI = Math.PI;
-  const AW = 760, H = 240, FLOOR = 222;
+  const AW = 760, H = 240, FLOOR = 222, AWX = 1100, PAD = (AWX - AW) / 2;
   let seed = 7;
   const rand = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
   const mk = () => { const c = document.createElement('canvas'); c.width = AW; c.height = H; return c; };
@@ -250,15 +250,25 @@ const STAGES = (() => {
     DEFS[id].draw(back.getContext('2d'), front.getContext('2d'));
     const bg = back.getContext('2d'); bg.fillStyle = `rgba(0,0,0,${id === 'fieldhouse' ? 0.42 : 0.22})`; bg.fillRect(0, 0, AW, H);
     grit(back, 16); grit(front, 18);
-    cache[id] = { id, name: DEFS[id].name, pit: !!DEFS[id].pit, back, front };
+    // widen the arena: the scene sits in the middle, mirrored scenery fills both ends
+    const widen = c => {
+      const w = document.createElement('canvas'); w.width = AWX; w.height = H; const g = w.getContext('2d');
+      g.drawImage(c, PAD, 0);
+      g.save(); g.scale(-1, 1); g.drawImage(c, 0, 0, PAD, H, -PAD, 0, PAD, H); g.drawImage(c, AW - PAD, 0, PAD, H, -AWX, 0, PAD, H); g.restore();
+      return w;
+    };
+    cache[id] = { id, name: DEFS[id].name, pit: !!DEFS[id].pit, back: widen(back), front: widen(front) };
     return cache[id];
   }
   // animated bits drawn each frame on top of the far layer (world coords, already scrolled)
   function live(g, id, t) {
+    g.save(); g.translate(PAD, 0); live0(g, id, t); g.restore();
+  }
+  function live0(g, id, t) {
     if (id === 'shedtown') { const x = 470; g.fillStyle = '#3a3a3e'; g.fillRect(x - 8, 172, 16, 22); g.fillStyle = '#2a2a2e'; g.fillRect(x - 8, 178, 16, 2); for (let i = 0; i < 4; i++) { const r = 3 + Math.sin(t * 9 + i) * 1.5; RIG.ball(g, x - 5 + i * 3.3, 168 - Math.abs(Math.sin(t * 7 + i * 2)) * 8, r, i % 2 ? '#ff9a20' : '#ffd040'); } }
     if (id === 'glassworks') { for (const x of [80, 380, 640]) { g.fillStyle = `rgba(255,${120 + Math.sin(t * 6 + x) * 40 | 0},30,${0.15 + Math.sin(t * 5 + x) * 0.08})`; g.fillRect(x - 24, 128, 48, 50); } }
     if (id === 'hell') { for (let i = 0; i < 6; i++) { const x = (i * 131 + t * 20) % AW; g.fillStyle = 'rgba(255,90,20,0.5)'; g.beginPath(); g.arc(x, 194 - Math.abs(Math.sin(t * 4 + i)) * 10, 4, 0, PI * 2); g.fill(); } }
     if (id === 'fieldhouse') { g.fillStyle = 'rgba(255,255,255,0.05)'; if (Math.sin(t * 13) > 0.97) g.fillRect(0, 0, AW, 190); }
   }
-  return { AW, H, FLOOR, get, live, drawBelow, drawTrain, ROTATION: ['fieldhouse', 'benny', 'bridge', 'minnetrista', 'shedtown', 'cityhall'] };
+  return { AW: AWX, H, FLOOR, get, live, drawBelow, drawTrain, ROTATION: ['fieldhouse', 'benny', 'bridge', 'minnetrista', 'shedtown', 'cityhall'] };
 })();

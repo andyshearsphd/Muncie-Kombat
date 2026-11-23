@@ -27,6 +27,9 @@ const FATAL = (() => {
     return FX.gib('head', x, y, o.vx || 0, o.vy || 0, Object.assign({ trail: true, draw: (g) => R.drawHeadAt(g, { def: V.def, d: V.d }, 0, 8 * V.d.k, 0, 1, { dead: true, t: 0 }) }, o));
   }
 
+  function skullGib(V, x, y, vx, vy) {
+    return FX.gib('skull', x, y, vx, vy, { s: 1, vr: 8, trail: true, draw: (g) => R.skull(g, 0, 0, 7.5 * V.d.k * (V.def.skullK || 1), 0, V.def.skull) });
+  }
   function start(id, A, V, api) {
     const s = { t: 0, done: false, ev: [], tick: null };
     s.at = (time, fn) => s.ev.push({ time, fn });
@@ -125,7 +128,7 @@ const FATAL = (() => {
       const hp = J(V, 'head');
       FX.blood(hp[0], hp[1], last ? 50 : 16, -A.face, last ? 1.5 : 0.9);
       splat(last ? 14 : 5, last);
-      if (last) { V.ro.noHead = true; FX.burst(hp[0], hp[1], 12, ['brain', 'eye', 'skullfrag', 'chunk', 'tooth', 'skullfrag'], 1.1); api.flash(); }
+      if (last) { V.ro.noHead = true; FX.burst(hp[0], hp[1], 12, ['brain', 'eye', 'skullfrag', 'chunk', 'tooth', 'skullfrag'], 1.1); skullGib(V, hp[0], hp[1], -A.face * 120, -260); api.flash(); }
     }));
     s.at(3.35, () => { dropped = true; V.scriptPose = PS.down(V); V.snapPose = true; V.x = hand[0] + A.face * 20; V.y = F; V.ro.noHead = true; api.sfx('thud'); FX.blood(V.x, F - 6, 12, 0, 0.6); });
     s.at(4.3, () => api.bubble('A HAPPY LITTLE ACCIDENT.', A.x, F - 150, { size: 12, life: 2, fill: 'white' }));
@@ -221,12 +224,12 @@ const FATAL = (() => {
     }
     s.at(3.6, () => { A.scriptPose = P({ hy: 4, lean: 0.25, aF: [2.2, 0.4], aB: [0.6, 1.9], fF: [16, 0], fB: [-13, 0] }); });
     s.at(4.0, () => {
-      shown = 10; spine = true; V.ro.noHead = true; V.scriptPose = PS.downFace(V); V.snapPose = true;
+      shown = 10; spine = true; V.ro.noHead = true; V.scriptPose = PS.down(V); V.snapPose = true; V.x += A.face * 12;
       api.sfx('crunch'); api.sfx('splat'); api.shake(6); api.flash();
       const nk = J(V, 'neck'); FX.blood(nk[0], nk[1], 50, -A.face, 1.4);
-      A.scriptPose = P({ hy: 2, lean: -0.15, aF: [3.05, 0.05], aB: [0.6, 1.9], fF: [11, 0], fB: [-12, 0] });
+      A.scriptPose = P({ hy: 2, lean: -0.1, aF: [1.85, 0.0], aB: [0.5, 2.0], fF: [11, 0], fB: [-12, 0] }); A.x -= A.face * 14;
     });
-    prop({ layer: 'front', draw(g) { if (!spine) return; const h = J(A, 'handF'); g.save(); g.translate(h[0], h[1] + 3); FX.drawSpine(g, 46 * V.d.k, V.d.k); g.restore(); } });
+    prop({ layer: 'front', draw(g) { if (!spine) return; const h = J(A, 'handF'); g.save(); g.translate(h[0] + A.face * 3, h[1] + 2); FX.drawSpine(g, 46 * V.d.k, V.d.k, V.def.skull); g.restore(); } });
     s.at(3.55, () => api.bubble('AND THE NUMBER ONE...', A.x - A.face * 10, F - 168, { size: 11, life: 1.6, fill: 'gold' }));
     s.at(5.8, () => { s.done = true; });
     s.tick = (t, dt) => {
@@ -299,6 +302,7 @@ const FATAL = (() => {
       const h = J(V, 'head');
       api.sfx('splat'); api.sfx('crunch'); api.shake(8); api.flash();
       FX.burst(h[0], h[1], 18, ['brain', 'eye', 'skullfrag', 'chunk', 'tooth', 'skullfrag', 'chunk', 'eye', 'brain'], 1.3);
+      skullGib(V, h[0], h[1], -A.face * 90, -420);
       FX.blood(h[0], h[1], 70, 0, 1.6, 1.4);
       FX.drops(5);
     });
@@ -410,7 +414,7 @@ const FATAL = (() => {
       }
       lodge = prop({ layer: 'back', draw(g) {
         for (const b of bones) { g.save(); g.translate(b.x, b.y); g.rotate(b.r); R.bone(g, [-6, 0], [6, 0], 1.5); g.restore(); }
-        if (s.t > 4.4) R.drawHeadAt(g, { def: V.def, d: V.d }, cx, F - 4, 0, 0.9, { dead: true });
+        if (s.t > 4.4) R.skull(g, cx, F - 6, 7 * V.d.k * (V.def.skullK || 1), 0, V.def.skull);
       }, update() { for (const b of bones) { const u = ease((s.t - b.t0) / 0.6); b.cx = b.cx == null ? b.x : b.cx; b.cy = b.cy == null ? b.y : b.cy; b.x = lerp(b.cx, b.tx, u); b.y = lerp(b.cy, b.ty, u) - Math.sin(u * PI) * 40; b.r = lerp(b.r, b.tr, u * 0.2); } } });
       lodge.cx = cx;
       FX.blood(cx, F - 10, 30, 0, 0.8);
@@ -478,7 +482,7 @@ const FATAL = (() => {
       V.hidden = true; api.sfx('crunch'); api.shake(5);
       const hh = api.hurtH(V);
       for (let i = 0; i < 16; i++) FX.gib(i % 5 ? 'bone' : 'skullfrag', V.x + FX.rnd(-8, 8), F - FX.rnd(10, hh), FX.rnd(-90, 90), FX.rnd(-160, -20));
-      FX.gib('skull', V.x, F - hh * 0.8, A.face * -40, -120, { draw: (g) => R.skull(g, 0, 0, 7 * V.d.k, 0) });
+      FX.gib('skull', V.x, F - hh * 0.8, A.face * -40, -120, { draw: (g) => R.skull(g, 0, 0, 7 * V.d.k * (V.def.skullK || 1), 0, V.def.skull) });
       FX.puff(V.x, F - 30, 'rgba(40,30,30,0.8)', 30, 7);
     });
     s.at(3.2, () => api.bubble('YOUR SOUL IS MINE.', A.x, F - 175, { size: 13, fill: 'fire', life: 2 }));

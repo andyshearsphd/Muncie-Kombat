@@ -105,6 +105,7 @@ const RIG = (() => {
     const up = PI - p.lean;
     const sh = add(hip, dir(up, d.torso));
     const nk = add(sh, dir(up - p.head * 0.4, d.neck));
+    if (d.hox) nk[0] += d.hox * Math.cos(p.lean * 0.5);
     const legs = L => {
       const h = hip;
       const knee = add(h, dir(L[0], d.thigh));
@@ -264,6 +265,7 @@ const RIG = (() => {
     if (def.sock && !o.cutAnkles) seg(g, lerp2(L.knee, L.ank, 0.5), L.ank, d.ankleR * 1.1, d.ankleR * 1.05, def.sock, 'cloth', { seed: sd + 2, dark });
     if (o.cutAnkles) { ball(g, end[0], end[1], d.ankleR * 0.9, '#8a0010'); ball(g, end[0], end[1], d.ankleR * 0.35, '#e8e0d0'); }
     seg(g, L.h, L.knee, d.thighR, d.kneeR, c.legU, ms.legU || 'skin', { bf: 0.22, bb: 0.12, bpos: 0.4, seed: sd + 3, dark });
+    if (def.stripe) { const a = lerp2(L.h, L.knee, 0.05), b = lerp2(L.h, L.knee, 0.92); line(g, a[0], a[1], b[0], b[1], shade(def.stripe, dark ? -0.3 : 0), 1.4); }
   }
   function drawArm(g, d, def, A, dark, st) {
     const c = def.col, ms = def.mat || {}, sd = dark ? 40 : 30;
@@ -354,10 +356,10 @@ const RIG = (() => {
     if (def.backHand) def.backHand(g, d, J, st);
     drawLeg(g, d, def, J.LB, true, o);
     if (def.tail) def.tail(g, d, J, st);
-    drawTorso(g, d, def, J, st);
-    drawLeg(g, d, def, J.LF, false, o);
+    if (def.bodyDraw) { const up = J.p.lF[0] - J.p.lean > 0.9; if (!up) drawLeg(g, d, def, J.LF, false, o); def.bodyDraw(g, d, J, st); if (up) drawLeg(g, d, def, J.LF, false, o); }
+    else { drawTorso(g, d, def, J, st); drawLeg(g, d, def, J.LF, false, o); }
     if (def.neckDraw) def.neckDraw(g, d, J, st);
-    else if (!o.noHead) seg(g, lerp2(J.sh, J.nk, -0.3), J.nk, d.shW * 0.36, d.shW * 0.32, def.col.neck || def.col.hand, (def.mat && def.mat.neck) || 'skin', { seed: 5 });
+    else if (!o.noHead && !def.bodyDraw) seg(g, lerp2(J.sh, J.nk, -0.3), J.nk, d.shW * 0.36, d.shW * 0.32, def.col.neck || def.col.hand, (def.mat && def.mat.neck) || 'skin', { seed: 5 });
     if (!o.noHead && !o.noHeadDraw) drawHeadAt(g, f, J.nk[0], J.nk[1], J.p.lean + J.p.head * 0.5, o.headScale || 1, Object.assign({}, st, { jaw: J.p.jaw }));
     if (o.noHead) { ball(g, J.nk[0], J.nk[1], d.shW * 0.42, '#7a0010'); ball(g, J.nk[0] + 1, J.nk[1] - 1, d.shW * 0.18, '#e8e0d0'); }
     if (st.wounds && st.wounds.length && !o.noWounds) drawWounds(g, d, J, st.wounds.filter(w => !(o.noHead && w.j === 'head')));
@@ -422,7 +424,7 @@ const RIG = (() => {
   function jointWorld(f, p, name) {
     const J = solve(f.d, p);
     let pt = name === 'head' ? add(J.nk, dir(PI - J.p.lean, 9 * f.d.k)) : name === 'handF' ? J.AF.wr : name === 'handB' ? J.AB.wr :
-      name === 'neck' ? J.nk : name === 'hip' ? J.hip : name === 'chest' ? lerp2(J.hip, J.sh, 0.7) : name === 'belly' ? lerp2(J.hip, J.sh, 0.35) : name === 'kneeF' ? J.LF.knee : name === 'kneeB' ? J.LB.knee : name === 'handFx' ? add(J.AF.wr, dir(J.AF.a2, f.d.fist * 1.2)) : name === 'handBx' ? add(J.AB.wr, dir(J.AB.a2, f.d.fist * 1.2)) : name === 'toeF' ? add(J.LF.ank, dir(J.LF.sa + PI / 2, f.d.footL * 0.5)) : name === 'footF' ? J.LF.ank : name === 'footB' ? J.LB.ank : J.hip;
+      name === 'neck' ? J.nk : name === 'hip' ? J.hip : name === 'chest' ? lerp2(J.hip, J.sh, 0.7) : name === 'belly' ? lerp2(J.hip, J.sh, 0.35) : name === 'kneeF' ? J.LF.knee : name === 'elbowF' ? J.AF.el : name === 'elbowB' ? J.AB.el : name === 'kneeB' ? J.LB.knee : name === 'handFx' ? add(J.AF.wr, dir(J.AF.a2, f.d.fist * 1.2)) : name === 'handBx' ? add(J.AB.wr, dir(J.AB.a2, f.d.fist * 1.2)) : name === 'toeF' ? add(J.LF.ank, dir(J.LF.sa + PI / 2, f.d.footL * 0.5)) : name === 'footF' ? J.LF.ank : name === 'footB' ? J.LB.ank : J.hip;
     if (J.p.rot) {
       const pv = J.p.piv === 1 ? [0, 0] : J.p.piv === 2 ? lerp2(J.hip, J.sh, 0.4) : J.hip, c = Math.cos(J.p.rot), s = Math.sin(J.p.rot);
       const dx = pt[0] - pv[0], dy = pt[1] - pv[1];
@@ -438,14 +440,43 @@ const RIG = (() => {
     line(g, A[0], A[1], B[0], B[1], BONE, w);
     ball(g, A[0], A[1], w * 0.95, BONE); ball(g, B[0], B[1], w * 0.95, BONE);
   }
-  function skull(g, x, y, r, rot) {
+  function skull(g, x, y, r, rot, type) {
     g.save(); g.translate(x, y); g.rotate(rot || 0);
-    ball(g, 0, -r * 0.2, r, BONE);
-    oval(g, r * 0.35, r * 0.45, r * 0.55, r * 0.4, BONE, 0, false);
-    g.fillStyle = '#1a1010';
-    g.beginPath(); g.ellipse(r * 0.42, -r * 0.2, r * 0.26, r * 0.3, 0, 0, PI * 2); g.fill();
-    g.beginPath(); g.moveTo(r * 0.75, r * 0.1); g.lineTo(r * 0.9, r * 0.32); g.lineTo(r * 0.66, r * 0.3); g.fill();
-    for (let i = 0; i < 4; i++) g.fillRect(r * 0.05 + i * r * 0.2, r * 0.62, r * 0.08, r * 0.22);
+    const D = '#1a1010', socket = (sx, sy, rx, ry) => { g.fillStyle = D; g.beginPath(); g.ellipse(sx, sy, rx, ry, 0, 0, PI * 2); g.fill(); };
+    if (type === 'goose') {
+      ball(g, 0, -r * 0.1, r * 0.75, BONE);
+      poly(g, [[r * 0.4, -r * 0.45], [r * 2.6, -r * 0.05], [r * 2.7, r * 0.12], [r * 0.5, r * 0.25]], BONE);
+      poly(g, [[r * 0.5, r * 0.3], [r * 2.4, r * 0.2], [r * 0.4, r * 0.55]], '#d8ceb4');
+      socket(r * 0.15, -r * 0.2, r * 0.38, r * 0.34); socket(r * 1.4, -r * 0.05, r * 0.35, r * 0.07);
+    } else if (type === 'hippo') {
+      ball(g, -r * 0.3, -r * 0.35, r * 0.85, BONE);
+      poly(g, [[-r * 0.4, -r * 0.7], [r * 1.6, -r * 0.75], [r * 2.4, -r * 0.4], [r * 2.4, r * 0.3], [-r * 0.2, r * 0.3]], BONE);
+      poly(g, [[-r * 0.3, r * 0.35], [r * 2.3, r * 0.35], [r * 2.4, r * 0.9], [r * 1.2, r * 1.2], [-r * 0.2, r * 0.9]], '#d8ceb4');
+      socket(r * 0.2, -r * 0.75, r * 0.35, r * 0.28); socket(r * 2.05, -r * 0.55, r * 0.2, r * 0.12);
+      poly(g, [[r * 1.9, r * 0.4], [r * 2.15, r * 0.4], [r * 2.3, -r * 0.6]], '#f4ecd4'); poly(g, [[r * 2.2, r * 0.3], [r * 2.6, r * 0.2], [r * 2.35, r * 0.5]], '#f4ecd4');
+      for (let i = 0; i < 5; i++) g.fillRect(r * 0.4 + i * r * 0.3, r * 0.26, r * 0.12, r * 0.18);
+    } else if (type === 'cat' || type === 'raccoon') {
+      const sn = type === 'cat' ? 0.55 : 1.0;
+      ball(g, 0, -r * 0.15, r * 0.95, BONE);
+      poly(g, [[r * 0.4, -r * 0.45], [r * (0.9 + sn), -r * 0.2], [r * (1.0 + sn), r * 0.25], [r * 0.4, r * 0.5]], BONE);
+      poly(g, [[r * 0.2, r * 0.5], [r * (0.9 + sn), r * 0.35], [r * (0.8 + sn), r * 0.65], [r * 0.1, r * 0.75]], '#d8ceb4');
+      socket(r * 0.55, -r * 0.25, r * 0.36, r * 0.38); socket(r * (0.85 + sn), -r * 0.05, r * 0.14, r * 0.12);
+      poly(g, [[r * (0.7 + sn * 0.6), r * 0.3], [r * (0.82 + sn * 0.6), r * 0.3], [r * (0.76 + sn * 0.6), r * 0.85]], '#f4ecd4');
+    } else if (type === 'muskrat') {
+      ball(g, 0, -r * 0.1, r * 0.85, BONE);
+      poly(g, [[r * 0.3, -r * 0.5], [r * 1.6, -r * 0.15], [r * 1.7, r * 0.2], [r * 0.3, r * 0.45]], BONE);
+      poly(g, [[r * 0.2, r * 0.5], [r * 1.4, r * 0.3], [r * 0.1, r * 0.75]], '#d8ceb4');
+      socket(r * 0.45, -r * 0.2, r * 0.28, r * 0.26);
+      g.fillStyle = '#d88a18'; g.fillRect(r * 1.5, r * 0.15, r * 0.22, r * 0.6); g.fillRect(r * 1.3, r * 0.35, r * 0.2, r * 0.45);
+    } else {
+      ball(g, 0, -r * 0.2, r, BONE);
+      oval(g, r * 0.35, r * 0.45, r * 0.55, r * 0.4, BONE, 0, false);
+      g.fillStyle = D;
+      g.beginPath(); g.ellipse(r * 0.42, -r * 0.2, r * 0.26, r * 0.3, 0, 0, PI * 2); g.fill();
+      g.beginPath(); g.moveTo(r * 0.75, r * 0.1); g.lineTo(r * 0.9, r * 0.32); g.lineTo(r * 0.66, r * 0.3); g.fill();
+      for (let i = 0; i < 4; i++) g.fillRect(r * 0.05 + i * r * 0.2, r * 0.62, r * 0.08, r * 0.22);
+      if (type === 'devil') { poly(g, [[-r * 0.2, -r * 0.9], [-r * 0.6, -r * 1.9], [r * 0.2, -r * 1.0]], '#d8ceb4'); poly(g, [[r * 0.35, -r * 1.0], [r * 0.5, -r * 2.0], [r * 0.75, -r * 0.9]], '#d8ceb4'); }
+    }
     g.restore();
   }
   function drawSkeleton(g, d, J, def, o) {
@@ -460,7 +491,8 @@ const RIG = (() => {
     }
     oval(g, J.hip[0], J.hip[1] + 2, d.hipW * 0.9, 5 * d.k, BONE);
     limb(J.LF.h, J.LF.knee, J.LF.ank); limb(J.AF.s0, J.AF.el, J.AF.wr);
-    if (!o.noHead) skull(g, J.nk[0] + 2 * d.k, J.nk[1] - 8 * d.k, 8.5 * d.k, J.p.lean);
+    if (def.bodyDraw) { for (let i = 0; i <= 8; i++) { const p = lerp2(J.sh, J.nk, i / 8); ball(g, p[0], p[1], w * 0.9, i % 2 ? BONED : BONE); } }
+    if (!o.noHead) skull(g, J.nk[0] + 2 * d.k, J.nk[1] - 8 * d.k * (def.skull === 'goose' ? 0.6 : 1), 8.5 * d.k * (def.skullK || 1), J.p.lean, def.skull);
     if (o.gore) {
       for (let i = 0; i < 7; i++) { const p = lerp2(J.hip, J.sh, (i * 0.37) % 1); g.fillStyle = i % 2 ? '#8a0010' : '#b0101a'; g.fillRect(p[0] - 3 + (i * 5) % 7, p[1], 3, 2 + i % 3); }
     }

@@ -41,8 +41,87 @@ const SFX = (() => {
       speechSynthesis.speak(u);
     } catch (e) {}
   }
+
+  // ---------- music: early-90s industrial fight loop, synthesized live ----------
+  const MU = { track: null, step: 0, next: 0, timer: null, tr: 0, g: null, dl: null };
+  function mOut() {
+    if (!MU.g) {
+      MU.g = ac.createGain(); MU.g.gain.value = 0.5; MU.g.connect(master);
+      MU.dl = ac.createDelay(1); MU.dl.delayTime.value = 0.34; const fb = ac.createGain(); fb.gain.value = 0.3; const wet = ac.createGain(); wet.gain.value = 0.35;
+      MU.dl.connect(fb); fb.connect(MU.dl); MU.dl.connect(wet); wet.connect(MU.g);
+    }
+    return MU.g;
+  }
+  const hz = n => 440 * Math.pow(2, (n - 69) / 12);
+  function mt(t, freq, dur, type, vol, o = {}) {
+    const osc = ac.createOscillator(), g = ac.createGain();
+    osc.type = type; osc.frequency.setValueAtTime(freq, t);
+    if (o.slide) osc.frequency.exponentialRampToValueAtTime(Math.max(20, o.slide), t + dur);
+    if (o.det) osc.detune.value = o.det;
+    let node = osc;
+    if (o.lp) { const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(o.lp, t); if (o.lp2) f.frequency.exponentialRampToValueAtTime(o.lp2, t + dur * 0.8); f.Q.value = o.q || 4; osc.connect(f); node = f; }
+    node.connect(g);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + (o.att || 0.004)); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+    g.connect(mOut()); if (o.echo) g.connect(MU.dl);
+    osc.start(t); osc.stop(t + dur + 0.05);
+  }
+  function mn(t, dur, vol, f0, type = 'bandpass', q = 1) {
+    if (!noiseBuf) { noiseBuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    s.buffer = noiseBuf; f.type = type; f.frequency.value = f0; f.Q.value = q;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+    s.connect(f); f.connect(g); g.connect(mOut()); s.start(t, Math.random()); s.stop(t + dur + 0.05);
+  }
+  const DR = {
+    kick: t => { mt(t, 150, 0.22, 'sine', 0.55, { slide: 42 }); mn(t, 0.02, 0.25, 3000, 'highpass'); },
+    snare: t => { mn(t, 0.2, 0.32, 1700, 'bandpass', 0.7); mt(t, 200, 0.09, 'triangle', 0.18, { slide: 140 }); },
+    hat: t => mn(t, 0.035, 0.07, 7500, 'highpass'),
+    clank: t => { mt(t, 1240, 0.09, 'triangle', 0.07); mt(t, 1867, 0.07, 'square', 0.03); mn(t, 0.06, 0.1, 3800, 'bandpass', 6); },
+    anvil: t => { mt(t, 620, 0.5, 'triangle', 0.08); mt(t, 931, 0.45, 'triangle', 0.05); mn(t, 0.1, 0.2, 2400, 'bandpass', 3); },
+  };
+  // progression in D minor: Dm, Bb, Gm, A
+  const ROOT = [0, -4, -7, -5], CH = [[0, 3, 7], [0, 4, 7], [0, 3, 7], [0, 4, 7]];
+  const BASS = [0, 0, 12, 0, 0, 0, 12, 0, 0, 12, 0, 0, 12, 0, 7, 0];
+  const KICK = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0], SNARE = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1], CLANK = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0];
+  const LEAD = [[12, 4], null, null, null, [15, 2], null, [13, 2], null, [12, 2], null, [10, 4], null, null, null, [8, 2], null,
+    [7, 4], null, null, null, [8, 2], null, [10, 2], null, [12, 6], null, null, null, null, null, [13, 2], null];
+  const FORM = ['A', 'A', 'B', 'B', 'C', 'C', 'B', 'D', 'C', 'C'];
+  function fightStep(i, t, sd) {
+    const bar = (i >> 4), s = i & 15, sec = FORM[(bar >> 1) % FORM.length], ci = bar % 4, r = ROOT[ci] + MU.tr;
+    if (sec !== 'D' && KICK[s]) DR.kick(t);
+    if (sec !== 'A' && SNARE[s]) DR.snare(t);
+    if (s % 2 === 1 || sec === 'C') DR.hat(t);
+    if (sec !== 'A' && CLANK[s]) DR.clank(t);
+    if (s === 0 && bar % 8 === 0) DR.anvil(t);
+    const bn = 38 + r + BASS[s];
+    mt(t, hz(bn), sd * 0.9, 'sawtooth', 0.16, { lp: 1400, lp2: 220, q: 6 }); mt(t, hz(bn - 12), sd * 0.9, 'square', 0.06, { lp: 500 });
+    if ((sec === 'B' || sec === 'C') && (s === 0 || s === 6 || s === 10)) for (const n of CH[ci]) mt(t, hz(62 + r + n), sd * 2.4, 'sawtooth', 0.04, { lp: 2400, lp2: 700, det: (n % 2 ? 7 : -7) });
+    if (sec === 'C' || sec === 'D') { const L = LEAD[i % 32]; if (L) { mt(t, hz(62 + MU.tr + L[0]), sd * L[1] * 0.95, 'square', 0.05, { lp: 3000, echo: 1, att: 0.01 }); mt(t, hz(62 + MU.tr + L[0]), sd * L[1] * 0.95, 'square', 0.03, { det: 12, lp: 2500, echo: 1, att: 0.01 }); } }
+  }
+  function menuStep(i, t, sd) {
+    const s = i & 15, bar = i >> 4, r = ROOT[bar % 4];
+    if (s === 0) { mt(t, hz(26 + r), sd * 16, 'sawtooth', 0.12, { lp: 300, q: 8, att: 0.3 }); mt(t, hz(38 + r), sd * 16, 'sawtooth', 0.05, { lp: 500, att: 0.3 }); }
+    if (s === 0 || s === 10) DR.kick(t);
+    if (s === 4 || s === 12) DR.clank(t);
+    if (s === 8 && bar % 2) DR.anvil(t);
+    if (s % 4 === 2) mt(t, hz(62 + r + CH[bar % 4][(s >> 2) % 3]), sd * 3, 'triangle', 0.04, { echo: 1 });
+  }
+  function music(name, tr = 0) {
+    if (!ac) return;
+    if (MU.track === name && MU.tr === tr) return;
+    MU.track = name; MU.tr = tr; MU.step = 0; MU.next = ac.currentTime + 0.08;
+    if (!MU.timer) MU.timer = setInterval(() => {
+      if (!MU.track || !ac || muted) { if (ac) MU.next = ac.currentTime + 0.05; return; }
+      const sd = 60 / (MU.track === 'fight' ? 132 : 92) / 4;
+      while (MU.next < ac.currentTime + 0.14) {
+        (MU.track === 'fight' ? fightStep : menuStep)(MU.step, MU.next, sd);
+        MU.step++; MU.next += sd;
+      }
+    }, 30);
+  }
+  function stopMusic() { MU.track = null; }
   const S = {
-    unlock, setMuted, isMuted: () => muted, say,
+    unlock, setMuted, isMuted: () => muted, say, music, stopMusic,
     whoosh: () => noise(0.12, 0.12, 900, 0.7, 'bandpass', 0, 0.02, 2400),
     punch: () => { noise(0.1, 0.45, 500, 0.8, 'lowpass'); tone(120, 0.1, 'sine', 0.4, -60); },
     kick: () => { noise(0.14, 0.5, 380, 0.8, 'lowpass'); tone(90, 0.14, 'sine', 0.45, -40); },

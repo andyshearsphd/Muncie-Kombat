@@ -95,7 +95,7 @@ const ROSTER = (() => {
   // ---------- the fighters ----------
   const HP = '#7d4fa8', HPL = '#a982c8', HPD = '#4a2a68';
   const hippo = {
-    id: 'hippo', name: 'MUNCIE HIPPO', short: 'HIPPO', him: 'HIM', k: 1.0, paws: true,
+    id: 'hippo', name: 'MUNCIE HIPPO', short: 'HIPPO', him: 'HIM', k: 1.0, paws: true, skull: 'hippo',
     bio: 'Purple, hungry and done filling potholes for this town.',
     d: dims({ thigh: 21, shin: 18, torso: 37, neck: 7, upper: 19, fore: 17, hipW: 19, shW: 19, chest: 21, belly: 26, back: 19, thighR: 10.5, kneeR: 8, ankleR: 7, shR: 8.5, elbowR: 6.8, wristR: 6, fist: 6, footL: 14, footH: 6.5, shOff: 4 }),
     col: { torso: HP, armU: HP, armL: HP, hand: HPD, legU: HP, legL: HP, foot: HPD, neck: HP },
@@ -190,7 +190,7 @@ const ROSTER = (() => {
 
   const OR = '#c8762e', ORD = '#7a3e14', CRM = '#e8d0a8';
   const garf = {
-    id: 'garf', name: 'GARF CAT', short: 'GARF', him: 'HIM', k: 1.08, paws: true, claws: true,
+    id: 'garf', name: 'GARF CAT', short: 'GARF', him: 'HIM', k: 1.08, paws: true, claws: true, skull: 'cat',
     bio: 'Twenty pounds of alley tom. Hates Mondays. Hates you more.',
     d: dims({ thigh: 21, shin: 21, torso: 35, neck: 2, upper: 18, fore: 17, hipW: 17, shW: 15, chest: 17, belly: 21, back: 14, thighR: 9.5, kneeR: 6.5, ankleR: 4.5, shR: 7, elbowR: 5.5, wristR: 4.6, fist: 5, footL: 12, footH: 5 }),
     col: { torso: OR, armU: OR, armL: OR, hand: sh(OR, 0.15), legU: OR, legL: OR, foot: sh(OR, 0.1), neck: OR },
@@ -279,18 +279,21 @@ const ROSTER = (() => {
 
   const SKB = '#7a4a2a', RED = '#a8132a';
   const ballin = {
-    id: 'ballin', name: "BALLIN' WELL", short: 'BALLIN', him: 'HIM', k: 1.05,
-    bio: 'Ball State legend. Still has the moves. Still has the elbows.',
-    sock: '#e8e8e8', bicep: 0.38, calf: 0.4,
-    d: dims({ thigh: 29, shin: 29, torso: 36, upper: 22, fore: 21, hipW: 12, shW: 16, chest: 15.5, belly: 11, back: 11, thighR: 7.4, kneeR: 4.6, shR: 6, elbowR: 4.1 }),
-    col: { torso: RED, armU: SKB, armL: SKB, hand: SKB, legU: RED, legL: SKB, foot: '#e8e8e8', neck: SKB },
+    id: 'ballin', name: "BALLIN' WELL", short: 'BALLIN', him: 'HIM', k: 1.1,
+    bio: 'Ball State legend. Number 42. Still has the moves. Still has the elbows.',
+    sock: '#ececea', bicep: 0.38, calf: 0.4, stripe: RED,
+    d: dims({ thigh: 31, shin: 31, torso: 37, upper: 23, fore: 22, hipW: 12, shW: 16, chest: 15.5, belly: 11, back: 11, thighR: 7.6, kneeR: 4.6, shR: 6, elbowR: 4.1 }),
+    col: { torso: '#eae8e2', armU: SKB, armL: SKB, hand: SKB, legU: '#eae8e2', legL: SKB, foot: '#b8141e', neck: SKB },
     mat: { torso: 'cloth', armU: 'skin', armL: 'skin', legU: 'cloth', legL: 'skin' },
     stats: { speed: 1.1, power: 1.0, weight: 1.0 },
     torsoDetail(g, d, st, L) {
-      R.poly(g, [[-d.shW * 0.4, -L * 1.06], [d.shW * 0.9, -L * 1.06], [d.shW * 0.45, -L * 0.82]], SKB);
-      g.strokeStyle = '#eee'; g.lineWidth = 1.3; g.beginPath(); g.moveTo(-d.shW * 0.4, -L * 1.04); g.lineTo(d.shW * 0.45, -L * 0.82); g.lineTo(d.shW * 0.9, -L * 1.04); g.stroke();
-      g.save(); g.translate(d.shW * 0.1, -L * 0.62); g.font = '700 6px Anton, Impact, sans-serif'; g.fillStyle = '#f2f2f2'; g.fillText('BALL ST', -9, 0); g.restore();
-      g.fillStyle = '#eee'; g.fillRect(-d.hipW, -6, d.hipW * 2.2, 1.4);
+      // tank top: scooped neck and arm holes trimmed in red
+      R.poly(g, [[-d.shW * 0.4, -L * 1.06], [d.shW * 0.9, -L * 1.06], [d.shW * 0.45, -L * 0.8]], SKB);
+      g.strokeStyle = RED; g.lineWidth = 1.6; g.beginPath(); g.moveTo(-d.shW * 0.4, -L * 1.04); g.lineTo(d.shW * 0.45, -L * 0.8); g.lineTo(d.shW * 0.9, -L * 1.04); g.stroke();
+      g.beginPath(); g.moveTo(-d.back * 0.9, -L * 0.98); g.quadraticCurveTo(-d.back * 0.1, -L * 0.7, d.shW * 0.25, -L * 0.98); g.stroke();
+      g.save(); g.translate(d.shW * 0.08, -L * 0.36); g.font = '400 13px Anton, Impact, sans-serif'; g.fillStyle = '#5a0a10'; g.fillText('42', -6.4, 0.6); g.fillStyle = RED; g.fillText('42', -7, 0); g.restore();
+      g.save(); g.translate(d.shW * 0.08, -L * 0.62); g.font = '400 5px Anton, Impact, sans-serif'; g.fillStyle = RED; g.fillText('BALL STATE', -10, 0); g.restore();
+      g.fillStyle = RED; g.fillRect(-d.hipW * 1.1, -5, d.hipW * 2.4, 2);
     },
     head(g, st) {
       humanHead(g, st, {
@@ -309,17 +312,17 @@ const ROSTER = (() => {
 
   const GB = '#6a5e50', GL = '#ddd6c6';
   const gertie = {
-    id: 'gertie', name: 'GERTIE', short: 'GERTIE', him: 'HER', k: 1.0, wings: true, webbed: true,
-    bio: 'Canada goose. Owns the Greenway. Will hiss at your corpse.',
-    d: dims({ thigh: 17, shin: 21, torso: 30, neck: 22, upper: 19, fore: 19, hipW: 15, shW: 13, chest: 16, belly: 19, back: 15, thighR: 7, kneeR: 2.4, ankleR: 2, shR: 6, elbowR: 5, wristR: 4, fist: 4.5, footL: 13, footH: 3.2 }),
-    col: { torso: GB, armU: GB, hand: '#221e1a', legU: GB, legL: '#1a1a1a', foot: '#1a1a1a' },
+    id: 'gertie', name: 'GERTIE', short: 'GERTIE', him: 'HER', k: 1.1, wings: true, webbed: true, skull: 'goose', skullK: 0.8,
+    bio: 'A Canada goose the size of a linebacker. Owns the Greenway. Will hiss at your corpse.',
+    d: dims({ thigh: 14, shin: 17, torso: 30, neck: 38, hox: 12, upper: 20, fore: 21, hipW: 16, shW: 14, chest: 16, belly: 26, back: 24, thighR: 5.5, kneeR: 2.8, ankleR: 2.2, shR: 7, elbowR: 6, wristR: 4.5, fist: 4.5, footL: 15, footH: 3.2, shOff: 2 }),
+    col: { torso: GB, armU: GB, hand: '#221e1a', legU: '#2a2826', legL: '#222020', foot: '#1a1a1a' },
     mat: { torso: 'feather', legU: 'feather', legL: 'skin' }, calf: 0,
     stats: { speed: 1.06, power: 0.95, weight: 0.9 },
     wing(g, A, dark, d, st) {
-      const c = dark ? sh(GB, -0.3) : GB;
-      const a = A.a2, e = A.el, w = A.wr, end = R.add(w, R.dir(a, 10));
+      const c = dark ? sh(GB, -0.2) : sh(GB, 0.08);
+      const a = A.a2, e = A.el, w = A.wr, end = R.add(w, R.dir(a, 13));
       g.beginPath(); g.moveTo(A.s0[0] - 3, A.s0[1]);
-      g.quadraticCurveTo(...R.add(e, R.dir(a + PI / 2, 8)), ...R.add(w, R.dir(a + PI / 2, 5)));
+      g.quadraticCurveTo(...R.add(e, R.dir(a + PI / 2, 12)), ...R.add(w, R.dir(a + PI / 2, 8)));
       g.lineTo(...end);
       g.quadraticCurveTo(...R.add(e, R.dir(a - PI / 2, 3)), A.s0[0] + 3, A.s0[1] + 4);
       g.closePath(); g.fillStyle = lit(g, e[0], e[1], 16, c); g.fill();
@@ -328,13 +331,32 @@ const ROSTER = (() => {
       g.fillStyle = dark ? '#100c08' : '#1e1a16'; g.beginPath(); g.moveTo(...R.lerp2(w, end, 0)); g.lineTo(...end); g.lineTo(...R.add(w, R.dir(a + PI / 2, 6))); g.fill();
       g.restore();
     },
-    torsoDetail(g, d, st, L) {
-      g.fillStyle = 'rgba(225,218,200,0.8)'; g.beginPath(); g.ellipse(d.belly * 0.3, -L * 0.55, d.belly * 0.6, L * 0.42, 0, 0, PI * 2); g.fill();
-      g.strokeStyle = 'rgba(40,30,20,0.4)'; g.lineWidth = 0.7; for (let i = 0; i < 9; i++) { g.beginPath(); g.arc(-d.back * 0.4 + (i % 3) * 5, -L * 0.15 - ((i / 3) | 0) * 7, 3, 0.3, PI - 0.3); g.stroke(); }
+    // a real goose body: big horizontal feathered barrel, long black neck
+    bodyDraw(g, d, J, st) {
+      const k = d.k, c = R.add(R.lerp2(J.hip, J.sh, 0.42), [5 * k, 0]), rot = J.p.lean * 0.55 - 0.12, rx = 31 * k, ry = 19 * k;
+      g.save(); g.translate(c[0], c[1]); g.rotate(rot);
+      R.poly(g, [[-rx * 0.8, -ry * 0.45], [-rx * 1.38, -ry * 0.55], [-rx * 1.3, ry * 0.05], [-rx * 0.8, ry * 0.3]], '#141210');
+      R.poly(g, [[-rx * 0.85, ry * 0.25], [-rx * 1.2, ry * 0.2], [-rx * 0.7, ry * 0.75]], '#ece6da');
+      g.beginPath(); g.ellipse(0, 0, rx, ry, 0, 0, PI * 2); g.fillStyle = lit(g, 0, 0, rx, GB, 0.28, -0.65); g.fill();
+      g.save(); g.clip();
+      g.fillStyle = 'rgba(220,212,196,0.9)'; g.beginPath(); g.ellipse(rx * 0.25, ry * 0.55, rx * 0.8, ry * 0.6, 0.08, 0, PI * 2); g.fill();
+      g.fillStyle = 'rgba(150,120,90,0.45)'; g.beginPath(); g.ellipse(rx * 0.7, -ry * 0.05, rx * 0.4, ry * 0.6, 0, 0, PI * 2); g.fill();
+      g.strokeStyle = 'rgba(30,22,14,0.5)'; g.lineWidth = 0.8;
+      for (let r = 0; r < 3; r++) for (let i = 0; i < 6; i++) { g.beginPath(); g.arc(-rx * 0.7 + i * rx * 0.22 + r * 2, -ry * 0.55 + r * ry * 0.3, 3.2 * k, 0.2, PI - 0.2); g.stroke(); }
+      g.fillStyle = 'rgba(255,250,240,0.12)'; for (let i = 0; i < 6; i++) g.fillRect(-rx * 0.6 + i * rx * 0.2, -ry * 0.75, rx * 0.12, 1);
+      g.restore();
+      R.srand(5); g.fillStyle = sh(GB, -0.3);
+      for (let i = 0; i < 18; i++) { const a = -PI * 0.95 + i * 0.11, x = Math.cos(a) * rx, y = Math.sin(a) * ry; g.beginPath(); g.moveTo(x - 1.5, y); g.lineTo(x * 1.06 - 1, y * 1.12 - 1); g.lineTo(x + 1.5, y); g.fill(); }
+      g.restore();
+      // neck rising from the front of the body
+      const base = R.add(c, [Math.cos(rot) * rx * 0.62 + Math.sin(rot) * ry * 0.5, Math.sin(rot) * rx * 0.62 - Math.cos(rot) * ry * 0.5]);
+      const nk = J.nk, ctl = [base[0] + 7 * k, (base[1] + nk[1]) / 2];
+      let p = base;
+      for (let i = 1; i <= 6; i++) { const t = i / 6, q = [(1 - t) * (1 - t) * base[0] + 2 * (1 - t) * t * ctl[0] + t * t * nk[0], (1 - t) * (1 - t) * base[1] + 2 * (1 - t) * t * ctl[1] + t * t * nk[1]]; R.seg(g, p, q, (5.4 - i * 0.35) * k, (5.0 - i * 0.35) * k, '#1c1a18', 'feather', { seed: 300 + i }); p = q; }
+      R.line(g, base[0] - 2 * k, base[1] + 2 * k, base[0] + 5 * k, base[1] - 1 * k, 'rgba(220,212,196,0.8)', 2.5 * k);
     },
-    tail(g, d, J) { R.poly(g, [[J.hip[0] - d.back * 0.6, J.hip[1] - 10], [J.hip[0] - d.back * 1.7, J.hip[1] - 2], [J.hip[0] - d.back * 0.8, J.hip[1] + 3]], '#121010'); R.poly(g, [[J.hip[0] - d.back * 0.9, J.hip[1] - 2], [J.hip[0] - d.back * 1.3, J.hip[1] + 4], [J.hip[0], J.hip[1] + 4]], '#e8e2d6'); },
-    neckDraw(g, d, J) { R.seg(g, J.sh, J.nk, 5.5 * d.k, 3.8 * d.k, '#1c1a18', 'feather', { seed: 300 }); R.line(g, ...R.lerp2(J.sh, J.nk, 0.02), ...R.lerp2(J.sh, J.nk, 0.12), GL, 4); },
     head(g, st) {
+      g.scale(1.25, 1.25);
       g.beginPath(); g.ellipse(2, -6, 6.5, 5.6, 0.15, 0, PI * 2); fillLit(g, '#1c1a18', 2, -6, 7, 0.35, -0.6);
       // white chinstrap
       g.beginPath(); g.moveTo(-2.5, -6.5); g.quadraticCurveTo(2, -11, 5.5, -7.5); g.quadraticCurveTo(5, -2, 0, -1); g.quadraticCurveTo(-3, -2.5, -2.5, -6.5); fillLit(g, '#ece6da', 1.5, -5, 6, 0.1, -0.35);
@@ -352,7 +374,7 @@ const ROSTER = (() => {
 
   const RG = '#6e6e72', RGL = '#b0b0b0', RGD = '#222226';
   const rocky = {
-    id: 'rocky', name: 'ROCKY', short: 'ROCKY', him: 'HIM', k: 0.96, paws: true, claws: true,
+    id: 'rocky', name: 'ROCKY', short: 'ROCKY', him: 'HIM', k: 1.0, paws: true, claws: true, skull: 'raccoon',
     bio: 'Rabid, foaming and living in the dumpster behind Royal Pizza.',
     d: dims({ thigh: 21, shin: 20, torso: 31, neck: 2, upper: 18, fore: 17, hipW: 14, shW: 13, chest: 14, belly: 16, back: 13, thighR: 8.5, kneeR: 5.8, ankleR: 4.2, shR: 6.5, elbowR: 4.8, wristR: 4, fist: 4.5, footL: 11, footH: 4.4 }),
     col: { torso: RG, armU: RG, armL: sh(RG, -0.3), hand: RGD, legU: RG, legL: sh(RG, -0.3), foot: RGD, neck: RG },
@@ -390,9 +412,9 @@ const ROSTER = (() => {
 
   const MB = '#5a3e26', MBL = '#8a6a48', MBD = '#2a1e14';
   const millie = {
-    id: 'millie', name: 'MILLIE', short: 'MILLIE', him: 'HER', k: 0.93, paws: true, claws: true,
+    id: 'millie', name: 'MILLIE', short: 'MILLIE', him: 'HER', k: 1.04, paws: true, claws: true, skull: 'muskrat',
     bio: 'White River muskrat. Those teeth go through bone like balsa.',
-    d: dims({ thigh: 21, shin: 19, torso: 31, neck: 2, upper: 17, fore: 17, hipW: 15, shW: 12.5, chest: 14, belly: 17, back: 14, thighR: 8.5, kneeR: 5.8, ankleR: 4, shR: 6.2, elbowR: 4.6, wristR: 3.8, fist: 4.3, footL: 12, footH: 4.2 }),
+    d: dims({ thigh: 25, shin: 23, torso: 34, neck: 5, upper: 19, fore: 18, hipW: 15, shW: 13, chest: 14.5, belly: 17, back: 14, thighR: 8.5, kneeR: 5.8, ankleR: 4, shR: 6.2, elbowR: 4.6, wristR: 3.8, fist: 4.3, footL: 12, footH: 4.2 }),
     col: { torso: MB, armU: MB, armL: MB, hand: MBD, legU: MB, legL: MB, foot: MBD, neck: MB },
     mat: { torso: 'fur', armU: 'fur', armL: 'fur', legU: 'fur', legL: 'fur', neck: 'fur' },
     stats: { speed: 1.08, power: 0.95, weight: 0.85 },
@@ -454,7 +476,7 @@ const ROSTER = (() => {
 
   const DR = '#a82024';
   const dan = {
-    id: 'dan', name: 'DEVIL DAN', short: 'DAN', him: 'HIM', k: 1.12, boss: true, bicep: 0.42, calf: 0.2,
+    id: 'dan', name: 'DEVIL DAN', short: 'DAN', him: 'HIM', k: 1.12, boss: true, skull: 'devil', bicep: 0.42, calf: 0.2,
     bio: 'He runs this town from City Hall. Now he wants your soul.',
     d: dims({ thigh: 28, shin: 27, torso: 36, upper: 21, fore: 20, hipW: 11, shW: 16.5, chest: 16, belly: 11.5, back: 11, thighR: 7.6, kneeR: 5, shR: 6.4 }),
     col: { torso: DR, armU: DR, armL: DR, hand: '#982024', legU: '#1a1012', legL: '#1a1012', foot: '#0c0606', neck: DR },
