@@ -4,6 +4,7 @@ const FATAL = (() => {
   const R = RIG, P = RIG.P, PI = Math.PI;
   const rnd = (a, b) => a + Math.random() * (b - a);
   const lerp = (a, b, t) => a + (b - a) * Math.max(0, Math.min(1, t));
+  const pick = a => a[(Math.random() * a.length) | 0];
   const ease = t => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
 
   function walkTo(f, x, dt, api, sp = 95) {
@@ -38,7 +39,7 @@ const FATAL = (() => {
       for (const e of s.ev) if (!e.f && s.t >= e.time) { e.f = 1; e.fn(); }
       if (s.tick) s.tick(s.t, dt);
     };
-    if (!['golemDie', 'danDie', 'bridge'].includes(id)) center(A, V, api);
+    if (!['golemDie', 'danDie', 'slumDie', 'bridge'].includes(id)) center(A, V, api);
     if (Math.abs(V.x - A.x) > 1) A.face = Math.sign(V.x - A.x);
     V.face = -A.face;
     A.scriptPose = api.PS.stance(A.t); V.scriptPose = api.PS.dizzy(V.t);
@@ -751,6 +752,205 @@ const FATAL = (() => {
       A.scriptPose = api.PS.win(A.t);
     };
   };
+  // ---------- COKE WOLFE: Full Moon ----------
+  S.wolfe = (s, A, V, api) => {
+    const PS = api.PS, k = A.d.k, F = api.FLOOR;
+    let moon = 0, bite = false, head = false, x0 = 0, nextShake = 0;
+    const mx = () => api.cam + api.W * 0.5, my = 54;
+    prop({ layer: 'back', draw(g) {
+      if (moon <= 0) return;
+      const y = lerp(F, my, moon);
+      g.save(); g.globalAlpha = Math.min(1, moon * 1.4);
+      const gr = g.createRadialGradient(mx(), y, 10, mx(), y, 70); gr.addColorStop(0, 'rgba(255,250,220,0.5)'); gr.addColorStop(1, 'rgba(255,250,220,0)');
+      g.fillStyle = gr; g.fillRect(mx() - 80, y - 80, 160, 160);
+      R.ball(g, mx(), y, 28, '#f4efd8'); g.fillStyle = 'rgba(160,150,120,0.35)'; g.beginPath(); g.arc(mx() - 8, y - 6, 7, 0, PI * 2); g.arc(mx() + 9, y + 8, 5, 0, PI * 2); g.arc(mx() + 4, y - 12, 3, 0, PI * 2); g.fill();
+      g.restore();
+    } });
+    prop({ layer: 'front', draw(g) {
+      if (!head) return;
+      const h = J(A, 'head');
+      g.save(); g.translate(h[0] + A.face * 20 * k, h[1] + 10); g.rotate(A.face * 0.6); R.drawHeadAt(g, { def: V.def, d: V.d }, 0, 6 * V.d.k, 0, 1, { dead: true, t: 0 }); g.restore();
+      if (Math.random() < 0.5) FX.blood(h[0] + A.face * 20 * k, h[1] + 18, 1, 0, 0.3);
+    } });
+    s.at(0.6, () => { api.sfx('sniff'); const h = J(A, 'head'); FX.puff(h[0] + A.face * 20 * k, h[1], 'rgba(250,250,250,0.9)', 14, 3); });
+    s.at(1.1, () => { api.sfx('howl'); });
+    s.at(2.3, () => { x0 = A.x; });
+    s.at(2.55, () => { bite = true; api.sfx('chomp'); api.sfx('scream'); api.shake(5); V.ro.gore = true; });
+    s.at(4.1, () => {
+      bite = false; head = true; V.ro.noHead = true; api.sfx('crunch'); api.sfx('splat'); api.shake(8); api.flash();
+      const nk = J(V, 'neck'); FX.blood(nk[0], nk[1], 70, A.face, 1.6); FX.spurt(nk[0], nk[1], A.face * 0.3, 1.6);
+      FX.burst(nk[0], nk[1], 6, ['chunk', 'chunk', 'bone', 'guts'], 1);
+    });
+    s.at(4.7, () => { head = false; const h = J(A, 'head'); headGib(V, h[0] + A.face * 20 * k, h[1] + 10, { vx: -A.face * 140, vy: -420, vr: 9 }); api.sfx('howl'); });
+    s.at(5.2, () => api.bubble('AWOOOOOO!', A.x, F - 170, { size: 14, fill: 'white', life: 1.8 }));
+    s.at(6.4, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      moon = Math.min(1, Math.max(0, (t - 0.4) / 0.9));
+      if (t < 0.6) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 34 * k, dt, api, 110); return; }
+      if (t < 1.0) { A.scriptPose = P({ hy: 6, lean: 0.3, head: 0.4, aF: [2.5, 2.75], aB: [0.6, 1.9], fF: [13, 0], fB: [-13, 0] }); V.scriptPose = PS.dizzy(V.t); return; }
+      if (t < 2.3) {
+        // the howl, and the change: he gets bigger
+        A.ro.scale = 1 + ease((t - 1.0) / 1.2) * 0.22;
+        A.scriptPose = P({ hy: 3, lean: -0.35, head: -1.05, jaw: 1, aF: [0.8 + Math.sin(t * 9) * 0.1, 0.6], aB: [0.7, 0.6], fF: [14, 0], fB: [-14, 0] });
+        V.scriptPose = P({ hy: 9, lean: -0.3, head: -0.3, aF: [2.3, 2.5], aB: [2.1, 2.6], fF: [8, 0], fB: [-13, 0] });
+        return;
+      }
+      if (t < 2.55) { A.x = lerp(x0, V.x - A.face * 16 * k, (t - 2.3) / 0.25); A.scriptPose = P({ hy: 4, lean: 0.9, head: 0.4, jaw: 1, aF: [1.7, 0.3], aB: [1.6, 0.4], fF: [20, 0], fB: [-16, 0] }); return; }
+      if (bite) {
+        // shakes the victim like a dog with a chew toy
+        const w = Math.sin(t * 26);
+        A.scriptPose = P({ hy: 6, lean: 0.55 + w * 0.15, head: 0.5 + w * 0.3, jaw: 0.25, aF: [1.6, 0.6], aB: [1.4, 0.8], fF: [18, 0], fB: [-16, 0] });
+        V.scriptPose = P({ hy: 6, lean: -0.35 + w * 0.5, head: -0.6 - w * 0.4, aF: [1.6 - w * 1.2, 0.4], aB: [1.2 + w * 1.2, 0.4], fF: [8 + w * 8, -Math.max(0, w) * 8], fB: [-10 - w * 8, -Math.max(0, -w) * 8], rot: w * 0.25, piv: 2 });
+        V.ro.dx = w * 5;
+        if (t > nextShake) { nextShake = t + 0.12; api.sfx('gnaw'); const nk = J(V, 'neck'); FX.blood(nk[0], nk[1], 10, Math.sign(w) || 1, 1.1); if (Math.random() < 0.4) FX.gib('chunk', nk[0], nk[1], rnd(-120, 120), rnd(-260, -100)); }
+        return;
+      }
+      V.ro.dx = 0;
+      if (t < 4.7) { V.scriptPose = PS.down(V); A.scriptPose = P({ hy: 5, lean: 0.3, head: 0.1, jaw: 0.4, aF: [1.2, 1.0], aB: [0.6, 1.9], fF: [14, 0], fB: [-14, 0] }); return; }
+      A.scriptPose = P({ hy: 3, lean: -0.35, head: -1.05, jaw: 1, aF: [0.8, 0.6], aB: [0.7, 0.6], fF: [14, 0], fB: [-14, 0] });
+    };
+  };
+
+  // ---------- EAST END EM: First Edition ----------
+  S.em = (s, A, V, api) => {
+    const PS = api.PS, k = A.d.k, F = api.FLOOR;
+    const PW = 62, PH = 118;
+    let bookY = -300, close = 0, pressed = false, sign = 0, spineX = 0, dir = 1, drop = false;
+    const pageL = () => spineX - dir * PW, pageR = () => spineX;
+    prop({ layer: 'back', draw(g) {
+      if (!drop) return;
+      const y0 = F - PH + bookY, sx = spineX;
+      g.save();
+      // the open book standing up behind the victim, facing us
+      if (close < 1) { g.fillStyle = '#4a0c14'; g.fillRect(sx - PW - 4, y0 - 4, PW * 2 + 8, PH + 8); }
+      else { const lx = Math.min(sx, sx - dir * PW); g.fillStyle = '#efe6cc'; g.fillRect(lx - 2, y0 - 2, PW + 4, PH + 4); g.fillStyle = '#6a1420'; g.fillRect(lx - 4, y0 - 4, PW + 6, PH + 8); g.fillStyle = 'rgba(0,0,0,0.4)'; g.fillRect(dir > 0 ? lx + PW - 4 : lx - 4, y0 - 4, 5, PH + 8); }
+      const page = (x, w, red) => { g.fillStyle = '#efe6cc'; g.fillRect(x, y0, w, PH); g.fillStyle = 'rgba(60,50,40,0.45)'; for (let i = 0; i < 13; i++) g.fillRect(x + 6, y0 + 12 + i * 7.5, Math.abs(w) - 12, 1); if (red) { g.fillStyle = 'rgba(140,0,12,0.55)'; g.fillRect(x, y0, w, PH); } };
+      // the page the victim is pressed into
+      if (close < 1) page(Math.min(sx, sx - dir * PW), PW, false);
+      if (pressed && close < 1) {
+        g.save(); g.beginPath(); g.rect(Math.min(sx, sx - dir * PW), y0, PW, PH); g.clip();
+        g.translate(sx - dir * PW / 2, y0 + PH - 6); g.scale(0.82, 0.82); g.globalAlpha = 0.9;
+        R.draw(g, { def: V.def, d: V.d, x: 0, y: 0, face: -dir, t: 0, st: { dead: true, wounds: V.st2.wounds } }, R.resolve(V.d, P({ hy: 4, lean: 0, aF: [2.4, 0.2], aB: [2.2, 0.3], fF: [16, 0], fB: [-16, 0] })), { flat: 1 });
+        g.restore();
+        g.fillStyle = 'rgba(150,0,14,0.5)'; g.fillRect(Math.min(sx, sx - dir * PW), y0, PW, PH);
+      }
+      // the other page swings shut over it
+      const c = Math.cos(close * PI), w = PW * c;
+      if (close < 1) { if (c > 0) page(sx, dir * w, false); else { g.fillStyle = '#6a1420'; g.fillRect(Math.min(sx, sx + dir * w), y0 - 4, Math.abs(w) + 4, PH + 8); } }
+      if (close >= 1) {
+        const cx = sx - dir * PW / 2;
+        g.fillStyle = '#d8b040'; g.fillRect(cx - 22, y0 + 18, 44, 1.5); g.fillRect(cx - 22, y0 + 46, 44, 1.5);
+        TXT.draw(g, 'MUNCIE', cx, y0 + 24, { size: 9, align: 'center', fill: 'gold', italic: false, shadow: false });
+        TXT.draw(g, 'VICTIMS', cx, y0 + 34, { size: 8, align: 'center', fill: 'gold', italic: false, shadow: false });
+        if (sign > 0) { g.strokeStyle = '#1a1a40'; g.lineWidth = 1.2; g.beginPath(); for (let i = 0; i <= sign * 20; i++) { const x = cx - 18 + i * 1.8, y = y0 + 80 + Math.sin(i * 1.3) * 3 - (i % 5 === 0 ? 3 : 0); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
+      }
+      g.restore();
+    } });
+    s.at(0.5, () => { drop = true; dir = A.face; spineX = V.x + A.face * PW / 2; });
+    s.at(0.8, () => { api.sfx('thud'); api.shake(6); FX.dust(spineX, F, 20); });
+    for (let i = 0; i < 8; i++) s.at(1.0 + i * 0.1, () => {
+      api.sfx('slash'); const c = J(V, pick(['chest', 'belly', 'head', 'neck']));
+      FX.blood(c[0], c[1], 10, A.face, 1); FX.spark(c[0], c[1], '#fffbe8', 4); V.ro.gore = true;
+      const w = V.st2.wounds || (V.st2.wounds = []); w.push({ j: pick(['head', 'chest', 'belly']), dx: rnd(-4, 8), dy: rnd(-6, 6), r: 1, a: rnd(0, 3), drip: rnd(3, 8) });
+      V.x += A.face * 1.2;
+    });
+    s.at(1.9, () => { pressed = true; V.hidden = true; api.sfx('splat'); api.sfx('squish'); api.shake(3); FX.blood(V.x, F - 60, 30, A.face, 0.9); });
+    s.at(2.55, () => {
+      api.sfx('crunch'); api.sfx('thud'); api.shake(9); api.flash();
+      const cx = spineX - dir * PW / 2;
+      for (let i = 0; i < 4; i++) FX.blood(cx + rnd(-PW / 2, PW / 2), F - PH, 18, rnd(-1, 1), 1.4);
+      FX.blood(spineX - dir * PW, F - 60, 30, -dir, 1.4);
+      FX.burst(cx, F - PH, 6, ['tooth', 'tooth', 'eye', 'chunk'], 1);
+    });
+    s.at(3.2, () => { api.sfx('ding'); });
+    s.at(4.3, () => api.bubble('AUTOGRAPHED COPY.', A.x, F - 140, { size: 12, fill: 'gold', life: 2 }));
+    s.at(5.8, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (drop) bookY = Math.min(0, bookY + dt * 1400);
+      if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 34 * k, dt, api, 110); return; }
+      if (t < 1.0) { V.scriptPose = PS.dizzy(V.t); A.scriptPose = PS.chopUp; return; }
+      if (t < 1.9) { const n = Math.floor(t / 0.05); A.scriptPose = [PS.chopUp, PS.chopDn, PS.chopUp2, PS.chopDn2][n % 4]; V.scriptPose = P({ hy: 6, lean: -0.35, head: -0.4, aF: [0.8, 0.4], aB: [0.6, 0.4], fF: [8, 0], fB: [-11, 0] }); return; }
+      if (t < 2.55) { close = ease((t - 2.15) / 0.4); A.scriptPose = t < 2.2 ? PS.chopUp : P({ hy: 8, lean: 0.4, aF: [1.5, 0.05], aB: [0.6, 1.9], fF: [19, 0], fB: [-14, 0] }); return; }
+      close = 1;
+      if (Math.random() < 0.5) FX.blood(spineX - dir * rnd(4, PW - 4), F - 2, 1, 0, 0.2);
+      if (t < 3.2) { walkTo(A, spineX - dir * PW / 2 - A.face * 22 * k, dt, api, 80); return; }
+      if (t < 4.2) { sign = Math.min(1, (t - 3.3) / 0.8); A.scriptPose = P({ hy: 6, lean: 0.2, head: 0.3, aF: [1.6 + Math.sin(t * 30) * 0.05, 1.0], aB: [0.6, 1.9], fF: [14, 0], fB: [-14, 0] }); return; }
+      A.scriptPose = P({ hy: 4, lean: -0.1, head: -0.25, aF: [3.0, 0.3], aB: [0.7, 2.3], fF: [12, 0], fB: [-12, 0] });
+    };
+  };
+
+  // ---------- SLUM LORD: Condemned ----------
+  S.slumlord = (s, A, V, api) => {
+    const PS = api.PS, k = A.d.k, F = api.FLOOR;
+    let maw = 0, pull = 0, vx0 = 0, tentT = 0;
+    const belly = () => { const c = J(A, 'belly'); return [c[0] + A.face * 8 * k, c[1]]; };
+    prop({ layer: 'front', draw(g) {
+      if (maw <= 0) return;
+      const [bx, by] = belly(), r = 18 * k * maw;
+      g.fillStyle = '#2a0204'; g.beginPath(); g.ellipse(bx, by, r * 0.55, r, 0, 0, PI * 2); g.fill();
+      g.fillStyle = '#e8dcb8'; for (let i = -3; i <= 3; i++) { R.poly(g, [[bx - r * 0.5, by + i * r * 0.26], [bx - r * 0.5 + 4, by + i * r * 0.26 + 2], [bx - r * 0.5, by + i * r * 0.26 + 4]], '#e8dcb8'); R.poly(g, [[bx + r * 0.5, by + i * r * 0.26], [bx + r * 0.5 - 4, by + i * r * 0.26 + 2], [bx + r * 0.5, by + i * r * 0.26 + 4]], '#e8dcb8'); }
+      if (tentT > 0) {
+        const h = J(V, 'chest');
+        for (let i = 0; i < 4; i++) {
+          g.strokeStyle = i % 2 ? '#a86a6a' : '#c08070'; g.lineWidth = 3.4 - i * 0.4; g.lineCap = 'round';
+          g.beginPath(); g.moveTo(bx, by + (i - 1.5) * 5);
+          g.quadraticCurveTo((bx + h[0]) / 2 + Math.sin(s.t * 9 + i) * 10, (by + h[1]) / 2 - 20 + i * 8, h[0], h[1] + (i - 1.5) * 9);
+          g.stroke();
+        }
+        g.lineCap = 'butt';
+      }
+    } });
+    s.at(0.55, () => { api.sfx('squish'); api.bubble('RENT IS DUE.', A.x, F - 170, { size: 12, fill: 'gold', life: 1.4 }); });
+    s.at(1.3, () => { tentT = 1; api.sfx('slurp'); api.sfx('scream'); vx0 = V.x; });
+    s.at(3.0, () => { V.hidden = true; tentT = 0; api.sfx('gulp'); api.shake(5); });
+    s.at(3.2, () => { for (let i = 0; i < 5; i++) s.at(3.2 + i * 0.22, () => { api.sfx('crunch'); api.shake(3); const [bx, by] = belly(); FX.blood(bx, by, 12, A.face, 0.9); }); });
+    s.at(4.5, () => {
+      const [bx, by] = belly(); api.sfx('fart'); api.shake(4);
+      skullGib(V, bx, by, A.face * 260, -300);
+      for (let i = 0; i < 5; i++) FX.gib('bone', bx, by, A.face * rnd(120, 300), rnd(-300, -120));
+      FX.gib('receipt', bx, by, A.face * 160, -380, { vr: 6, s: 1.4, draw: g => { g.fillStyle = '#f4f0e0'; g.fillRect(-7, -10, 14, 20); g.fillStyle = '#b01018'; g.font = '5px Anton, Impact, sans-serif'; g.fillText('PAID', -5.5, -3); g.fillStyle = 'rgba(40,40,40,0.6)'; for (let i = 0; i < 4; i++) g.fillRect(-5, 1 + i * 2, 10, 0.7); } });
+    });
+    s.at(5.0, () => api.bubble('DEPOSIT IS NON-REFUNDABLE.', A.x, F - 150, { size: 11, fill: 'gold', life: 2 }));
+    s.at(6.6, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 70 * k, dt, api, 90); return; }
+      maw = Math.min(1, Math.max(0, (t - 0.6) / 0.5)); if (t > 3.0 && t < 4.7) maw = 0.6 + Math.abs(Math.sin(t * 12)) * 0.4; if (t > 4.7) maw = Math.max(0, maw - dt * 2);
+      A.scriptPose = P({ hy: 6, lean: -0.35, head: -0.3, aF: [1.2, 1.5], aB: [0.8, 1.7], fF: [16, 0], fB: [-16, 0] });
+      if (t > 4.7) A.scriptPose = PS.mirror(t);
+      if (tentT > 0) {
+        // dragged in feet first, shrinking into the gut
+        const u = ease((t - 1.6) / 1.4), [bx, by] = belly();
+        V.x = lerp(vx0, bx, u); V.y = lerp(F, by + 20 * (1 - u), u);
+        V.ro.scale = 1 - u * 0.75;
+        V.scriptPose = P({ hy: 3, lean: -0.6 - u * 0.6, head: -0.5, aF: [2.6 + Math.sin(t * 20) * 0.3, 0.4], aB: [2.4 + Math.cos(t * 18) * 0.3, 0.5], fF: [14, -4], fB: [-6, 0], rot: -u * 1.2, piv: 2 });
+        if (Math.random() < 0.3) { const c = J(V, 'chest'); FX.blood(c[0], c[1], 2, 0, 0.5); }
+      }
+    };
+  };
+  S.slumDie = (s, A, V, api) => {
+    const F = api.FLOOR;
+    let melt = 0;
+    prop({ layer: 'front', draw(g) {
+      if (melt <= 0) return;
+      const w = 30 + melt * 40, h = 10 + (1 - melt) * 20;
+      g.fillStyle = '#9a6a5a'; g.beginPath(); g.ellipse(V.x, F - h / 2, w, h / 2 + 2, 0, PI, PI * 2); g.fill();
+      g.fillStyle = 'rgba(110,30,40,0.6)'; for (let i = 0; i < 7; i++) { g.beginPath(); g.arc(V.x - w * 0.8 + i * w * 0.27, F - h * 0.3, 3 + (i % 3), 0, PI * 2); g.fill(); }
+      g.fillStyle = '#c8a060'; for (let i = 0; i < 4; i++) R.ball(g, V.x - 20 + i * 13, F - h * 0.6, 2.2, '#c8a060');
+      // the hair survives, still perfectly slicked
+      g.fillStyle = '#14100c'; g.beginPath(); g.ellipse(V.x + 4, F - h - 2, 10, 3.2, 0, PI, PI * 2); g.fill(); g.fillStyle = 'rgba(255,255,255,0.3)'; g.fillRect(V.x - 2, F - h - 4.4, 8, 0.8);
+    } });
+    s.at(0.1, () => { api.sfx('scream'); api.bubble('NOT THE FACE!', V.x, F - 170, { size: 14, fill: 'gold', life: 1.4 }); });
+    for (let i = 0; i < 6; i++) s.at(0.5 + i * 0.18, () => { const c = J(V, pick(['chest', 'belly', 'head'])); api.sfx('splat'); FX.puff(c[0], c[1], 'rgba(170,190,80,0.8)', 8, 2); FX.blood(c[0], c[1], 12, rnd(-1, 1), 1); });
+    s.at(1.7, () => { V.ro.cracked = true; api.sfx('shatter'); });
+    s.at(2.0, () => { V.hidden = true; api.sfx('squish'); api.shake(6); FX.burst(V.x, F - 30, 10, ['chunk', 'guts', 'eye', 'bone', 'liver'], 1); });
+    s.at(3.4, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (t < 2.0) { V.ro.dx = rnd(-2, 2); V.ro.scale = 1 + Math.sin(t * 30) * 0.03 * t; V.scriptPose = P({ hy: 6 + t * 10, lean: 0.3 + t * 0.2, head: 0.5, aF: [2.6, 2.6], aB: [2.4, 2.5], fF: [10, 0], fB: [-12, 0] }); }
+      else melt = Math.min(1, (t - 2.0) / 0.8);
+      A.scriptPose = api.PS.stance(A.t); void dt;
+    };
+  };
+
   S.generic = (s, A, V, api) => { s.at(0.1, () => { V.scriptPose = api.PS.down(V); }); s.at(1.5, () => { s.done = true; }); };
 
   return { start };

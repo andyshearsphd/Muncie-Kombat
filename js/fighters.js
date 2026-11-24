@@ -643,8 +643,217 @@ const ROSTER = (() => {
     fatal: { id: 'turkey', name: 'CARVED' }
   };
 
-  const FIGHTERS = [hippo, painter, garf, host, ballin, gertie, rocky, millie, chucky, turkey];
-  const BOSSES = [golem, dan];
+  // ---------- COKE WOLFE: a werewolf in a white 80s suit with a nose habit ----------
+  const WF = '#6a5a4a', WFD = '#3a3028', WS = '#ece8de';
+  const wolfe = {
+    id: 'wolfe', name: 'COKE WOLFE', short: 'WOLFE', him: 'HIM', k: 1.08, paws: true, claws: true, skull: 'raccoon', skullK: 1.25,
+    bio: 'Came up from the Southside in a white suit and never came down. Full moon every night if you bring enough powder.',
+    bicep: 0.3, calf: 0.12,
+    d: dims({ thigh: 29, shin: 28, torso: 37, neck: 5, upper: 22, fore: 21, hipW: 11, shW: 17, chest: 16, belly: 11, back: 12, thighR: 7.4, kneeR: 4.8, shR: 6.6, elbowR: 4.6, wristR: 3.8, fist: 4.6, footL: 13 }),
+    col: { torso: WS, armU: WS, armL: WS, cuff: WF, hand: WFD, legU: WS, legL: WS, foot: '#b89a70', neck: WF },
+    mat: { torso: 'suit', armU: 'suit', armL: 'suit', legU: 'suit', legL: 'suit', neck: 'fur' },
+    stats: { speed: 1.1, power: 1.04, weight: 1.0 },
+    torsoDetail(g, d, st, L) {
+      // pastel tee under the open jacket, lapels, a little vial on a chain
+      R.poly(g, [[d.shW * 0.0, -L * 1.02], [d.shW * 0.9, -L * 1.02], [d.shW * 0.6, -L * 0.1], [d.shW * 0.1, -L * 0.1]], '#e8a0b8');
+      g.fillStyle = 'rgba(80,40,30,0.5)'; for (let i = 0; i < 9; i++) g.fillRect(d.shW * 0.25 + (i % 3) * 2.5, -L * 0.98 + ((i / 3) | 0) * 2, 1.2, 1.6);
+      R.poly(g, [[d.shW * 0.0, -L * 1.02], [d.shW * 0.25, -L * 0.3], [d.shW * 0.12, -L * 0.75]], '#d8d2c4');
+      R.poly(g, [[d.shW * 0.9, -L * 1.02], [d.shW * 0.62, -L * 0.3], [d.shW * 1.0, -L * 0.72]], '#d8d2c4');
+      R.line(g, d.shW * 0.3, -L * 0.98, d.shW * 0.5, -L * 0.62, '#d8b040', 0.7); R.line(g, d.shW * 0.7, -L * 0.98, d.shW * 0.5, -L * 0.62, '#d8b040', 0.7);
+      g.fillStyle = '#c8c8d0'; g.fillRect(d.shW * 0.46, -L * 0.63, 2.4, 4.5); g.fillStyle = '#f8f8f8'; g.fillRect(d.shW * 0.48, -L * 0.6, 1.6, 2.6);
+      g.fillStyle = '#d8d2c4'; g.fillRect(d.shW * 0.55, -L * 0.25, 1.6, 1.6);
+    },
+    tail(g, d, J, st) {
+      const w = Math.sin((st.t || 0) * 3) * 0.15;
+      let p = [J.hip[0] - d.back * 0.8, J.hip[1] - 2];
+      for (let i = 0; i < 5; i++) { const a = PI * 0.7 + i * 0.1 + w * i, q = R.add(p, R.dir(a, 6 * d.k)); R.seg(g, p, q, (4.5 + Math.sin(i / 4 * PI) * 2) * d.k, (4.2 + Math.sin((i + 1) / 4 * PI) * 2) * d.k, i === 4 ? '#2a221c' : WF, 'fur', { seed: 450 + i }); p = q; }
+    },
+    head(g, st) {
+      const jaw = Math.max(0, st.jaw || 0);
+      R.poly(g, [[-4, -18], [-7, -33], [1, -21]], WFD);
+      // skull and long snout
+      g.beginPath(); g.moveTo(-8, -3); g.bezierCurveTo(-11, -14, -6, -24, 3, -22); g.quadraticCurveTo(8, -20, 12, -15); g.quadraticCurveTo(18, -13, 22, -11.5);
+      g.quadraticCurveTo(23.2, -10, 22, -8.6); g.quadraticCurveTo(16, -6.5, 11, -5.5 + jaw * 0); g.quadraticCurveTo(4, -1, -2, 1); g.quadraticCurveTo(-6, 1, -8, -3); g.closePath();
+      fillLit(g, WF, 4, -12, 14, 0.25, -0.6);
+      g.save(); g.clip(); strokes(g, 4, -12, 14, 11, 140, 31, -0.4, 2.6, 0.32, 0.22);
+      g.fillStyle = 'rgba(200,185,160,0.6)'; g.beginPath(); g.ellipse(15, -8.4, 7.5, 2.8, -0.12, 0, PI * 2); g.fill(); g.restore();
+      // lower jaw drops open for howls and bites
+      g.save(); g.translate(10, -6); g.rotate(jaw * 0.55);
+      g.beginPath(); g.moveTo(-6, 0); g.quadraticCurveTo(4, 2.5, 11, 0.5); g.quadraticCurveTo(10.5, 2.6, 6, 3.6); g.quadraticCurveTo(-2, 4.5, -7, 2); g.closePath(); fillLit(g, sh(WF, 0.08), 2, 2, 8);
+      g.fillStyle = '#efe8d4'; for (let i = 0; i < 3; i++) R.poly(g, [[3 + i * 2.6, 0.2], [4.2 + i * 2.6, 0.2], [3.6 + i * 2.6, -1.6]], '#efe8d4');
+      g.restore();
+      if (jaw > 0.1) { g.fillStyle = '#3a0608'; g.beginPath(); g.moveTo(5, -6); g.lineTo(21, -8.8); g.lineTo(18 - jaw * 2, -4 + jaw * 4); g.lineTo(6, -3); g.closePath(); g.fill(); }
+      // fangs
+      R.poly(g, [[16.5, -8.4], [17.8, -8.6], [17.2, -5.6]], '#f4eedc'); R.poly(g, [[12, -7.6], [13.2, -7.8], [12.7, -5.4]], '#f4eedc');
+      R.poly(g, [[3, -20], [6, -35], [10, -18]], WF); R.poly(g, [[5, -21], [6.4, -31], [8.4, -19.5]], '#8a5a52');
+      fringe(g, 0, -9, 10, 10, PI * 0.35, PI * 1.25, 18, WFD, 3.4, 9);
+      // the nose, dusted white, and the nosebleed
+      R.ball(g, 22, -10.6, 1.9, '#0c0808');
+      g.fillStyle = '#fafafa'; R.srand(4); for (let i = 0; i < 12; i++) g.fillRect(19 + R.rr() * 5, -11.5 + R.rr() * 4, 0.9, 0.9);
+      if (!st.dead) { g.fillStyle = '#a00010'; g.fillRect(21.4, -9, 0.9, 2.2 + Math.abs(Math.sin((st.t || 0) * 1.3)) * 1.5); }
+      eye(g, 9.5, -15, 1.6, st, { animal: 1, iris: '#e8c020', slit: 1, glow: !st.dead, socket: 'rgba(20,10,0,0.4)' });
+      if (!st.dead) brow(g, 9.5, -17.4, 5, 0.4, 'rgba(20,12,6,1)', 1.5);
+    },
+    proj: { kind: 'howl', name: 'HOWL' }, sp2: { kind: 'blow', name: 'NOSE CANDY' },
+    fatal: { id: 'wolfe', name: 'FULL MOON' }
+  };
+
+  // ---------- EAST END EM: Muncie author, fashion editor, globetrotter ----------
+  const EMD = '#1f5a52', EMS = '#ecc6aa', GLOVE = '#f0ece2';
+  const em = {
+    id: 'em', name: 'EAST END EM', short: 'EAST END EM', him: 'HER', k: 0.98,
+    bio: 'Born in Muncie\'s East End in 1899. Fashion editor, globetrotter, best-selling author. Her chops leave paper cuts to the bone.',
+    bicep: 0.12, calf: 0.25,
+    d: dims({ thigh: 27, shin: 26, torso: 33, upper: 19, fore: 18, hipW: 11.5, shW: 13, chest: 13, belly: 10, back: 10, thighR: 6.8, kneeR: 4.2, ankleR: 3, shR: 5, elbowR: 3.4, wristR: 2.8, fist: 3.5, footL: 11 }),
+    col: { torso: EMD, armU: EMD, armL: GLOVE, hand: GLOVE, legU: '#d4a890', legL: '#d4a890', foot: '#2a1a12', neck: EMS },
+    mat: { torso: 'cloth', armU: 'cloth', armL: 'cloth', legU: 'skin', legL: 'skin' },
+    stats: { speed: 1.08, power: 0.94, weight: 0.88 },
+    torsoDetail(g, d, st, L) {
+      R.poly(g, [[d.shW * 0.12, -L * 1.03], [d.shW * 0.78, -L * 1.03], [d.shW * 0.45, -L * 0.8]], EMS);
+      // long rope of pearls
+      g.fillStyle = '#f4efe4';
+      for (let i = 0; i < 16; i++) { const t = i / 15, x = d.shW * (0.18 + 0.5 * Math.sin(t * PI) * 0.9 + t * 0.1), y = -L * (1.0 - Math.sin(t * PI) * 0.55); g.beginPath(); g.arc(x, y, 0.95, 0, PI * 2); g.fill(); }
+      // dropped waist sash with a bow
+      g.fillStyle = sh(EMD, -0.35); g.fillRect(-d.back * 1.3, -L * 0.24, d.back * 1.3 + d.belly * 1.3, 4);
+      R.poly(g, [[d.belly * 0.4, -L * 0.22], [d.belly * 1.1, -L * 0.32], [d.belly * 1.0, -L * 0.12]], sh(EMD, -0.2));
+    },
+    skirt(g, d, J) {
+      const ux = J.sh[0] - J.hip[0], uy = J.sh[1] - J.hip[1], L = Math.hypot(ux, uy) || 1, u = [ux / L, uy / L], n = [-u[1], u[0]];
+      const at = (p, s, t) => [p[0] + n[0] * s + u[0] * t, p[1] + n[1] * s + u[1] * t];
+      const wF = at(J.hip, d.hipW * 1.2, 5), wB = at(J.hip, -d.back * 1.25, 5);
+      let hA = R.lerp2(J.hip, J.LF.knee, 1.12), hB = R.lerp2(J.hip, J.LB.knee, 1.12);
+      const pr = p => (p[0] - J.hip[0]) * n[0] + (p[1] - J.hip[1]) * n[1];
+      if (pr(hA) < pr(hB)) [hA, hB] = [hB, hA];
+      const gap = pr(hA) - pr(hB), need = d.hipW * 2.4;
+      if (gap < need) { const e = (need - gap) / 2; hA = [hA[0] + n[0] * e, hA[1] + n[1] * e]; hB = [hB[0] - n[0] * e, hB[1] - n[1] * e]; }
+      hA = [hA[0] + n[0] * 3, hA[1] + n[1] * 3]; hB = [hB[0] - n[0] * 3, hB[1] - n[1] * 3];
+      const mid = R.lerp2(hA, hB, 0.5);
+      g.beginPath(); g.moveTo(...wB); g.lineTo(...wF); g.lineTo(...hA); g.quadraticCurveTo(mid[0] - u[0] * 3, mid[1] - u[1] * 3, ...hB); g.closePath();
+      g.fillStyle = lit(g, mid[0], (mid[1] + J.hip[1]) / 2, 18, EMD, 0.2, -0.55); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 0.8;
+      for (let i = 1; i < 5; i++) { const t = i / 5, a = R.lerp2(wB, wF, t), b = R.lerp2(hB, hA, t); g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.stroke(); }
+      R.line(g, hA[0], hA[1], hB[0], hB[1], sh(EMD, -0.4), 1.2);
+    },
+    head(g, st) {
+      humanHead(g, st, {
+        skin: EMS, chin: 0.3, nose: -0.4, eyeC: '#3a2a1a', browC: 'rgba(30,15,10,0.95)', cleanJaw: 1,
+        back(g) { g.beginPath(); g.moveTo(-7, -2); g.bezierCurveTo(-12, -10, -10, -22, -2, -24); g.lineTo(2, -20); g.quadraticCurveTo(-3, -12, -1, -2); g.closePath(); fillLit(g, '#1e1410', -5, -12, 9, 0.15, -0.6); },
+        front(g) {
+          // finger-waved bob at the cheek, cloche hat pulled down to the brows
+          g.beginPath(); g.moveTo(-4, -3); g.quadraticCurveTo(-6, -12, -1, -16); g.quadraticCurveTo(3, -15, 3.5, -12); g.quadraticCurveTo(0.5, -9, 1.5, -3.5); g.closePath(); fillLit(g, '#241812', 0, -10, 7, 0.2, -0.6);
+          R.line(g, -2, -12, 1.5, -13, 'rgba(255,255,255,0.18)', 0.6); R.line(g, -2.5, -8, 0.5, -9, 'rgba(255,255,255,0.18)', 0.6);
+          g.beginPath(); g.moveTo(-10, -12); g.bezierCurveTo(-12, -24, -4, -31, 4, -30.5); g.bezierCurveTo(11, -30, 14, -24, 13.5, -16.4); g.quadraticCurveTo(6, -17.4, -1, -15); g.quadraticCurveTo(-6, -13, -10, -12); g.closePath();
+          fillLit(g, '#6a2638', 3, -24, 13, 0.25, -0.55);
+          g.fillStyle = '#1a0a10'; g.beginPath(); g.moveTo(-10.5, -15); g.quadraticCurveTo(2, -20, 13.6, -18.8); g.lineTo(13.6, -17); g.quadraticCurveTo(2, -18, -10.5, -13); g.fill();
+          R.ball(g, -6, -17.5, 2.2, '#e8d0a0'); R.ball(g, -6, -17.5, 1, '#b08030');
+          R.ball(g, -0.5, -7.5, 1.1, '#f4efe4');
+        },
+        mouth(g) {
+          if (st.dead) { g.fillStyle = '#2a0404'; g.beginPath(); g.ellipse(10.3, -4.4, 1.3, 1.1, 0, 0, PI * 2); g.fill(); g.fillStyle = '#8a0010'; g.fillRect(9.8, -3.6, 1.1, 5); return; }
+          g.fillStyle = '#a8142a'; g.beginPath(); g.moveTo(8.6, -5.3); g.quadraticCurveTo(10, -6.2, 11.3, -5.1); g.quadraticCurveTo(10, -3.9, 8.6, -5.3); g.fill();
+          R.line(g, 8.6, -5.2, 11.3, -5.1, '#4a0410', 0.5);
+        }
+      });
+    },
+    proj: { kind: 'book', name: 'HARDCOVER' }, sp2: { kind: 'flurry', name: 'PAPER CUT' },
+    fatal: { id: 'em', name: 'FIRST EDITION' }
+  };
+
+  // ---------- SLUM LORD: the landlord the black mold got into ----------
+  const SLF = '#b88474', SLS = '#5a1a2a';
+  const slumlord = {
+    id: 'slumlord', name: 'SLUM LORD', short: 'SLUMLORD', him: 'HIM', k: 1.22, boss: true, bicep: 0.5, calf: 0.3,
+    bio: 'Owns half the east side and fixes none of it. The black mold got into him, and he has never looked better. Just ask him.',
+    d: dims({ thigh: 25, shin: 25, torso: 38, neck: 5, upper: 21, fore: 21, hipW: 15, shW: 18, chest: 19, belly: 23, back: 15, thighR: 9, kneeR: 6, ankleR: 4.2, shR: 7.4, elbowR: 6.5, wristR: 5, fist: 5.4 }),
+    col: { torso: SLF, armU: SLS, armL: SLF, hand: '#b08470', legU: '#26262c', legL: '#26262c', foot: '#140c08', neck: SLF },
+    mat: { torso: 'skin', armU: 'cloth', armL: 'skin', legU: 'suit', legL: 'suit' },
+    stats: { speed: 0.96, power: 1.18, weight: 1.6, armor: 0.85 },
+    behind(g, d, J, st) {
+      // tumorous tentacles growing out of his back
+      const t = st.t || 0, b = R.lerp2(J.hip, J.sh, 0.7);
+      for (let i = 0; i < 5; i++) {
+        let p = [b[0] - d.back * 0.7, b[1] - 8 + i * 8];
+        for (let j = 0; j < 8; j++) { const a = PI * (0.62 + i * 0.13) + Math.sin(t * 2.4 + i * 2 + j * 0.7) * 0.45, q = R.add(p, R.dir(a, 7.5 * d.k)); R.seg(g, p, q, (5.4 - j * 0.6) * d.k, (4.8 - j * 0.6) * d.k, j % 2 ? '#a05a60' : '#b87a6c', 'skin', { seed: 500 + i * 7 + j }); if (j === 3) R.ball(g, q[0], q[1], 2.2 * d.k, '#c89a5a'); p = q; }
+        R.ball(g, p[0], p[1], 2 * d.k, '#6a1a20'); R.ball(g, p[0], p[1], 0.9 * d.k, '#e8dcb8');
+      }
+    },
+    torsoDetail(g, d, st, L) {
+      const t = st.t || 0;
+      // mottled mold, veins, boils
+      R.srand(71);
+      for (let i = 0; i < 14; i++) { g.fillStyle = R.rr() < 0.5 ? 'rgba(60,80,40,0.3)' : 'rgba(110,30,40,0.25)'; g.beginPath(); g.ellipse(-d.back + R.rr() * (d.back + d.belly), -R.rr() * L, 2 + R.rr() * 4, 1.5 + R.rr() * 3, R.rr() * 3, 0, PI * 2); g.fill(); }
+      g.strokeStyle = 'rgba(80,20,60,0.45)'; g.lineWidth = 0.7; for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(-d.back * 0.5 + i * 5, -L * 0.1); g.quadraticCurveTo(i * 4, -L * 0.5, d.belly * 0.3 + i * 2, -L * 0.85); g.stroke(); }
+      // raw, weeping patches where the skin gave up
+      for (let i = 0; i < 5; i++) { R.srand(130 + i); const x = -d.back * 0.7 + R.rr() * (d.back + d.belly) * 0.95, y = -L * (0.1 + R.rr() * 0.85), rx = 3 + R.rr() * 5, ry = 2 + R.rr() * 4;
+        g.fillStyle = '#7a1018'; g.beginPath(); g.ellipse(x, y, rx, ry, R.rr() * 3, 0, PI * 2); g.fill(); g.fillStyle = 'rgba(220,80,90,0.6)'; g.beginPath(); g.ellipse(x - 0.6, y - 0.6, rx * 0.5, ry * 0.4, 0, 0, PI * 2); g.fill(); g.fillStyle = 'rgba(255,255,255,0.5)'; g.fillRect(x - 1, y - ry * 0.5, 1, 0.8); }
+      // ribs showing through on the flank
+      for (let i = 0; i < 4; i++) R.line(g, -d.back * 0.6, -L * (0.45 + i * 0.09), -d.back * 0.05, -L * (0.5 + i * 0.09), 'rgba(240,230,210,0.75)', 1.1);
+      for (let i = 0; i < 9; i++) { R.srand(90 + i); const x = -d.back * 0.6 + R.rr() * (d.back + d.belly) * 0.95, y = -L * (0.1 + R.rr() * 0.8), r = 2.2 + R.rr() * 2.6 + Math.sin(t * 3 + i) * 0.4; R.ball(g, x, y, r, '#c89a5a'); R.ball(g, x + r * 0.2, y - r * 0.3, r * 0.45, '#e8d890'); g.fillStyle = 'rgba(255,250,200,0.7)'; g.fillRect(x - r * 0.3, y - r * 0.5, 1, 1); }
+      // a gaping mouth across the gut that breathes, drools and gnashes
+      const o = 2 + Math.max(0, Math.sin(t * 2.2)) * 4.5, mx = d.belly * 0.42, my = -L * 0.33;
+      g.fillStyle = '#a85060'; g.beginPath(); g.ellipse(mx, my, 11, o + 2.2, 0.08, 0, PI * 2); g.fill();
+      g.fillStyle = '#2a0204'; g.beginPath(); g.ellipse(mx, my, 9.5, o, 0.08, 0, PI * 2); g.fill();
+      g.fillStyle = '#c04050'; g.beginPath(); g.ellipse(mx + 1, my + o * 0.4, 5, o * 0.4, 0, 0, PI * 2); g.fill();
+      for (let i = 0; i < 8; i++) { R.poly(g, [[mx - 8.5 + i * 2.3, my - o], [mx - 7.4 + i * 2.3, my - o], [mx - 7.9 + i * 2.3, my - o + 2.2]], '#e8dcb8'); R.poly(g, [[mx - 8 + i * 2.3, my + o], [mx - 6.9 + i * 2.3, my + o], [mx - 7.4 + i * 2.3, my + o - 2.2]], '#e8dcb8'); }
+      g.fillStyle = 'rgba(200,220,160,0.6)'; g.fillRect(mx + 3, my + o, 0.9, 3 + Math.abs(Math.sin(t * 1.7)) * 5);
+      // an extra eye in the chest
+      const ey = -L * 0.72;
+      R.ball(g, d.belly * 0.15, ey, 3.4, '#ece0c8'); R.ball(g, d.belly * 0.15 + 1.2, ey, 1.7, '#5a7a2a'); R.ball(g, d.belly * 0.15 + 1.4, ey, 0.8, '#000');
+      if (Math.sin(t * 0.9) > 0.95) { g.fillStyle = SLF; g.fillRect(d.belly * 0.15 - 3.6, ey - 3.6, 7.2, 7.2); }
+      // the open silk shirt and the gold chains
+      R.poly(g, [[-d.back * 1.2, -L * 1.05], [d.shW * 0.05, -L * 1.05], [-d.back * 0.6, -L * 0.15], [-d.back * 1.2, -L * 0.1]], SLS);
+      g.strokeStyle = '#e0b040'; g.lineWidth = 1.1; g.beginPath(); g.arc(d.shW * 0.3, -L * 0.98, 8, 0.3, 2.6); g.stroke();
+      g.lineWidth = 0.8; g.beginPath(); g.arc(d.shW * 0.3, -L * 0.98, 12, 0.4, 2.4); g.stroke();
+      g.fillStyle = '#e0b040'; g.fillRect(d.shW * 0.2, -L * 0.8, 3, 3.6);
+      g.fillStyle = '#1a1416'; g.fillRect(-d.hipW * 1.2, -3, d.hipW * 2.6, 3); g.fillStyle = '#d8b040'; g.fillRect(d.hipW * 0.5, -3.4, 3.4, 3.8);
+    },
+    backHand(g, d, J, st) {
+      // a gilded hand mirror, never far from his face
+      const w = J.AB.wr;
+      g.save(); g.translate(w[0], w[1]); g.rotate(-0.5);
+      g.fillStyle = '#c89830'; g.fillRect(-1.2, -2, 2.4, 9);
+      g.beginPath(); g.ellipse(0, -8, 5.5, 7, 0, 0, PI * 2); g.fillStyle = '#c89830'; g.fill();
+      g.beginPath(); g.ellipse(0, -8, 4.2, 5.6, 0, 0, PI * 2); g.fillStyle = st.cracked ? '#6a7a8a' : '#b8d0e0'; g.fill();
+      g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(-2, -12, 1.2, 4);
+      if (st.cracked) { R.line(g, -3, -12, 2, -4, '#222', 0.6); R.line(g, 2, -12, -2, -5, '#222', 0.6); }
+      g.restore();
+    },
+    frontHand(g, d, J) { const w = J.AF.wr; R.ball(g, w[0] + 2, w[1] + 2, 1.6, '#e0b040'); R.ball(g, w[0] + 3.5, w[1] + 1, 1.3, '#e0b040'); },
+    head(g, st) {
+      humanHead(g, st, {
+        skin: '#c8a08a', chin: 1.4, nose: 0.8, eyeC: '#4a5a2a', browC: 'rgba(20,10,5,0.95)', cleanJaw: 1,
+        front(g) {
+          // greasy hair, slicked straight back, comb tracks and shine
+          g.beginPath(); g.moveTo(-6.5, -7); g.bezierCurveTo(-10, -20, -3, -28, 4, -27.8); g.bezierCurveTo(10, -27.6, 12.4, -24, 12, -20.5);
+          g.quadraticCurveTo(7, -23, 2, -21.6); g.quadraticCurveTo(-2, -19.6, -3.6, -14); g.quadraticCurveTo(-4.4, -10, -4, -7); g.closePath();
+          fillLit(g, '#14100c', 2, -22, 11, 0.45, -0.5);
+          g.save(); g.clip(); strokes(g, 2, -22, 11, 6, 70, 41, PI + 0.08, 6, 0.5, 0.35);
+          g.fillStyle = 'rgba(255,255,255,0.25)'; g.beginPath(); g.ellipse(4, -25.5, 6, 1.1, -0.05, 0, PI * 2); g.fill(); g.restore();
+          // boils, a weeping sore, and a second little eye growing out of his cheek
+          // a tumor the size of a second head bulging from the back of the skull, with its own mouth
+          g.beginPath(); g.ellipse(-8, -14, 7.5, 9, -0.3, 0, PI * 2); fillLit(g, '#b88070', -8, -14, 9, 0.2, -0.6);
+          g.fillStyle = '#7a1018'; g.beginPath(); g.ellipse(-9, -11, 3, 1.4 + Math.abs(Math.sin((st.t || 0) * 3)) * 1.2, 0.2, 0, PI * 2); g.fill();
+          g.fillStyle = '#e8dcb8'; g.fillRect(-11, -12, 1, 1); g.fillRect(-9, -12.4, 1, 1); g.fillRect(-7.4, -12, 1, 1);
+          R.ball(g, -6.5, -19, 1.6, '#ece0c8'); R.ball(g, -6.1, -19, 0.8, '#5a7a2a');
+          R.ball(g, -2, -18.6, 2.6, '#b07a6a'); R.ball(g, -1.6, -19, 1.2, '#d8b070');
+          g.fillStyle = '#7a1018'; g.beginPath(); g.ellipse(6, -2, 3, 2, 0.3, 0, PI * 2); g.fill();
+          R.ball(g, 3.2, -6.5, 2.3, '#ece0c8'); R.ball(g, 4, -6.5, 1.1, '#5a7a2a'); R.ball(g, 4.2, -6.5, 0.5, '#000');
+          g.fillStyle = 'rgba(120,160,60,0.6)'; g.fillRect(7, -3, 0.9, 3);
+        },
+        mouth(g) {
+          if (st.dead) { g.fillStyle = '#2a0404'; g.beginPath(); g.ellipse(10, -4.2, 1.6, 1.4, 0, 0, PI * 2); g.fill(); return; }
+          // a smug, gold-toothed smirk
+          g.fillStyle = '#2a0606'; g.beginPath(); g.moveTo(7, -5.4); g.quadraticCurveTo(10, -3.8, 12, -6.4); g.quadraticCurveTo(9.6, -5.2, 7, -5.4); g.fill();
+          g.fillStyle = '#e0b040'; g.fillRect(9.6, -5.4, 1.2, 1); g.fillStyle = '#e8e0c8'; g.fillRect(10.9, -5.8, 0.9, 0.9);
+        }
+      });
+    },
+    proj: { kind: 'notice', name: 'EVICTION NOTICE' }, sp2: { kind: 'sneak', name: 'LATE FEE' },
+    fatal: { id: 'slumlord', name: 'CONDEMNED' }
+  };
+
+  const FIGHTERS = [hippo, painter, garf, host, ballin, gertie, rocky, millie, chucky, turkey, wolfe, em];
+  const BOSSES = [golem, slumlord, dan];
   const ALL = {};
   for (const f of FIGHTERS.concat(BOSSES)) {
     ALL[f.id] = f;

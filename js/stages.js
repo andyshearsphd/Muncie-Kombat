@@ -606,9 +606,63 @@ const STAGES = (() => {
     fog(g, FY - 60, 64, 'rgba(60,40,70,0.4)');
   }
 
+  // ---------- THE RENTAL: Slum Lord's condemned house on the east side ----------
+  function rental(B, F) {
+    vg(B, 0, 0, BW, H, ['#040806', '#0c1610', '#1a2418', '#2a2a1a']);
+    stars(B, 30, 50); moon(B, 980, 30, 10, '#d8e0b8');
+    clouds(B, 8, 80, 12, 'rgba(20,30,20,0.6)', 'rgba(110,130,90,0.25)', 1);
+    seed = 307;
+    // neighbors: more rentals, just as bad
+    const shack = (x, w, h, c) => {
+      wall(B, x, FY - h, w, h, c, { uplit: true }); for (let r = FY - h + 3; r < FY; r += 4) { B.fillStyle = 'rgba(0,0,0,0.28)'; B.fillRect(x, r, w, 0.8); }
+      B.fillStyle = '#0a0c0a'; B.beginPath(); B.moveTo(x - 6, FY - h); B.lineTo(x + w / 2, FY - h - w * 0.32); B.lineTo(x + w + 6, FY - h); B.fill();
+      win(B, x + 8, FY - h + 10, 10, 13, rand() < 0.3, '#c8e0a0'); B.fillStyle = '#3a2a1a'; B.fillRect(x + w - 20, FY - h + 10, 12, 14); B.fillStyle = '#5a4a32'; B.fillRect(x + w - 21, FY - h + 14, 14, 2); B.fillRect(x + w - 21, FY - h + 19, 14, 2);
+    };
+    for (const [x, w, h, c] of [[90, 78, 58, '#3a3a2e'], [200, 70, 52, '#2e3430'], [940, 80, 60, '#383028'], [1060, 72, 54, '#30342c']]) shack(x, w, h, c);
+    treeline(B, FY, 14, '#060806', 40, 80, BW);
+    fog(B, 110, 70, 'rgba(60,80,50,0.35)');
+    // the big house: two stories of peeling siding, a sagging porch
+    const x0 = CX - 150, w = 300, top = FY - 150;
+    B.fillStyle = '#0a0c0a'; B.beginPath(); B.moveTo(x0 - 14, top); B.lineTo(CX - 20, top - 62); B.lineTo(CX + 10, top - 58); B.lineTo(x0 + w + 14, top); B.fill();
+    for (let i = 0; i < 14; i++) { B.fillStyle = 'rgba(80,70,50,0.5)'; B.fillRect(x0 + 20 + i * 18, top - 30 + Math.abs(i - 7) * 3.6, 10, 2); }
+    B.fillStyle = '#3a3a34'; B.fillRect(CX + 60, top - 52, 14, 26); B.fillStyle = '#221a14'; B.fillRect(CX + 58, top - 54, 18, 4);
+    wall(B, x0, top, w, FY - top, '#6a6a52', { uplit: true });
+    for (let r = top + 3; r < FY; r += 4.5) { B.fillStyle = 'rgba(0,0,0,0.3)'; B.fillRect(x0, r, w, 0.9); }
+    // peeling paint and black mold creeping up from the ground
+    for (let i = 0; i < 60; i++) { B.fillStyle = rand() < 0.5 ? 'rgba(160,150,120,0.35)' : 'rgba(30,24,16,0.4)'; B.fillRect(x0 + rand() * w, top + rand() * (FY - top), 2 + rand() * 7, 1 + rand() * 2); }
+    for (let i = 0; i < 26; i++) { const mx = x0 + rand() * w, mh = 20 + rand() * 70; const gr = B.createLinearGradient(0, FY - mh, 0, FY); gr.addColorStop(0, 'rgba(20,40,10,0)'); gr.addColorStop(1, 'rgba(14,26,8,0.75)'); B.fillStyle = gr; B.beginPath(); B.ellipse(mx, FY - mh * 0.4, 6 + rand() * 12, mh * 0.6, 0, 0, PI * 2); B.fill(); }
+    // windows: boarded, broken, one lit by a TV
+    const board = (x, y, ww, hh) => { B.fillStyle = '#0a0806'; B.fillRect(x, y, ww, hh); for (let i = 0; i < 3; i++) { B.save(); B.translate(x + ww / 2, y + 5 + i * (hh - 8) / 2); B.rotate((i - 1) * 0.18); B.fillStyle = '#7a6040'; B.fillRect(-ww / 2 - 3, -2.2, ww + 6, 4.4); B.fillStyle = 'rgba(0,0,0,0.4)'; B.fillRect(-ww / 2 - 3, 1.4, ww + 6, 0.8); B.fillStyle = '#2a2a2a'; B.fillRect(-ww / 2 - 1, -0.6, 1.2, 1.2); B.fillRect(ww / 2, -0.6, 1.2, 1.2); B.restore(); } };
+    board(x0 + 24, top + 14, 30, 40); board(x0 + 96, top + 14, 30, 40); win(B, x0 + 176, top + 14, 30, 40, true, '#8ab8e0'); board(x0 + 246, top + 14, 30, 40);
+    B.fillStyle = '#0a0806'; B.beginPath(); B.moveTo(x0 + 178, top + 16); B.lineTo(x0 + 190, top + 30); B.lineTo(x0 + 182, top + 40); B.fill();
+    board(x0 + 24, FY - 76, 30, 40); win(B, x0 + 246, FY - 76, 30, 40, false, '#ffb060');
+    // porch, door, CONDEMNED notice
+    B.fillStyle = '#1a1612'; B.fillRect(x0 + 64, FY - 86, 170, 5); B.save(); B.translate(x0 + 64, FY - 86); B.rotate(0.03); B.fillStyle = '#2a2018'; B.fillRect(0, 0, 170, 3); B.restore();
+    for (const px of [x0 + 66, x0 + 140, x0 + 228]) { B.fillStyle = '#4a4030'; B.fillRect(px, FY - 82, 4, 82); }
+    B.fillStyle = '#2a1e14'; B.fillRect(x0 + 136, FY - 70, 30, 70); B.fillStyle = '#c8a040'; B.fillRect(x0 + 160, FY - 36, 2, 2);
+    B.fillStyle = '#e86a10'; B.fillRect(x0 + 140, FY - 62, 22, 16); B.fillStyle = '#1a0a04'; B.font = '5px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('CONDEMNED', x0 + 151, FY - 55); B.fillText('UNFIT', x0 + 151, FY - 49); B.textAlign = 'left';
+    // couch on the porch
+    B.fillStyle = '#4a3a5a'; B.fillRect(x0 + 82, FY - 24, 44, 14); B.fillRect(x0 + 82, FY - 34, 44, 10); B.fillStyle = '#3a2a48'; B.fillRect(x0 + 78, FY - 30, 6, 20); B.fillRect(x0 + 124, FY - 30, 6, 20);
+    B.fillStyle = 'rgba(200,180,120,0.5)'; B.fillRect(x0 + 96, FY - 33, 10, 4);
+    // the FOR RENT sign in the yard
+    B.fillStyle = '#1a1410'; B.fillRect(x0 + w + 24, FY - 34, 2, 34); B.fillStyle = '#f2eedc'; B.fillRect(x0 + w + 8, FY - 50, 34, 20); B.strokeStyle = '#b01018'; B.lineWidth = 1.5; B.strokeRect(x0 + w + 9, FY - 49, 32, 18);
+    B.fillStyle = '#b01018'; B.font = '7px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('FOR RENT', x0 + w + 25, FY - 41); B.font = '4px Anton, Impact, sans-serif'; B.fillStyle = '#2a2a2a'; B.fillText('NO REFUNDS', x0 + w + 25, FY - 34); B.textAlign = 'left';
+    // a fridge at the curb, a dead tree
+    B.fillStyle = '#c8c4b0'; B.fillRect(x0 - 60, FY - 40, 20, 40); B.fillStyle = '#8a8670'; B.fillRect(x0 - 60, FY - 26, 20, 1.5); B.fillRect(x0 - 43, FY - 36, 1.5, 8);
+    B.strokeStyle = '#0c0a08'; B.lineWidth = 4; B.beginPath(); B.moveTo(x0 + w + 80, FY); B.lineTo(x0 + w + 74, FY - 90); B.stroke(); B.lineWidth = 2; for (const [a, b] of [[-0.8, 40], [0.7, 34], [-0.3, 50], [1.1, 28]]) { B.beginPath(); B.moveTo(x0 + w + 76, FY - 60 - b * 0.4); B.lineTo(x0 + w + 76 + Math.sin(a) * b, FY - 60 - b * 0.4 - Math.cos(a) * b); B.stroke(); }
+    grime(B, x0, top, w, FY - top, 30, 0.25);
+    fog(B, FY - 40, 50, 'rgba(70,90,50,0.35)');
+    vignette(B, BW);
+    // the yard: dead grass, mud, trash
+    pfloor(F, 'stone', '#3a3424', '#14120a', { rows: 8, span: 50, wet: true, edge: '#4a4a30' });
+    for (let i = 0; i < 160; i++) { F.fillStyle = rand() < 0.5 ? 'rgba(90,100,40,0.6)' : 'rgba(40,30,16,0.6)'; F.fillRect(rand() * AWX, FY + rand() * (H - FY), 1, 2 + rand() * 3); }
+    for (let i = 0; i < 26; i++) { F.fillStyle = ['#c8c0a0', '#8a2020', '#3a6a3a', '#d8d8d8', '#2a4a8a'][i % 5]; F.fillRect(rand() * AWX, FY + 4 + rand() * (H - FY - 6), 2 + rand() * 4, 1 + rand() * 2); }
+    for (const x of [180, 900]) lamp(F, x, FY + 3, 74, 'rgba(200,230,150,0.85)');
+  }
+
   const DEFS = {
     cityhall: { name: 'CITY HALL', draw: (B, F) => cityhall(B, F, false) },
-    hell: { name: 'CITY HALL', draw: (B, F) => cityhall(B, F, true) },
+    hell: { name: 'CITY HALL BASEMENT', draw: (B, F) => cityhall(B, F, true) },
     benny: { name: 'BENEFICENCE', draw: benny },
     bridge: { name: 'WHITE RIVER RAILROAD BRIDGE', draw: bridge, pit: true },
     minnetrista: { name: 'MINNETRISTA', draw: minnetrista },
@@ -618,6 +672,7 @@ const STAGES = (() => {
     cornbread: { name: 'CORNBREAD ROAD', draw: cornbread },
     glassworks: { name: 'BALL GLASS WORKS', draw: glassworks },
     village: { name: 'THE VILLAGE', draw: village },
+    rental: { name: 'THE RENTAL', draw: rental },
   };
   const cache = {};
   function get(id) {
@@ -652,6 +707,7 @@ const STAGES = (() => {
         for (let k = 0; k < 4; k++) glow(g, x - 12 + k * 8, y + 1, 4, (Math.floor(t * 8) + k) % 2 ? 'rgba(255,60,60,1)' : 'rgba(80,255,120,1)');
       }
     }
+    if (id === 'rental') { const fl = Math.sin(t * 13) * Math.sin(t * 7.3) > 0.1 ? 0.22 : 0.08; g.fillStyle = `rgba(120,170,240,${fl})`; g.fillRect(CX - 150 + 170, FY - 150 + 8, 44, 54); for (let i = 0; i < 6; i++) { g.fillStyle = 'rgba(20,20,10,0.8)'; g.fillRect(CX - 60 + Math.sin(t * 3 + i * 2) * 30 + i * 8, FY - 40 + Math.cos(t * 4 + i) * 12, 1, 1); } }
     if (id === 'village') { bros(g, t); for (let i = 0; i < 4; i++) { const on = Math.sin(t * 3 + i * 2) > -0.7; if (on) glow(g, 78 + i * 166, FY - 75, 30, 'rgba(255,120,200,0.1)'); } }
     if (id === 'glassworks') for (const x of [230, 640, 1050]) glow(g, x, 160, 40 + Math.sin(t * 6 + x) * 8, 'rgba(255,140,40,0.3)');
     if (id === 'benny') { for (const d of [-78, 78]) glow(g, CX + d, FY - 158, 14 + Math.sin(t * 9 + d) * 2, 'rgba(255,220,150,0.35)'); }

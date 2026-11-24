@@ -364,7 +364,7 @@ const RIG = (() => {
     drawLeg(g, d, def, J.LB, true, o);
     if (def.tail) def.tail(g, d, J, st);
     if (def.bodyDraw) { const up = J.p.lF[0] - J.p.lean > 0.9; if (!up) drawLeg(g, d, def, J.LF, false, o); def.bodyDraw(g, d, J, st); if (up) drawLeg(g, d, def, J.LF, false, o); }
-    else { drawTorso(g, d, def, J, st); drawLeg(g, d, def, J.LF, false, o); }
+    else { drawTorso(g, d, def, J, st); drawLeg(g, d, def, J.LF, false, o); if (def.skirt) def.skirt(g, d, J, st); }
     if (def.neckDraw) def.neckDraw(g, d, J, st);
     else if (!o.noHead && !def.bodyDraw) seg(g, lerp2(J.sh, J.nk, -0.3), J.nk, d.shW * 0.36, d.shW * 0.32, def.col.neck || def.col.hand, (def.mat && def.mat.neck) || 'skin', { seed: 5 });
     if (!o.noHead && !o.noHeadDraw) drawHeadAt(g, f, J.nk[0], J.nk[1], J.p.lean + J.p.head * 0.5, o.headScale || 1, Object.assign({}, st, { jaw: J.p.jaw }));
