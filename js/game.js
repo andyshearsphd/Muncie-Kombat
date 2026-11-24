@@ -1361,6 +1361,7 @@
     bio(g, def.bio, cx, gy + rows * (chh + GP) + 21, Math.min(gw + 20, 2 * (W - 100 - cx)), 3);
     uiButton('FIGHT', W - 86, H - 36, 76, 28, confirmPick, 'fire', 18);
     uiButton('MOVES', W - 86, H - 70, 76, 26, () => { screen = 'moves'; movesBack = 'select'; SFX.blip(); }, 'gold', 14);
+    uiButton('BACK', 6, H - 26, 56, 20, () => { screen = 'title'; SFX.blip(); }, 'gold', 11);
     grit();
   }
   function bio(g, str, cx, ly, maxW, maxLines = 9) {
@@ -1503,7 +1504,7 @@
       TXT.draw(g, 'YOUR DESTINY', cx, 70, { size: 28, align: 'center', fill: 'gold' });
       TXT.draw(g, n + ' FIGHTS TO CITY HALL', cx, 112, { size: 12, align: 'center', fill: 'white', italic: false });
       ui.push({ x: 0, y: 0, w: W, h: H, fn: () => { ladder.scanned = true; ladder.t0 = performance.now() - SCAN * 1000; } });
-      grit(); return;
+      ladderBack(); grit(); return;
     }
     const me = ROSTER.FIGHTERS[ladder.pick], op = ladder.opps[r];
     const f1 = { def: me, d: me.dk, x: cx - 68, y: 196, face: 1, t }, f2 = { def: op, d: op.dk, x: cx + 68, y: 196, face: -1, t: t + 1 };
@@ -1514,8 +1515,10 @@
     if (op.boss) bio(g, op.bio, cx, 199, tx - 30, 2);
     if (Math.sin(t * 5) > -0.3) TXT.draw(g, 'TAP TO FIGHT', cx, op.boss ? 222 : 218, { size: 13, align: 'center', fill: 'white' });
     ui.push({ x: 0, y: 0, w: W, h: H, fn: () => { SFX.gong(); startMatch(); } });
-    grit();
+    ladderBack(); grit();
   }
+  // before the first fight BACK returns to fighter select; partway up the tower it quits to the title
+  function ladderBack() { uiButton('BACK', 6, H - 26, 56, 20, () => { SFX.blip(); SFX.music('menu'); screen = ladder.rung === 0 ? 'select' : 'title'; }, 'gold', 11); }
   function renderContinue() {
     elControls.classList.remove('on'); elPause.classList.remove('on');
     drawWorld(); grit(); ui = [];
