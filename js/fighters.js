@@ -796,11 +796,11 @@ const ROSTER = (() => {
   const BY = '#e6c02a', BJ = '#2a4a78', BSK = '#e6c4a4', BRD = '#141010', BCAP = '#b8161c';
   const bunyon = {
     id: 'bunyon', name: 'TIM BUNYON', short: 'BUNYON', him: 'HIM', k: 1.3, bicep: 0.42, calf: 0.35, sock: '#c0181c', sockLow: true,
-    bio: 'Yellow shirt, black beard, an axe the size of a canoe. Stood by the road for decades. You look like kindling.',
+    bio: 'Yellow shirt, black beard, and an axe he saves for special occasions. You look like kindling.',
     d: dims({ thigh: 30, shin: 29, torso: 38, neck: 4, upper: 22, fore: 21, hipW: 14, shW: 19, chest: 19, belly: 16, back: 14, thighR: 9, kneeR: 6, ankleR: 4.6, shR: 7.6, elbowR: 5.6, wristR: 4.6, fist: 5.6, footL: 15, footH: 5.5 }),
     col: { torso: BY, armU: BY, armL: BSK, hand: BSK, legU: BJ, legL: BJ, foot: '#4a3626', neck: BSK },
     mat: { torso: 'cloth', armU: 'cloth', armL: 'skin', legU: 'denim', legL: 'denim' },
-    stats: { speed: 0.9, power: 1.18, weight: 1.35 },
+    stats: { speed: 0.95, power: 1.0, weight: 1.1 },
     torsoDetail(g, d, st, L) {
       R.poly(g, [[d.shW * 0.1, -L * 1.03], [d.shW * 0.75, -L * 1.03], [d.shW * 0.45, -L * 0.86]], BSK);
       R.poly(g, [[d.shW * 0.12, -L * 1.03], [d.shW * 0.45, -L * 0.86], [d.shW * 0.2, -L * 0.82]], sh(BY, -0.15));
@@ -810,7 +810,7 @@ const ROSTER = (() => {
       g.fillStyle = '#b81820'; g.fillRect(-d.hipW * 1.3, -4, d.hipW * 2.8, 3.4); g.fillStyle = '#d8c060'; g.fillRect(d.hipW * 0.6, -4.4, 3, 4.2);
     },
     backHand(g, d, J, st) {
-      if (st.noProp) return;
+      if (!st.axe) return;
       // the axe: long pale handle and a heavy dark head
       const w = J.AB.wr, ua = R.dir(J.AB.a2 + PI / 2, 1), u = ua[1] >= 0 ? ua : [-ua[0], -ua[1]], n = [-u[1], u[0]], k = d.k, L = 40 * k;
       const a = [w[0] - u[0] * 8 * k, w[1] - u[1] * 8 * k], b = [w[0] + u[0] * L, w[1] + u[1] * L];
@@ -839,7 +839,7 @@ const ROSTER = (() => {
         mouth() {}
       });
     },
-    proj: { kind: 'axe', name: 'AXE THROW' }, sp2: { kind: 'roll', name: 'LOG ROLL' },
+    proj: { kind: 'log', name: 'LOG TOSS' }, sp2: { kind: 'roll', name: 'LOG ROLL' },
     fatal: { id: 'bunyon', name: 'TIMBER' }
   };
 

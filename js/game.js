@@ -817,7 +817,7 @@
     else if (kind === 'notice') list.push(Object.assign(base, { vx: f.face * 210, w: 10, h: 9, dmg: 10 }));
     else if (kind === 'hellfire') list.push(Object.assign(base, { vx: f.face * 320, w: 12, h: 10, dmg: 11 }));
     else if (kind === 'oil') list.push(Object.assign(base, { y: FLOOR - 8, h: 7, w: 14, vx: f.face * 220, low: 1, dmg: 7, trip: 1 }));
-    else if (kind === 'axe') list.push(Object.assign(base, { y: FLOOR - 70 * k, vy: -60, grav: 300, vx: f.face * 300, w: 13, h: 14, dmg: 13 }));
+    else if (kind === 'log') list.push(Object.assign(base, { y: FLOOR - 70 * k, vy: -60, grav: 300, vx: f.face * 280, w: 13, h: 10, dmg: 10 }));
     else if (kind === 'shimmer') list.push(Object.assign(base, { vx: f.face * 300, w: 10, h: 10, dmg: 5, blind: 1 }));
     else if (kind === 'teeth') { for (const v of [-55, 0, 55]) list.push(Object.assign({}, base, { vy: v, vx: f.face * 320, dmg: 4, w: 6, h: 5 })); }
     else if (kind === 'poop') list.push(Object.assign(base, { y: FLOOR - 52, vy: -120, grav: 300, vx: f.face * 250 }));
@@ -841,7 +841,7 @@
         if (p.kind === 'gust' || p.kind === 'howl') { mv.fx = 'stun'; mv.push = p.push; mv.stun = 0.3; }
         if (p.trip) mv.fx = 'trip';
         if (p.blind) mv.fx = 'blind';
-        if (p.kind === 'axe') { mv.fx = 'knock'; mv.vx = 240; mv.vy = -360; SFX.slash(); }
+        if (p.kind === 'log') { mv.fx = 'knock'; mv.vx = 220; mv.vy = -320; SFX.thud(); }
         if (p.kind === 'shimmer') { game.flash = 0.08; SFX.ding(); }
         if (p.kind === 'book') { SFX.thud(); FX.burst(p.x, p.y, 2, ['tooth']); }
         if (p.kind === 'notice') banner('EVICTED', { size: 16, fill: 'blood', life: 1.1, y: 96, x: v === p1 ? W * 0.27 : W * 0.73 });
@@ -877,7 +877,7 @@
       case 'notice': g.rotate(Math.sin(t * 14) * 0.35); g.fillStyle = '#f2eedc'; g.fillRect(-6, -8, 12, 16); g.fillStyle = '#b01018'; g.font = '5px Anton, Impact, sans-serif'; g.fillText('EVICT', -5.5, -2); g.fillStyle = 'rgba(40,40,40,0.6)'; for (let i = 0; i < 4; i++) g.fillRect(-5, 1 + i * 1.8, 10, 0.7); g.strokeStyle = '#b01018'; g.lineWidth = 0.8; g.strokeRect(-4, -7, 8, 6); break;
       case 'hellfire': R.ball(g, 0, 0, 7, '#ff6a10'); R.ball(g, 1, -1, 4, '#ffe060'); break;
       case 'oil': g.scale(s, 1); g.fillStyle = 'rgba(10,10,14,0.92)'; g.beginPath(); g.moveTo(10, 0); g.quadraticCurveTo(0, -5 - Math.sin(t * 20) * 1.5, -14, -1); g.quadraticCurveTo(-4, 4, 10, 0); g.fill(); g.fillStyle = 'rgba(140,150,200,0.5)'; g.fillRect(-4, -2.5, 8, 0.9); R.ball(g, -16, 2 + Math.sin(t * 25) * 2, 1.6, '#0a0a0e'); break;
-      case 'axe': g.rotate(t * 14 * s); R.line(g, 0, -11, 0, 11, '#e8dcc0', 2.4); g.fillStyle = '#2a2a2e'; g.beginPath(); g.moveTo(-1, -11); g.lineTo(10, -14); g.lineTo(10, -2); g.lineTo(-1, -5); g.fill(); R.line(g, 10, -14, 10, -2, '#d8dce4', 1.2); break;
+      case 'log': g.rotate(t * 9 * s); g.fillStyle = '#5a3a1e'; g.fillRect(-11, -4.5, 22, 9); g.fillStyle = 'rgba(0,0,0,0.3)'; for (let i = -8; i < 10; i += 4) g.fillRect(i, -4.5, 1, 9); g.fillStyle = '#c8a070'; g.beginPath(); g.ellipse(11, 0, 2.4, 4.5, 0, 0, PI * 2); g.fill(); g.strokeStyle = '#8a6030'; g.lineWidth = 0.6; g.beginPath(); g.ellipse(11, 0, 1.2, 2.4, 0, 0, PI * 2); g.stroke(); break;
       case 'shimmer': { g.rotate(t * 10); for (let i = 0; i < 8; i++) { g.rotate(PI / 4); g.fillStyle = `rgba(240,244,255,${i % 2 ? 0.5 : 0.9})`; g.beginPath(); g.moveTo(0, 0); g.lineTo(-1.2, -(i % 2 ? 6 : 11)); g.lineTo(1.2, -(i % 2 ? 6 : 11)); g.fill(); } R.ball(g, 0, 0, 3.4, '#d8dce6'); R.ball(g, 0, 0, 1.4, '#7a808a'); g.fillStyle = 'rgba(255,255,255,0.35)'; g.beginPath(); g.arc(0, 0, 9 + Math.sin(t * 30) * 2, 0, PI * 2); g.fill(); break; }
       case 'teeth': g.rotate(t * 20 * s); g.fillStyle = '#f4f0e4'; g.beginPath(); g.moveTo(-2.5, -3); g.lineTo(2.5, -3); g.lineTo(1.6, 2); g.lineTo(0, 4); g.lineTo(-1.6, 2); g.fill(); g.fillStyle = '#c86a6a'; g.fillRect(-2.5, -3.6, 5, 1); break;
     }
@@ -927,9 +927,8 @@
       draw(g, f) { const h = fj(f, 'handR'); R.line(g, h[0], h[1] + 26, h[0], h[1] - 40, '#4a2e12', 2.2); R.line(g, h[0] - 6, h[1] - 40, h[0] + 6, h[1] - 40, '#b8b8c0', 1.8); for (let i = -1; i <= 1; i++) R.line(g, h[0] + i * 5.5, h[1] - 40, h[0] + i * 5.5, h[1] - 49, '#c8c8d0', 1.4); } },
     tinman: { fp: t => t < 1.5 ? ({ aL: [1.5 + Math.sin(t * 8) * 0.5, 0.05], aR: [1.5 - Math.sin(t * 8) * 0.5, 0.05], sway: Math.sin(t * 8) * 0.04 }) : ({ aR: [0.55, -2.1], aL: [0.6, -1.5], jaw: 0.4 }),
       fx(f, t) { if (once(f, 'c1', t, 0.15) || once(f, 'c2', t, 0.55) || once(f, 'c3', t, 0.95) || once(f, 'c4', t, 1.6) || once(f, 'c5', t, 2.0)) SFX.clang(); } },
-    bunyon: { fp: t => ({ aR: [2.98, 0.05], aL: [0.6, -1.5], sway: Math.sin(t * 2) * 0.02 }),
-      fx(f, t) { if (once(f, 's', t, 0.25) || once(f, 's2', t, 1.25)) { SFX.thud(); game.shake = 4; FX.dust(f.x, FLOOR, 14); } },
-      draw(g, f) { const h = fj(f, 'handR'), k = f.d.k; R.line(g, h[0], h[1] + 10 * k, h[0], h[1] - 34 * k, '#5a4630', 3.4 * k); R.line(g, h[0], h[1] + 10 * k, h[0], h[1] - 34 * k, '#e8dcc0', 2.4 * k); g.fillStyle = '#2a2a2e'; g.beginPath(); g.moveTo(h[0] - 2 * k, h[1] - 34 * k); g.lineTo(h[0] + 13 * k, h[1] - 40 * k); g.lineTo(h[0] + 13 * k, h[1] - 24 * k); g.lineTo(h[0] - 2 * k, h[1] - 27 * k); g.fill(); R.line(g, h[0] + 13 * k, h[1] - 40 * k, h[0] + 13 * k, h[1] - 24 * k, '#d8dce4', 1.3 * k); } },
+    bunyon: { fp: t => ({ aR: [0.45, -2.5], aL: [0.45, -2.5], sway: Math.sin(t * 2) * 0.02 }),
+      fx(f, t) { if (once(f, 's', t, 0.25) || once(f, 's2', t, 1.25)) { SFX.thud(); game.shake = 4; FX.dust(f.x, FLOOR, 14); } } },
     becky: { fp: t => ({ aL: [0.6, -1.5], aR: [0.6, -1.5], head: Math.sin(t * 1.5) * 0.06 }),
       fx(f, t) { if (Math.random() < 0.25) { const c = fj(f, 'chest'); FX.spark(c[0] + rnd(-12, 12), c[1] + rnd(-6, 10), '#eef2ff', 2); } if (once(f, 'd', t, 0.3)) SFX.ding(); } },
     possum: { fp: t => t < 1.5 ? ({ jaw: 1, aL: [1.9 + Math.sin(t * 18) * 0.15, 0.3], aR: [1.9 - Math.sin(t * 18) * 0.15, 0.3], squat: 4 }) : ({ jaw: 0.2, aL: [0.4, 0.2], aR: [0.4, 0.2], squat: 3, head: 0.25 }),
@@ -998,7 +997,7 @@
     while (tr.rot - f.pose.rot > PI) f.pose.rot += 2 * PI;
     while (tr.rot - f.pose.rot < -PI) f.pose.rot -= 2 * PI;
     f.pose = R.lerp(f.d, f.pose, tr, rate);
-    f.st2 = Object.assign(f.st2 || {}, { wounds: f.st2.wounds || [], t: f.t, dead: f.dead && f.state !== 'script' ? true : f.st2.dead, hurt: ['hit', 'air', 'down'].includes(f.state) && !f.dead, claws: f.state === 'attack', noProp: f.def.id === 'bunyon' && f.projOut > 0.3, pd: f.state === 'script' ? f.st2.pd : !!(f.state === 'attack' && f.move && f.move.kind === 'playdead' && f.mt < f.move.t[0]) });
+    f.st2 = Object.assign(f.st2 || {}, { wounds: f.st2.wounds || [], t: f.t, dead: f.dead && f.state !== 'script' ? true : f.st2.dead, hurt: ['hit', 'air', 'down'].includes(f.state) && !f.dead, claws: f.state === 'attack', axe: f.state === 'script' ? f.st2.axe : false, pd: f.state === 'script' ? f.st2.pd : !!(f.state === 'attack' && f.move && f.move.kind === 'playdead' && f.mt < f.move.t[0]) });
   }
   function separate() {
     if (!p1 || !p2) return;

@@ -909,6 +909,7 @@ const FATAL = (() => {
     const UP = P({ hy: 2, lean: -0.25, head: -0.3, aF: [2.9, 0.2], aB: [3.05, 0.1], fF: [14, 0], fB: [-14, 0] });
     const SLAM = P({ hyL: 0.2, lean: 0.9, head: 0.5, aF: [1.5, 0.1], aB: [1.45, 0.05], fF: [20, 0], fB: [-14, 0] });
     let fall = 0, falling = false, landed = false, logsOn = false, feet = null, midX = 0;
+    A.st2.axe = true;
     const logs = [];
     prop({ layer: 'back', draw(g) {
       if (feet) for (const p of feet) { R.ball(g, p[0], F - 3, 5 * V.d.k, V.def.col.foot); R.ball(g, p[0], F - 7 * V.d.k, 3 * V.d.k, '#8a0010'); }
