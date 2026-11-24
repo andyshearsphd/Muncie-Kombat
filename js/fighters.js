@@ -644,7 +644,7 @@ const ROSTER = (() => {
   const WF = '#6a5a4a', WFD = '#3a3028', WS = '#ece8de';
   const wolfe = {
     id: 'wolfe', name: 'COKE WOLFE', short: 'WOLFE', him: 'HIM', k: 1.08, paws: true, claws: true, skull: 'raccoon', skullK: 1.25,
-    bio: 'Came up from the Southside in a white suit and never came down. Full moon every night if you bring enough powder.',
+    bio: 'Came up in a white suit and never came down. Full moon every night if you bring enough powder.',
     bicep: 0.3, calf: 0.12,
     d: dims({ thigh: 29, shin: 28, torso: 37, neck: 5, upper: 22, fore: 21, hipW: 11, shW: 17, chest: 16, belly: 11, back: 12, thighR: 7.4, kneeR: 4.8, shR: 6.6, elbowR: 4.6, wristR: 3.8, fist: 4.6, footL: 13 }),
     col: { torso: WS, armU: WS, armL: WS, cuff: WF, hand: WFD, legU: WS, legL: WS, foot: '#b89a70', neck: WF },
