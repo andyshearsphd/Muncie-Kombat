@@ -39,7 +39,7 @@ const FATAL = (() => {
       for (const e of s.ev) if (!e.f && s.t >= e.time) { e.f = 1; e.fn(); }
       if (s.tick) s.tick(s.t, dt);
     };
-    if (!['golemDie', 'danDie', 'slumDie', 'bridge'].includes(id)) center(A, V, api);
+    if (!['golemDie', 'danDie', 'slumDie', 'bridge', 'overpass'].includes(id)) center(A, V, api);
     if (Math.abs(V.x - A.x) > 1) A.face = Math.sign(V.x - A.x);
     V.face = -A.face;
     A.scriptPose = api.PS.stance(A.t); V.scriptPose = api.PS.dizzy(V.t);
@@ -62,19 +62,10 @@ const FATAL = (() => {
       api.sfx('fart'); api.sfx('crunch'); api.shake(6); A.st2.belly = 1;
       const hp = J(A, 'hip'), bx = hp[0] - A.face * 14 * k, by = hp[1];
       FX.puff(bx, by, 'rgba(90,60,26,0.9)', 18, 4); FX.blood(bx, by, 30, -A.face, 1.2);
-      const pose = P({ aF: [2.8, 0.4], aB: [2.4, 0.6], lF: [0.6, 0.3], lB: [-0.4, 0.3], lean: 0 });
-      const hh = api.hurtH(V);
-      FX.gib('skel', bx, by, -A.face * 520, -90, {
-        grav: 260, vr: -A.face * 9, trail: true,
-        draw: (g) => R.draw(g, { def: V.def, d: V.d, x: 0, y: hh * 0.5, face: 1, t: 0 }, pose, { skeleton: true, gore: true }),
-        onUpdate: (o) => {
-          if (o.x < api.cam + 16 || o.x > api.cam + api.W - 16 || o.rest) {
-            o.dead = true; api.sfx('crunch'); api.shake(5);
-            FX.burst(o.x, o.y, 14, ['bone', 'bone', 'skullfrag', 'chunk', 'tooth'], 1);
-            FX.blood(o.x, o.y, 30, A.face, 1);
-          }
-        }
-      });
+      // the skeleton comes out already flying apart: bones in every direction
+      skullGib(V, bx, by, -A.face * rnd(260, 420), rnd(-560, -380));
+      for (let i = 0; i < 34; i++) { const a = rnd(0, PI * 2), sp = rnd(250, 720); FX.gib(pick(['bone', 'bone', 'bone', 'tooth', 'skullfrag']), bx, by, Math.cos(a) * sp - A.face * 120, Math.sin(a) * sp - 220, { s: rnd(0.8, 1.7), vr: rnd(-24, 24) }); }
+      FX.burst(bx, by, 8, ['chunk', 'guts'], 1.2); FX.drops(6); api.flash();
       for (let i = 0; i < 5; i++) FX.gib('poop', bx, by, -A.face * rnd(60, 200), rnd(-200, -60));
     });
     s.at(3.3, () => { A.face = -A.face; });
@@ -122,24 +113,45 @@ const FATAL = (() => {
       void hh;
     });
     const splat = (n, big) => { for (let i = 0; i < n; i++) easel.splats.push({ x: rnd(-15, 15), y: rnd(-18, 14), r: rnd(1.5, big ? 6 : 4), c: Math.random() < 0.5 ? '#9a000c' : '#c0101a', d: Math.random() < 0.5 ? rnd(4, 14) : 0 }); };
-    const hits = [1.3, 1.8, 2.3, 2.8];
+    // swish swish: whack the victim back and forth like a wet brush, faster and faster
+    const hits = [1.45, 1.75, 2.0, 2.2, 2.38, 2.53, 2.66, 2.78, 2.89, 2.99];
+    const side = i => i % 2 ? -1.25 : 1.2;
+    let can = null;
+    s.at(0.62, () => {
+      const hh = api.hurtH(V), hd = R.jointWorld(A, R.resolve(A.d, raise(2.75)), 'handF'), Lh = hh * 0.95;
+      can = prop({ layer: 'back', x: hd[0] - A.face * (Math.sin(1.25) * Lh + 6), dents: 0, draw(g, p) {
+        const x = p.x, h = 34;
+        g.fillStyle = '#5a5e64'; g.fillRect(x - 11, F - h, 22, h); g.fillStyle = '#8a9098'; g.fillRect(x - 11, F - h, 4, h); g.fillStyle = '#3a3e44'; g.fillRect(x + 7, F - h, 4, h);
+        g.fillStyle = '#2a2c30'; for (let i = 1; i < 4; i++) g.fillRect(x - 11, F - h + i * 8, 22, 1.2);
+        g.fillStyle = '#6a6e74'; g.fillRect(x - 13, F - h - 3, 26, 3);
+        g.fillStyle = 'rgba(140,0,12,0.8)'; for (let i = 0; i < p.dents; i++) g.fillRect(x - 10 + (i * 7) % 20, F - h + 2 + (i * 5) % 18, 2, 4 + i % 3);
+      } });
+      api.bubble("LET'S BEAT THE DEVIL OUT OF IT.", A.x, F - 160, { size: 11, life: 1.6, fill: 'white' });
+    });
     hits.forEach((h, i) => s.at(h, () => {
-      const last = i === hits.length - 1;
-      api.sfx('crunch'); api.sfx('splat'); api.shake(last ? 7 : 3);
+      const last = i === hits.length - 1, front = side(i) > 0;
+      api.sfx(front ? 'splat' : 'clang'); api.sfx('crunch'); api.shake(last ? 8 : 3);
       const hp = J(V, 'head');
-      FX.blood(hp[0], hp[1], last ? 50 : 16, -A.face, last ? 1.5 : 0.9);
-      splat(last ? 14 : 5, last);
+      // blood flicks off in arcs, like paint off a brush
+      for (let j = 0; j < 3; j++) FX.blood(hp[0], hp[1], last ? 30 : 12, (front ? 1 : -1) * A.face, last ? 1.6 : 1.2);
+      if (front) splat(last ? 14 : 4, last); else if (can) can.dents++;
+      if (i > 2 && Math.random() < 0.6) FX.gib('tooth', hp[0], hp[1], rnd(-200, 200), rnd(-300, -100));
+      if (i === 6) FX.gib('eye', hp[0], hp[1], rnd(-150, 150), -280);
       if (last) { V.ro.noHead = true; FX.burst(hp[0], hp[1], 12, ['brain', 'eye', 'skullfrag', 'chunk', 'tooth', 'skullfrag'], 1.1); skullGib(V, hp[0], hp[1], -A.face * 120, -260); api.flash(); }
     }));
     s.at(3.35, () => { dropped = true; V.scriptPose = PS.down(V); V.snapPose = true; V.x = hand[0] + A.face * 20; V.y = F; V.ro.noHead = true; api.sfx('thud'); FX.blood(V.x, F - 6, 12, 0, 0.6); });
-    s.at(4.3, () => api.bubble('A HAPPY LITTLE ACCIDENT.', A.x, F - 150, { size: 12, life: 2, fill: 'white' }));
+    s.at(4.3, () => api.bubble('THERE. NICE AND CLEAN.', A.x, F - 150, { size: 12, life: 2, fill: 'white' }));
     s.at(5.4, () => { s.done = true; });
     s.tick = (t, dt) => {
       if (t < 0.6) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 30 * k, dt, api, 110); return; }
       if (!dropped) {
         // swing: 0 = hanging, ~1.2 = head into the canvas
         if (t < 1.05) swingA = -0.3 * ease((t - 0.6) / 0.45);
-        else if (t < 3.05) { const u = ((t - 1.05) % 0.5) / 0.5; swingA = u < 0.5 ? lerp(-0.4, 1.2, ease(u / 0.5)) : lerp(1.2, -0.4, ease((u - 0.5) / 0.5)); }
+        else if (t < hits[hits.length - 1]) {
+          let i = 0; while (i < hits.length && hits[i] <= t) i++;
+          const t0 = i ? hits[i - 1] : 1.05, a0 = i ? side(i - 1) : -0.3, u = (t - t0) / (hits[i] - t0);
+          swingA = a0 + (side(i) - a0) * u * u;
+        }
         else swingA = lerp(swingA, 0, dt * 6);
         A.scriptPose = raise(2.75 - Math.max(0, swingA) * 0.6);
         hand = J(A, 'handF');
@@ -424,58 +436,155 @@ const FATAL = (() => {
     };
   };
 
-  // ---------- CHUCKY: Early Bird ----------
+  // ---------- CHUCKY: Bird Strike ----------
   S.chucky = (s, A, V, api) => {
     const PS = api.PS, F = api.FLOOR, k = A.d.k;
-    let rope = 0, slurp = 0, fell = false, nextTug = 1.3, out = false, from = 0;
-    const beak = () => { const h = J(A, 'head'); return [h[0] + A.face * 15 * k, h[1] - 1 * k]; };
+    const hh = api.hurtH(V), cut = hh * 0.5;
+    let x0 = 0, path = null, off = null, split = false, heart = false, shadow = 0, vPose = null, land = 0;
+    const top = { x: 0, y: 0, vx: 0, vy: 0, a: 0, rest: false }, bot = { a: 0, va: 0 };
+    const DIVE = P({ lean: 1.45, head: 0.2, aF: [-0.5, 0.15], aB: [-0.65, 0.2], lF: [-0.55, 0.2], lB: [-0.75, 0.3], rot: 0.42, piv: 2 });
+    const piece = (g, upper) => {
+      const f = { def: V.def, d: V.d, x: 0, y: upper ? cut : 0, face: V.face, t: 0, st: { dead: true, wounds: V.st2.wounds } };
+      g.save(); g.beginPath(); if (upper) g.rect(-300, -400, 600, 400); else g.rect(-300, -cut, 600, cut + 30); g.clip();
+      R.draw(g, f, vPose, { gore: true }); g.restore();
+      const cy = upper ? 0 : -cut; g.fillStyle = '#8a0010'; g.beginPath(); g.ellipse(0, cy, V.d.belly * 1.05, 3.2, 0, 0, PI * 2); g.fill();
+      g.fillStyle = '#c8303a'; g.beginPath(); g.ellipse(-1, cy - 0.5, V.d.belly * 0.6, 1.6, 0, 0, PI * 2); g.fill(); R.ball(g, -V.face * V.d.back * 0.4, cy, 2.2, '#ece4d0');
+    };
+    prop({ layer: 'back', draw(g) { if (shadow > 0) { g.fillStyle = `rgba(0,0,0,${0.15 + shadow * 0.35})`; g.beginPath(); g.ellipse(V.x, F + 1, 8 + shadow * 26, 2 + shadow * 2.5, 0, 0, PI * 2); g.fill(); } } });
     prop({ layer: 'front', draw(g) {
-      if (!out) return;
-      const b = beak(), e0 = J(V, 'belly'), e = [lerp(e0[0], b[0], slurp), lerp(e0[1], b[1], slurp)];
-      const dist = Math.hypot(b[0] - e[0], b[1] - e[1]), sag = Math.max(2, rope - dist) * 0.8 + 3;
-      const mx = (b[0] + e[0]) / 2, my = Math.max(b[1], e[1]) + sag;
-      for (const [w, c] of [[4.2, '#5a0a14'], [3, '#c8606a'], [1, 'rgba(255,200,200,0.6)']]) {
-        g.strokeStyle = c; g.lineWidth = w; g.lineCap = 'round'; g.beginPath(); g.moveTo(e[0], e[1]);
-        for (let i = 1; i <= 16; i++) { const u = i / 16, x = (1 - u) * (1 - u) * e[0] + 2 * (1 - u) * u * mx + u * u * b[0], y = (1 - u) * (1 - u) * e[1] + 2 * (1 - u) * u * my + u * u * b[1] + Math.sin(u * 18 + s.t * 20) * 1.2; g.lineTo(x, y); }
-        g.stroke();
+      if (split) {
+        g.save(); g.translate(V.x, F); g.rotate(bot.a); piece(g, false); g.restore();
+        g.save(); g.translate(top.x, top.y); g.rotate(top.a); piece(g, true); g.restore();
       }
-      g.lineCap = 'butt';
-      if (Math.random() < 0.3) FX.blood(e[0], e[1], 1, 0, 0.3);
+      if (heart) { const h = J(A, 'head'); g.save(); g.translate(h[0] + A.face * 17 * k, h[1] + 1); g.scale(1.3, 1.3); FX.ORG.heart(g); g.restore(); if (Math.random() < 0.4) FX.blood(h[0] + A.face * 17 * k, h[1] + 6, 1, 0, 0.2); }
     } });
-    s.at(0.8, () => { api.sfx('chirp'); });
-    s.at(1.05, () => { out = true; api.sfx('slash'); api.sfx('splat'); api.shake(5); const b = J(V, 'belly'); FX.blood(b[0], b[1], 40, -A.face, 1.3); FX.spurt(b[0], b[1], -A.face, 1); V.ro.gore = true; from = A.x; });
-    s.at(2.6, () => { fell = true; V.scriptPose = PS.downFace(V); api.sfx('thud'); });
-    s.at(3.0, () => { FX.dust(V.x, F, 14); api.shake(4); });
-    s.at(3.15, () => { api.sfx('slurp'); });
-    s.at(4.0, () => { out = false; api.sfx('gulp'); api.sfx('chirp'); });
-    s.at(4.3, () => api.bubble('THE EARLY BIRD GETS THE WORM.', A.x, F - 140, { size: 11, fill: 'white', life: 2 }));
+    s.at(0.35, () => { x0 = A.x; api.sfx('whoosh'); api.sfx('chirp'); FX.dust(A.x, F, 16); });
+    s.at(1.25, () => { api.sfx('chirp'); api.sfx('whoosh'); });
+    s.at(1.3, () => {
+      const c = J(V, 'chest'), sx = V.x - A.face * 230, sy = F - 210, dx = c[0] - sx, dy = c[1] - sy, L = Math.hypot(dx, dy);
+      path = { sx, sy, cx: c[0], cy: c[1], ex: c[0] + dx / L * 110, ey: Math.min(F - 14, c[1] + dy / L * 110) };
+      const p = R.jointWorld(A, R.resolve(A.d, DIVE), 'head'); off = [p[0] - A.x, p[1] - A.y]; A.scriptPose = DIVE; A.snapPose = true;
+    });
+    s.at(1.5, () => {
+      split = true; heart = true; vPose = V.pose; V.hidden = true; shadow = 0;
+      top.x = V.x; top.y = F - cut; top.vx = A.face * 240; top.vy = -380; top.a = 0; land = V.x + A.face * 95;
+      api.sfx('crunch'); api.sfx('splat'); api.sfx('big'); api.shake(10); api.flash(); FX.drops(8);
+      const c = [path.cx, path.cy];
+      FX.blood(c[0], c[1], 90, A.face, 2); FX.spurt(c[0], c[1], A.face, 1.6);
+      FX.burst(c[0], c[1], 16, ['chunk', 'guts', 'lung', 'chunk', 'bone', 'liver', 'stomach'], 1.4);
+      for (let i = 0; i < 8; i++) FX.gib('bone', c[0], c[1], A.face * rnd(150, 420), rnd(-360, -60), { s: 0.8 });
+    });
+    s.at(1.95, () => { api.sfx('thud'); api.shake(4); });
+    s.at(3.3, () => { heart = false; const h = J(A, 'head'); FX.gib('heart', h[0] + A.face * 17 * k, h[1], 0, -330, { s: 1.3, vr: 10 }); api.sfx('whoosh'); });
+    s.at(3.75, () => { api.sfx('gulp'); FX.gibs.forEach(g => { if (g.kind === 'heart') g.dead = true; }); });
+    s.at(4.0, () => { api.sfx('chirp'); api.bubble('TWEET TWEET.', A.x, F - 150, { size: 13, fill: 'white', life: 1.8 }); });
     s.at(5.6, () => { s.done = true; });
     s.tick = (t, dt) => {
-      if (t < 0.55) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 30 * k, dt, api, 110); return; }
-      if (t < 1.05) { A.scriptPose = P({ hy: 6, lean: -0.35, head: -0.5, aF: [1.0, 1.4], aB: [0.4, 1.6], fF: [14, 0], fB: [-16, 0] }); return; }
-      if (!fell) {
-        V.scriptPose = P({ hy: 8, lean: 0.35, head: 0.4, aF: [1.3 + Math.sin(t * 13) * 0.2, 1.6], aB: [1.1, 1.8], fF: [10, 0], fB: [-10, 0] });
-        V.ro.dx = rnd(-0.8, 0.8);
-      } else V.ro.dx = 0;
-      if (t < 1.3) { A.scriptPose = P({ hy: 10, lean: 1.0, head: 0.6, aF: [0.9, 0.3], aB: [0.6, 0.4], fF: [18, 0], fB: [-12, 0] }); rope = 8; return; }
-      if (t < 3.15) {
-        // back-pedal and tug, the worm stretching out of the belly
-        const u = ease((t - 1.3) / 1.3); A.x = from - A.face * 60 * u;
-        rope = 20 + 70 * u;
-        const tug = t > nextTug ? (nextTug = t + 0.35, 1) : 0;
-        if (tug) { api.sfx('squeak'); api.shake(2); const b = J(V, 'belly'); FX.blood(b[0], b[1], 8, -A.face, 0.8); if (!fell) V.ro.dx = A.face * -3; }
-        A.wph = (A.wph || 0) - dt * 5;
-        A.scriptPose = Object.assign({}, PS.walk(A.wph), { hy: 10, lean: -0.35 + Math.sin(t * 17) * 0.06, head: -0.3, aF: [0.9, 1.2], aB: [0.5, 1.4] });
-        if (fell) { A.x = from - A.face * 60; rope = Math.max(rope, Math.hypot(beak()[0] - J(V, 'belly')[0], beak()[1] - J(V, 'belly')[1])); }
+      if (t < 0.35) { V.scriptPose = PS.dizzy(V.t); A.scriptPose = P({ hyL: 0.5, lean: 0.4, aF: [2.2, 0.4], aB: [2.0, 0.5], fF: [12, 0], fB: [-12, 0] }); return; }
+      if (t < 1.3) {
+        // straight up and out of sight while the victim looks around for him
+        A.y = Math.max(F - 520, F - (t - 0.35) * 1400); A.scriptPose = P({ lean: -0.1, head: -0.3, aF: [2.9, 0.1], aB: [2.8, 0.1], lF: [0.1, 0.1], lB: [-0.1, 0.1] });
+        V.scriptPose = P({ hy: 6, lean: -0.25, head: -0.6 + Math.sin(t * 4) * 0.3, aF: [0.6, 0.6], aB: [0.5, 0.6], fF: [9, 0], fB: [-10, 0] });
+        shadow = Math.max(0, (t - 0.8) / 0.5);
         return;
       }
-      if (t < 4.0) {
-        // slurp it down like spaghetti
-        slurp = ease((t - 3.15) / 0.85);
-        A.scriptPose = P({ hy: 6, lean: -0.3, head: -0.75 + Math.sin(t * 30) * 0.06, aF: [0.6, 0.8], aB: [0.4, 0.9], fF: [12, 0], fB: [-13, 0] });
+      if (path && t < 1.5) { const u = (t - 1.3) / 0.2; A.x = lerp(path.sx, path.cx, u) - off[0]; A.y = lerp(path.sy, path.cy, u) - off[1]; shadow = 1; return; }
+      if (path && t < 1.75) { const u = (t - 1.5) / 0.25; A.x = lerp(path.cx, path.ex, u) - off[0]; A.y = lerp(path.cy, path.ey, u) - off[1]; return; }
+      if (t < 2.05) { A.y = lerp(A.y, F, Math.min(1, dt * 14)); A.x = lerp(A.x, land, Math.min(1, dt * 8)); A.scriptPose = P({ hyL: 0.5, lean: 0.5, aF: [1.8, 0.5], aB: [1.6, 0.6], fF: [16, 0], fB: [-12, 0] }); if (Math.random() < 0.6) FX.dust(A.x, F, 1); return; }
+      A.y = F;
+      if (t < 3.3) { if (t > 2.3 && A.face !== -Math.sign(A.x - V.x)) { A.face = -A.face; A.snapPose = true; } A.scriptPose = P({ hy: 4, lean: -0.15, head: -0.25, aF: [2.2, 0.6], aB: [2.0, 0.6], fF: [12, 0], fB: [-12, 0] }); }
+      else if (t < 3.75) A.scriptPose = P({ hy: 4, lean: -0.3, head: -0.7, jaw: 1, aF: [1.8, 0.6], aB: [1.6, 0.6], fF: [12, 0], fB: [-12, 0] });
+      else A.scriptPose = PS.win(A.t);
+    };
+    // the two halves: the top flies, the legs topple
+    const base = s.tick;
+    s.tick = (t, dt) => {
+      base(t, dt);
+      if (!split) return;
+      if (!top.rest) { top.vy += 1200 * dt; top.x += top.vx * dt; top.y += top.vy * dt; top.a += A.face * 5 * dt; if (top.y >= F - 8 && top.vy > 0) { top.y = F - 8; top.rest = true; api.sfx('thud'); FX.blood(top.x, F - 4, 30, 0, 0.8); } }
+      else { top.a += (A.face * PI / 2 - top.a) * Math.min(1, dt * 6); }
+      if (t > 1.85) { bot.va += A.face * 7 * dt; bot.a = Math.max(-1.45, Math.min(1.45, bot.a + bot.va * dt)); }
+      if (Math.random() < 0.7) {
+        FX.spurt(top.x, top.y, -A.face * 0.3, 0.7);
+        FX.spurt(V.x + Math.sin(bot.a) * cut, F - Math.cos(bot.a) * cut, Math.sin(bot.a) * 0.6, 0.8);
+      }
+    };
+  };
+
+  // ---------- CHUCKY (hidden): Nest ----------
+  S.nest = (s, A, V, api) => {
+    const PS = api.PS, F = api.FLOOR, k = A.d.k;
+    let nx = 0, build = 0, egg = 0, crack = 0, chick = false, chickT = 0, pile = false;
+    prop({ layer: 'back', draw(g) {
+      if (!pile) return;
+      // a mound of guts first, then woven bones and a ribcage on top
+      g.fillStyle = '#6a0a12'; g.beginPath(); g.ellipse(nx, F - 3, 34, 9, 0, PI, PI * 2); g.fill();
+      g.fillStyle = '#a0202a'; for (let i = 0; i < 8; i++) { g.beginPath(); g.arc(nx - 26 + i * 7.5, F - 7 - (i % 3) * 2, 3.2, 0, PI * 2); g.fill(); }
+    } });
+    prop({ layer: 'front', draw(g) {
+      if (!pile) return;
+      const n = Math.floor(build * 22);
+      R.srand(77);
+      for (let i = 0; i < n; i++) { const a = R.rr() * 0.9 - 0.45, x = nx - 30 + R.rr() * 60, y = F - 4 - R.rr() * 12 - Math.abs(x - nx) * 0.12; R.line(g, x - Math.cos(a) * 9, y - Math.sin(a) * 9, x + Math.cos(a) * 9, y + Math.sin(a) * 9, R.rr() < 0.7 ? '#e6dcc4' : '#b02030', 2); }
+      if (build > 0.6) { g.strokeStyle = '#e6dcc4'; g.lineWidth = 1.6; for (let i = 0; i < 5; i++) { g.beginPath(); g.arc(nx + 22, F - 6, 5 + i * 2.2, PI * 1.1, PI * 1.9); g.stroke(); } }
+      if (build > 0.85) R.skull(g, nx - 30, F - 12, 6.5 * V.d.k * (V.def.skullK || 1), -0.3, V.def.skull);
+      if (egg > 0 && !chick) {
+        g.save(); g.translate(nx, F - 18); g.scale(1.9, 1.9); g.rotate(Math.sin(s.t * 18) * 0.25 * (crack > 0 ? 1 : 0));
+        g.fillStyle = '#f2ece0'; g.beginPath(); g.ellipse(0, 0, 6 * egg, 8 * egg, 0, 0, PI * 2); g.fill();
+        g.fillStyle = '#a0101c'; for (let i = 0; i < 6; i++) g.fillRect(-4 + (i * 3.7) % 8, -5 + (i * 2.9) % 9, 1.2, 1.2);
+        if (crack > 0) { g.strokeStyle = '#2a1a10'; g.lineWidth = 0.7; g.beginPath(); g.moveTo(-5, -1); g.lineTo(-2, -3 * crack); g.lineTo(1, 0); g.lineTo(3, -3 * crack); g.lineTo(5, -1); g.stroke(); }
+        g.restore();
+      }
+      if (chick) {
+        const bob = Math.abs(Math.sin(chickT * 9)) * 2;
+        g.save(); g.translate(nx, F - 16 - bob * 1.8); g.scale(1.9, 1.9);
+        R.ball(g, 0, 0, 5.5, '#c01420'); R.ball(g, 2.5, -6, 4, '#c8161e');
+        R.poly(g, [[0, -9], [1.5, -14], [3, -9.5]], '#c8161e');
+        g.fillStyle = '#0a0404'; g.beginPath(); g.ellipse(4.5, -6, 2, 1.8, 0, 0, PI * 2); g.fill();
+        R.poly(g, [[5.5, -7], [9, -5.6], [5.5, -4.4]], '#e8802a');
+        R.ball(g, 4, -6.6, 0.7, '#fff');
+        g.fillStyle = '#8a0010'; g.fillRect(-2, 3, 1, 3 + bob); g.fillRect(2, 2, 1, 2 + bob);
+        // shell halves
+        g.fillStyle = '#f2ece0'; g.beginPath(); g.ellipse(-7, 4, 4, 3, 0.4, 0, PI); g.fill(); g.beginPath(); g.ellipse(8, 4, 4, 3, -0.4, 0, PI); g.fill();
+        g.restore();
+      }
+    } });
+    for (let i = 0; i < 12; i++) s.at(0.5 + i * 0.12, () => {
+      api.sfx(i % 3 ? 'chomp' : 'splat'); const c = J(V, pick(['chest', 'belly', 'head', 'hip']));
+      FX.blood(c[0], c[1], 14, -A.face, 1); FX.gib(pick(['chunk', 'guts', 'bone', 'bone', 'chunk']), c[0], c[1], rnd(-160, 160), rnd(-320, -120)); V.ro.gore = true; V.ro.dx = rnd(-3, 3);
+    });
+    s.at(2.0, () => { V.hidden = true; pile = true; nx = V.x; api.sfx('crunch'); api.shake(5); FX.burst(V.x, F - 30, 10, ['bone', 'bone', 'guts', 'chunk'], 0.7); FX.blood(V.x, F - 20, 40, 0, 1); });
+    s.at(3.05, () => { api.sfx('land'); });
+    s.at(3.55, () => { api.sfx('squeak'); api.shake(2); });
+    s.at(3.85, () => { api.sfx('squeak'); api.shake(3); });
+    s.at(4.1, () => { egg = 1; api.sfx('gulp'); });
+    s.at(4.9, () => { crack = 0.5; api.sfx('crunch'); });
+    s.at(5.2, () => { crack = 1; api.sfx('crunch'); });
+    s.at(5.45, () => { chick = true; api.sfx('chirp'); FX.blood(nx, F - 16, 10, 0, 0.5); });
+    s.at(5.8, () => api.bubble("IT'S A BOY.", A.x, F - 150, { size: 13, fill: 'gold', life: 2 }));
+    s.at(7.4, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (chick) chickT += dt;
+      if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 28 * k, dt, api, 110); return; }
+      if (t < 2.0) {
+        const p = Math.sin(t * 40);
+        A.scriptPose = P({ hy: 6, lean: 0.55 + p * 0.2, head: 0.5 + p * 0.3, aF: [1.6 + p * 0.4, 0.5], aB: [1.4 - p * 0.4, 0.6], fF: [14, 0], fB: [-13, 0] });
+        V.scriptPose = P({ hy: 6 + (t - 0.5) * 10, lean: 0.2 + (t - 0.5) * 0.4, head: 0.6, aF: [0.4, 0.3], aB: [0.3, 0.3], fF: [9, 0], fB: [-10, 0] });
         return;
       }
-      A.scriptPose = PS.win(A.t);
+      V.ro.dx = 0;
+      if (t < 3.0) {
+        // building: hop around the pile tucking bones in
+        build = Math.min(1, (t - 2.0) / 0.9);
+        A.x = nx - A.face * (34 + Math.sin(t * 7) * 8); A.y = F - Math.abs(Math.sin(t * 7)) * 8;
+        A.scriptPose = P({ hy: 6, lean: 0.8, head: 0.5 + Math.sin(t * 30) * 0.2, aF: [1.2, 0.5], aB: [1.0, 0.6], fF: [12, 0], fB: [-12, 0] });
+        return;
+      }
+      if (t < 3.3) { const u = (t - 3.0) / 0.3; A.x = lerp(nx - A.face * 34, nx, u); A.y = F - 8 - Math.sin(u * PI) * 30; A.scriptPose = PS.jump; return; }
+      if (t < 4.1) { A.x = nx; A.y = F - 8; A.ro.dx = Math.sin(t * 30) * 1.5; A.scriptPose = P({ hyL: 0.7, lean: 0.15, head: -0.1, aF: [1.0 + Math.sin(t * 20) * 0.3, 0.5], aB: [0.9, 0.6], fF: [10, 0], fB: [-10, 0] }); return; }
+      if (t < 4.4) { A.ro.dx = 0; const u = (t - 4.1) / 0.3; A.x = lerp(nx, nx - A.face * 46, u); A.y = F - Math.sin(u * PI) * 26; A.scriptPose = PS.jump; return; }
+      A.y = F; A.x = nx - A.face * 46;
+      A.scriptPose = chick ? P({ hy: 3, lean: -0.3, head: 0.3, aF: [2.0 + Math.sin(t * 14) * 0.3, 0.5], aB: [1.9, 0.6], fF: [12, 0], fB: [-12, 0] }) : P({ hy: 6, lean: 0.4, head: 0.5, aF: [0.8, 0.8], aB: [0.6, 0.9], fF: [12, 0], fB: [-12, 0] });
     };
   };
 
@@ -528,7 +637,7 @@ const FATAL = (() => {
       g.restore();
     } });
     const launch = (kind, x, y, tx, ty, o = {}) => plat.fly.push(Object.assign({ kind, x0: x, y0: y, x, y, tx, ty, t: 0, d: 0.55, h: 60, r0: 0, r: 0, spin: rnd(-6, 6), rt: rnd(-0.4, 0.4) }, o));
-    s.at(0.55, () => { tools = true; api.sfx('slash'); api.sfx('gobble'); });
+    s.at(0.55, () => { tools = true; api.sfx('slash'); api.sfx('yelp'); });
     const cuts = [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5];
     cuts.forEach((c, i) => s.at(c, () => {
       const parts = ['chest', 'belly', 'chest', 'hip', 'belly', 'elbowF', 'kneeF'], p = J(V, parts[i]);
@@ -549,7 +658,7 @@ const FATAL = (() => {
       FX.blood(b[0], F - 10, 40, 0, 0.8);
     });
     s.at(3.9, () => { plat.apple = true; api.sfx('select'); });
-    s.at(4.3, () => { api.sfx('gobble'); api.bubble('HAPPY THANKSGIVING.', A.x, F - 140, { size: 12, fill: 'gold', life: 2 }); });
+    s.at(4.3, () => { api.sfx('yelp'); api.bubble('HAPPY THANKSGIVING.', A.x, F - 140, { size: 12, fill: 'gold', life: 2 }); });
     s.at(5.8, () => { s.done = true; });
     s.tick = (t, dt) => {
       if (t < 0.55) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 40 * k, dt, api, 110); return; }
@@ -685,7 +794,7 @@ const FATAL = (() => {
   };
 
   // ---------- Stage fatality: off the White River trestle ----------
-  S.bridge = (s, A, V, api) => {
+  S.overpass = (s, A, V, api) => {
     const PS = api.PS;
     let vy = -900, by = -40, bvy = 0, landed = false, trainX = null, smashed = false;
     const bx = () => api.W * 0.5;
@@ -693,7 +802,7 @@ const FATAL = (() => {
     s.at(0.75, () => {
       FX.reset();
       api.scene((g, W, H) => {
-        STAGES.drawBelow(g, W, s.t);
+        STAGES.drawBelow(g, W, s.t, 'overpass');
         FX.drawDecals(g); FX.drawGibs(g);
         if (!smashed) {
           const f = { def: V.def, d: V.d, x: bx(), y: by, face: 1, t: s.t, st: { dead: landed } };
@@ -725,6 +834,45 @@ const FATAL = (() => {
   };
 
   // ---------- boss deaths ----------
+  S.bridge = (s, A, V, api) => {
+    const PS = api.PS, ROCK = 198;
+    let vy = -900, by = -40, bvy = 0, landed = false, pool = 0, stream = 0;
+    const bx = () => api.W * 0.5;
+    const BROKE = P({ rot: -PI / 2, hyA: 6, aF: [2.7, -1.2], aB: [-0.9, 1.6], lF: [1.9, -1.4], lB: [-0.7, 2.3], head: 1.1 });
+    api.sfx('big'); FX.blood(V.x, V.y - 80, 40, A.face, 1.6);
+    s.at(0.75, () => {
+      FX.reset();
+      api.scene((g, W) => {
+        STAGES.drawBelow(g, W, s.t, 'river');
+        // blood spreads over the rock and runs into the water
+        if (pool > 0) {
+          g.fillStyle = 'rgba(120,0,10,0.85)'; g.beginPath(); g.ellipse(bx(), ROCK + 2, 10 + pool * 34, 3 + pool * 5, 0, 0, PI * 2); g.fill();
+          g.fillStyle = 'rgba(140,0,14,0.5)'; for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(bx() - 30 + i * 15, ROCK + 4); g.lineTo(bx() - 34 + i * 17, ROCK + 4 + stream * (18 + i * 6)); g.lineTo(bx() - 26 + i * 15, ROCK + 4); g.fill(); }
+          g.fillStyle = `rgba(150,10,20,${0.35 * stream})`; g.beginPath(); g.ellipse(bx(), 226, 40 + stream * 90, 6 + stream * 5, 0, 0, PI * 2); g.fill();
+        }
+        FX.drawDecals(g); FX.drawGibs(g);
+        const f = { def: V.def, d: V.d, x: bx(), y: landed ? ROCK + 2 : by, face: 1, t: s.t, st: { dead: landed, wounds: V.st2.wounds } };
+        R.draw(g, f, landed ? BROKE : PS.air(s.t * 9), landed ? { flat: 0.7, gore: true } : {});
+        FX.drawParts(g);
+      });
+    });
+    s.at(1.0, () => api.sfx('scream'));
+    s.at(3.9, () => { api.scene(null); FX.reset(); V.hidden = true; A.scriptPose = PS.win(A.t); });
+    s.at(4.6, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (t < 0.75) { V.y += vy * dt; V.x += A.face * 40 * dt; V.scriptPose = PS.air(t * 12); A.scriptPose = PS.up1 || PS.stance(A.t); return; }
+      if (!landed) {
+        bvy += 1300 * dt; by += bvy * dt;
+        if (by >= ROCK) {
+          by = ROCK; landed = true; api.sfx('splat'); api.sfx('crunch'); api.sfx('thud'); api.shake(10); api.flash(); FX.drops(12);
+          FX.burst(bx(), ROCK - 10, 24, ['chunk', 'bone', 'guts', 'skullfrag', 'eye', 'brain', 'bone', 'tooth'], 1.3);
+          FX.blood(bx(), ROCK - 6, 140, 0, 1.8, 1.2);
+          for (let i = 0; i < 6; i++) FX.gib('chunk', bx(), ROCK - 8, rnd(-260, 260), rnd(-420, -200), { onRest: o => { if (o.x < bx() - 70 || o.x > bx() + 70) FX.puff(o.x, o.y, 'rgba(220,230,255,0.8)', 6, 2); } });
+        }
+      } else { pool = Math.min(1, pool + dt * 0.9); stream = Math.min(1, stream + dt * 0.45); }
+      A.scriptPose = PS.win(A.t);
+    };
+  };
   S.golemDie = (s, A, V, api) => {
     const F = api.FLOOR;
     s.at(0.7, () => {

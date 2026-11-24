@@ -304,7 +304,7 @@ const ROSTER = (() => {
   const ballin = {
     id: 'ballin', name: "BALLIN' WELL", short: 'BALLIN', him: 'HIM', k: 1.1,
     bio: 'Ball State legend. Number 42. Still has the moves. Still has the elbows.',
-    sock: '#ececea', bicep: 0.38, calf: 0.4, stripe: RED,
+    sock: '#ececea', bicep: 0.38, calf: 0.4, stripe: RED, sleeve: '#f0efea',
     d: dims({ thigh: 31, shin: 31, torso: 37, upper: 23, fore: 22, hipW: 12, shW: 16, chest: 15.5, belly: 11, back: 11, thighR: 7.6, kneeR: 4.6, shR: 6, elbowR: 4.1 }),
     col: { torso: '#eae8e2', armU: SKB, armL: SKB, hand: SKB, legU: '#eae8e2', legL: SKB, foot: '#b8141e', neck: SKB },
     mat: { torso: 'cloth', armU: 'skin', armL: 'skin', legU: 'cloth', legL: 'skin' },
@@ -315,16 +315,18 @@ const ROSTER = (() => {
       g.strokeStyle = RED; g.lineWidth = 1.6; g.beginPath(); g.moveTo(-d.shW * 0.4, -L * 1.04); g.lineTo(d.shW * 0.45, -L * 0.8); g.lineTo(d.shW * 0.9, -L * 1.04); g.stroke();
       g.beginPath(); g.moveTo(-d.back * 0.9, -L * 0.98); g.quadraticCurveTo(-d.back * 0.1, -L * 0.7, d.shW * 0.25, -L * 0.98); g.stroke();
       g.save(); g.translate(d.shW * 0.08, -L * 0.36); g.font = '400 13px Anton, Impact, sans-serif'; g.fillStyle = '#5a0a10'; g.fillText('42', -6.4, 0.6); g.fillStyle = RED; g.fillText('42', -7, 0); g.restore();
-      g.save(); g.translate(d.shW * 0.08, -L * 0.62); g.font = '400 5px Anton, Impact, sans-serif'; g.fillStyle = RED; g.fillText('BALL STATE', -10, 0); g.restore();
       g.fillStyle = RED; g.fillRect(-d.hipW * 1.1, -5, d.hipW * 2.4, 2);
     },
     head(g, st) {
       humanHead(g, st, {
         skin: SKB, eyeC: '#1a0a04', browC: 'rgba(10,5,0,0.95)', nose: 0.3,
         front(g) {
-          g.beginPath(); g.moveTo(-6.5, -11); g.bezierCurveTo(-8.5, -21, -2, -26.5, 4, -26.5); g.bezierCurveTo(9, -26.5, 11.2, -22, 10.6, -18.5); g.quadraticCurveTo(5, -20.5, -1, -19); g.quadraticCurveTo(-3.5, -15, -4, -11); g.closePath();
-          g.fillStyle = '#141010'; g.fill();
-          g.save(); g.clip(); R.srand(21); g.fillStyle = 'rgba(80,60,50,0.5)'; for (let i = 0; i < 60; i++) g.fillRect(-7 + R.rr() * 18, -27 + R.rr() * 16, 0.6, 0.6); g.restore();
+          // clean-shaven head: a shine on the scalp, then the white headband across the brow
+          g.fillStyle = 'rgba(255,240,220,0.22)'; g.beginPath(); g.ellipse(2, -23.5, 6, 2.2, -0.15, 0, PI * 2); g.fill();
+          g.fillStyle = 'rgba(255,255,255,0.35)'; g.beginPath(); g.ellipse(3.5, -24.2, 2.4, 0.8, -0.15, 0, PI * 2); g.fill();
+          g.beginPath(); g.moveTo(-8.2, -15.5); g.quadraticCurveTo(1, -21.5, 10.9, -18.6); g.lineTo(11.2, -15.6); g.quadraticCurveTo(1, -18.6, -8, -12.3); g.closePath();
+          fillLit(g, '#f2f1ec', 2, -17, 10, 0.1, -0.35);
+          g.strokeStyle = 'rgba(0,0,0,0.18)'; g.lineWidth = 0.4; for (let i = 0; i < 9; i++) { g.beginPath(); g.moveTo(-6 + i * 2, -14.5 - i * 0.5); g.lineTo(-6 + i * 2, -17 - i * 0.55); g.stroke(); }
           R.line(g, 8.8, -3.4, 11.2, -3.6, 'rgba(20,10,5,0.6)', 0.5);
         }
       });
@@ -397,12 +399,12 @@ const ROSTER = (() => {
 
   const RG = '#6e6e72', RGL = '#b0b0b0', RGD = '#222226';
   const rocky = {
-    id: 'rocky', name: 'ROCKY', short: 'ROCKY', him: 'HIM', k: 1.0, paws: true, claws: true, skull: 'raccoon',
+    id: 'rocky', name: 'ROCKY', short: 'ROCKY', him: 'HIM', k: 1.05, paws: true, claws: true, skull: 'raccoon', bicep: 0.4,
     bio: 'Rabid, foaming and living in the dumpster behind Royal Pizza.',
-    d: dims({ thigh: 21, shin: 20, torso: 31, neck: 2, upper: 18, fore: 17, hipW: 14, shW: 13, chest: 14, belly: 16, back: 13, thighR: 8.5, kneeR: 5.8, ankleR: 4.2, shR: 6.5, elbowR: 4.8, wristR: 4, fist: 4.5, footL: 11, footH: 4.4 }),
+    d: dims({ thigh: 20, shin: 19, torso: 33, neck: 2, upper: 18, fore: 17, hipW: 19, shW: 17, chest: 20, belly: 26, back: 19, thighR: 11, kneeR: 7, ankleR: 5, shR: 8.4, elbowR: 6.4, wristR: 5, fist: 5.4, footL: 12, footH: 4.8 }),
     col: { torso: RG, armU: RG, armL: sh(RG, -0.3), hand: RGD, legU: RG, legL: sh(RG, -0.3), foot: RGD, neck: RG },
     mat: { torso: 'fur', armU: 'fur', armL: 'fur', legU: 'fur', legL: 'fur', neck: 'fur' },
-    stats: { speed: 1.12, power: 0.95, weight: 0.85 },
+    stats: { speed: 1.02, power: 1.05, weight: 1.15 },
     torsoDetail(g, d, st, L) { g.fillStyle = 'rgba(190,190,185,0.5)'; g.beginPath(); g.ellipse(d.belly * 0.35, -L * 0.45, d.belly * 0.5, L * 0.38, 0, 0, PI * 2); g.fill(); },
     tail(g, d, J, st) {
       const w = Math.sin((st.t || 0) * 4) * 0.2;
@@ -546,13 +548,13 @@ const ROSTER = (() => {
   // ---------- CHUCKY: an original anthropomorphic red cardinal ----------
   const CR = '#b0141c', CRD = '#6a0a10', CRL = '#d83a34';
   const chucky = {
-    id: 'chucky', name: 'CHUCKY', short: 'CHUCKY', him: 'HIM', k: 1.05, talons: true, paws: true, skull: 'cardinal', skullK: 0.95,
+    id: 'chucky', name: 'CHUCKY', short: 'CHUCKY', him: 'HIM', k: 1.1, talons: true, paws: true, skull: 'cardinal', skullK: 1.0,
     bio: 'A cardinal with a chip on his shoulder and a beak like a pickaxe. Cardinal red runs in his veins. Yours too, soon.',
-    bicep: 0.32, calf: 0.1,
-    d: dims({ thigh: 26, shin: 25, torso: 35, neck: 3, upper: 20, fore: 19, hipW: 13, shW: 16, chest: 17, belly: 14, back: 13, thighR: 8, kneeR: 3.4, ankleR: 2.8, shR: 6.5, elbowR: 4.8, wristR: 3.8, fist: 4.6, footL: 13, footH: 3.6 }),
+    bicep: 0.45, calf: 0.1,
+    d: dims({ thigh: 25, shin: 24, torso: 36, neck: 3, upper: 21, fore: 20, hipW: 15, shW: 20, chest: 22, belly: 19, back: 17, thighR: 10.5, kneeR: 3.8, ankleR: 3.2, shR: 8.4, elbowR: 6.4, wristR: 4.8, fist: 5.6, footL: 14, footH: 3.8 }),
     col: { torso: CR, armU: CR, armL: CR, hand: '#3a2a26', legU: CR, legL: '#4a3a34', foot: '#3a2a26', neck: CR },
     mat: { torso: 'feather', armU: 'feather', armL: 'feather', legU: 'feather', legL: 'skin', neck: 'feather' },
-    stats: { speed: 1.1, power: 0.98, weight: 0.92 },
+    stats: { speed: 1.04, power: 1.06, weight: 1.08 },
     torsoDetail(g, d, st, L) {
       g.fillStyle = 'rgba(230,80,70,0.35)'; g.beginPath(); g.ellipse(d.belly * 0.45, -L * 0.6, d.belly * 0.55, L * 0.42, 0, 0, PI * 2); g.fill();
       g.strokeStyle = 'rgba(60,0,8,0.45)'; g.lineWidth = 0.7; for (let i = 0; i < 12; i++) { g.beginPath(); g.arc(-d.back * 0.5 + (i % 4) * 5, -L * 0.2 - ((i / 4) | 0) * 9, 3, 0.3, PI - 0.3); g.stroke(); }
@@ -576,14 +578,14 @@ const ROSTER = (() => {
       if (!st.dead) brow(g, 8.5, -15.2, 5, 0.45, 'rgba(0,0,0,1)', 1.4);
     },
     proj: { kind: 'feather', name: 'FEATHER DARTS' }, sp2: { kind: 'leap', name: 'DIVE PECK' },
-    fatal: { id: 'chucky', name: 'EARLY BIRD' }
+    fatal: { id: 'chucky', name: 'BIRD STRIKE' }, alt: { id: 'nest', name: 'NEST' }
   };
 
   // ---------- MAD TURKEY: a human-sized southside wild turkey ----------
-  const TB = '#6a4426', TBL = '#8a6a40', TBD = '#1e140c';
+  const TB = '#6a5034', TBL = '#9a7a52', TBD = '#1e140c';
   const turkey = {
-    id: 'turkey', name: 'MAD TURKEY', short: 'TURKEY', him: 'HIM', k: 1.1, wings: true, talons: true, skull: 'turkey', skullK: 0.85,
-    bio: 'The southside wild turkey. Survived every Thanksgiving. Holds a grudge about all of them.',
+    id: 'turkey', name: 'MAD TURKEY', short: 'TURKEY', him: 'HER', k: 1.08, wings: true, talons: true, skull: 'turkey', skullK: 0.85,
+    bio: 'The southside wild turkey hen. Yes, the beard is real. Survived every Thanksgiving and holds a grudge about all of them.',
     d: dims({ thigh: 15, shin: 20, torso: 30, neck: 30, hox: 12, upper: 20, fore: 21, hipW: 16, shW: 14, chest: 16, belly: 26, back: 24, thighR: 6.5, kneeR: 3.2, ankleR: 2.6, shR: 7, elbowR: 6, wristR: 4.5, fist: 4.5, footL: 15, footH: 3.4, shOff: 2 }),
     col: { torso: TB, armU: TB, hand: TBD, legU: '#9a7a70', legL: '#9a7a70', foot: '#8a6a60' },
     mat: { torso: 'feather', legU: 'skin', legL: 'skin' }, calf: 0,
@@ -599,21 +601,15 @@ const ROSTER = (() => {
       for (let i = 0; i < 7; i++) { const b = R.lerp2(A.s0, end, 0.15 + i * 0.12); g.strokeStyle = i % 2 ? 'rgba(240,235,220,0.55)' : 'rgba(0,0,0,0.45)'; g.lineWidth = 1.1; g.beginPath(); g.moveTo(...R.add(b, R.dir(a + PI / 2, 10))); g.lineTo(...R.add(b, R.dir(a + 0.2, 5))); g.stroke(); }
       g.restore();
     },
-    // round bronze body with the big tail fan raised behind it
+    // round, plain brown body with a short folded tail
     bodyDraw(g, d, J, st) {
       const k = d.k, c = R.add(R.lerp2(J.hip, J.sh, 0.45), [4 * k, 0]), rot = J.p.lean * 0.5 - 0.05, rx = 28 * k, ry = 21 * k;
-      // tail fan
-      g.save(); g.translate(c[0] - rx * 0.7, c[1] - ry * 0.2); g.rotate(rot * 0.5);
-      for (let i = 0; i < 13; i++) {
-        const a = -PI * 0.95 + i * PI * 0.07, L = 44 * k, tip = [Math.cos(a) * L, Math.sin(a) * L];
-        g.save(); g.rotate(a + PI / 2);
-        g.fillStyle = lit(g, 0, -L * 0.6, L, '#5a3a22', 0.2, -0.6); g.beginPath(); g.moveTo(-3.5 * k, 0); g.lineTo(-5.5 * k, -L * 0.92); g.quadraticCurveTo(0, -L * 1.04, 5.5 * k, -L * 0.92); g.lineTo(3.5 * k, 0); g.fill();
-        g.fillStyle = '#140c06'; g.fillRect(-5.5 * k, -L * 0.9, 11 * k, 3 * k); g.fillStyle = '#d8c8a0'; g.fillRect(-5.2 * k, -L * 0.98, 10.4 * k, 2.4 * k);
-        g.restore(); void tip;
-      }
+      // a hen's tail: short, folded and pointing down and back
+      g.save(); g.translate(c[0] - rx * 0.8, c[1] + ry * 0.05); g.rotate(rot * 0.5 - 0.55);
+      for (let i = 0; i < 7; i++) { g.save(); g.rotate(-0.3 + i * 0.1); g.fillStyle = lit(g, -12 * k, 0, 16 * k, '#4a3420', 0.2, -0.6); g.beginPath(); g.moveTo(0, -3 * k); g.lineTo(-20 * k, -2 * k); g.quadraticCurveTo(-23 * k, 0, -20 * k, 2.4 * k); g.lineTo(0, 3 * k); g.fill(); g.fillStyle = '#1a120a'; g.fillRect(-18 * k, -2.4 * k, 2 * k, 4.8 * k); g.fillStyle = '#c8b088'; g.fillRect(-21 * k, -2 * k, 1.6 * k, 4 * k); g.restore(); }
       g.restore();
       g.save(); g.translate(c[0], c[1]); g.rotate(rot);
-      g.beginPath(); g.ellipse(0, 0, rx, ry, 0, 0, PI * 2); g.fillStyle = lit(g, 0, 0, rx, TB, 0.3, -0.7); g.fill();
+      g.beginPath(); g.ellipse(0, 0, rx * 0.92, ry * 0.95, 0, 0, PI * 2); g.fillStyle = lit(g, 0, 0, rx, TB, 0.3, -0.7); g.fill();
       g.save(); g.clip();
       for (let r = 0; r < 6; r++) for (let i = 0; i < 9; i++) { const x = -rx * 0.9 + i * rx * 0.24 + (r % 2) * 3, y = -ry * 0.8 + r * ry * 0.3; g.fillStyle = r % 2 ? 'rgba(120,160,90,0.18)' : 'rgba(170,110,60,0.25)'; g.beginPath(); g.arc(x, y, 3.2 * k, 0, PI); g.fill(); g.strokeStyle = 'rgba(0,0,0,0.45)'; g.lineWidth = 0.7; g.beginPath(); g.arc(x, y, 3.2 * k, 0.2, PI - 0.2); g.stroke(); }
       g.restore();
@@ -623,19 +619,20 @@ const ROSTER = (() => {
       // bare reddish neck
       const base = R.add(c, [Math.cos(rot) * rx * 0.6 + Math.sin(rot) * ry * 0.55, Math.sin(rot) * rx * 0.6 - Math.cos(rot) * ry * 0.55]), nk = J.nk, ctl = [base[0] + 5 * k, (base[1] + nk[1]) / 2];
       let p = base;
-      for (let i = 1; i <= 6; i++) { const t = i / 6, q = [(1 - t) * (1 - t) * base[0] + 2 * (1 - t) * t * ctl[0] + t * t * nk[0], (1 - t) * (1 - t) * base[1] + 2 * (1 - t) * t * ctl[1] + t * t * nk[1]]; R.seg(g, p, q, (6.4 - i * 0.5) * k, (6 - i * 0.5) * k, i < 3 ? '#3a2a1c' : '#a85a5a', i < 3 ? 'feather' : 'skin', { seed: 700 + i }); p = q; }
+      for (let i = 1; i <= 6; i++) { const t = i / 6, q = [(1 - t) * (1 - t) * base[0] + 2 * (1 - t) * t * ctl[0] + t * t * nk[0], (1 - t) * (1 - t) * base[1] + 2 * (1 - t) * t * ctl[1] + t * t * nk[1]]; R.seg(g, p, q, (6.4 - i * 0.5) * k, (6 - i * 0.5) * k, i < 4 ? '#4a3a28' : '#8a90a8', i < 4 ? 'feather' : 'skin', { seed: 700 + i }); p = q; }
       // spurs
       R.line(g, J.LF.knee[0] + (J.LF.ank[0] - J.LF.knee[0]) * 0.7 - 3, J.LF.knee[1] + (J.LF.ank[1] - J.LF.knee[1]) * 0.7, J.LF.knee[0] + (J.LF.ank[0] - J.LF.knee[0]) * 0.7 - 6, J.LF.knee[1] + (J.LF.ank[1] - J.LF.knee[1]) * 0.7 + 1, '#3a2a22', 1.2);
     },
     head(g, st) {
       g.scale(1.2, 1.2);
-      // blue-gray bare head, warty red snood and wattle
-      g.beginPath(); g.ellipse(2, -6.5, 6.2, 5.8, 0.1, 0, PI * 2); fillLit(g, '#7a90b0', 2, -6.5, 6.5, 0.25, -0.55);
-      R.srand(81); g.fillStyle = 'rgba(200,60,70,0.5)'; for (let i = 0; i < 10; i++) g.fillRect(-2 + R.rr() * 8, -9 + R.rr() * 6, 1, 1);
+      // a hen's head: blue-gray skin, a bristly feathered crown, only a hint of red
+      g.beginPath(); g.ellipse(2, -6.5, 6.2, 5.8, 0.1, 0, PI * 2); fillLit(g, '#8094ae', 2, -6.5, 6.5, 0.25, -0.55);
+      g.beginPath(); g.ellipse(0.5, -9.5, 5.2, 3.4, 0.1, PI, PI * 2); fillLit(g, '#4a3a2a', 0.5, -10, 5, 0.2, -0.5);
+      fringe(g, 0.5, -9.5, 5.2, 3.4, PI * 1.05, PI * 1.95, 9, '#3a2a1a', 1.6, 12);
+      R.srand(81); g.fillStyle = 'rgba(200,90,110,0.4)'; for (let i = 0; i < 6; i++) g.fillRect(1 + R.rr() * 6, -6 + R.rr() * 4, 1, 1);
       g.beginPath(); g.moveTo(7, -7.6); g.quadraticCurveTo(11.5, -6.8, 12.4, -4.6); g.quadraticCurveTo(10, -4.4, 7, -4.4); g.closePath(); fillLit(g, '#c8b080', 9, -6, 4, 0.3, -0.4);
-      g.beginPath(); g.moveTo(7.5, -9.5); g.quadraticCurveTo(9.5, -10.5, 10.5, -6); g.quadraticCurveTo(11.2, -1, 10, 1.5); g.quadraticCurveTo(8.6, -1, 8.4, -6); g.fillStyle = '#b8141c'; g.fill();
-      g.beginPath(); g.moveTo(3, -2); g.quadraticCurveTo(7, 0, 7.5, 6); g.quadraticCurveTo(4.5, 7.5, 2, 4); g.quadraticCurveTo(1.5, 1, 3, -2); g.fillStyle = '#a8121a'; g.fill();
-      g.fillStyle = 'rgba(255,140,140,0.35)'; for (let i = 0; i < 5; i++) { g.beginPath(); g.arc(4 + (i % 2), -0.5 + i * 1.4, 0.8, 0, PI * 2); g.fill(); }
+      R.ball(g, 7.6, -8, 0.9, '#a8505a');
+      g.beginPath(); g.moveTo(3.5, -2); g.quadraticCurveTo(6, -0.5, 6, 2.5); g.quadraticCurveTo(4, 3.4, 3, 1.5); g.closePath(); g.fillStyle = '#b05a68'; g.fill();
       eye(g, 4.5, -8.6, 1.1, st, { animal: 1, iris: '#1a0604', socket: 'rgba(0,0,0,0.2)', glow: !st.dead });
       if (!st.dead) brow(g, 4.6, -10.3, 4, 0.55, 'rgba(40,10,10,1)', 1.1);
     },

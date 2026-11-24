@@ -279,6 +279,8 @@ const RIG = (() => {
     if (def.wings) { def.wing(g, A, dark, d, st); return; }
     seg(g, A.el, A.wr, d.elbowR, d.wristR, c.armL || c.armU, ms.armL || ms.armU || 'skin', { bf: 0.25, bb: 0.1, bpos: 0.3, seed: sd + 1, dark });
     if (c.cuff) seg(g, lerp2(A.el, A.wr, 0.8), A.wr, d.wristR * 1.2, d.wristR * 1.2, c.cuff, 'cloth', { seed: sd + 5, dark });
+    // a compression sleeve on the fighter's real left arm: the far arm when facing right, the near arm when facing left
+    if (def.sleeve && (dark ? st.face > 0 : st.face < 0)) seg(g, lerp2(A.el, A.wr, -0.04), lerp2(A.el, A.wr, 0.93), d.elbowR * 1.1, d.wristR * 1.12, def.sleeve, 'cloth', { seed: sd + 6, dark });
     seg(g, A.s0, A.el, d.shR, d.elbowR, c.armU, ms.armU || 'skin', { bf: def.bicep != null ? def.bicep : 0.25, bb: 0.18, bpos: 0.45, seed: sd + 2, dark });
     hand(g, d, def, A, dark, st);
   }
@@ -347,7 +349,7 @@ const RIG = (() => {
   function draw(g, f, p, o = {}) {
     const def = f.def, d = f.d;
     const J = solve(d, p);
-    const st = Object.assign({ t: f.t || 0 }, f.st || {}, o);
+    const st = Object.assign({ t: f.t || 0, face: f.face }, f.st || {}, o);
     g.save();
     g.translate(f.x, f.y);
     if (o.flat) g.scale(1, o.flat);

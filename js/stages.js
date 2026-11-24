@@ -278,7 +278,7 @@ const STAGES = (() => {
     B.fillStyle = 'rgba(0,0,0,0.4)'; B.fillRect(px + 46, 58, 18, 140);
     B.fillStyle = '#8a8a84'; B.fillRect(px - 6, 50, 76, 10);
     B.font = '15px Anton, Impact, sans-serif'; B.textAlign = 'center';
-    [['YOU', '#ff3a8a'], ['ARE', '#ffd040'], ['BEAUTIFUL', '#30e8ff']].forEach(([t, c], i) => { const y = 88 + i * 22, fs = i === 2 ? 11 : 15; B.font = fs + 'px Anton, Impact, sans-serif'; B.fillStyle = '#0a0a0a'; for (const [dx, dy] of [[-1.5, 0], [1.5, 0], [0, -1.5], [0, 1.5]]) B.fillText(t, px + 32 + dx, y + dy); B.fillStyle = shade(c, -0.25); B.fillText(t, px + 32, y); });
+    [['YOU', '#ff3a8a'], ['ARE', '#ffd040'], ['BEAUT', '#30e8ff']].forEach(([t, c], i) => { const y = 88 + i * 22, fs = 15; B.font = fs + 'px Anton, Impact, sans-serif'; B.fillStyle = '#0a0a0a'; for (const [dx, dy] of [[-1.5, 0], [1.5, 0], [0, -1.5], [0, 1.5]]) B.fillText(t, px + 32 + dx, y + dy); B.fillStyle = shade(c, -0.25); B.fillText(t, px + 32, y); });
     B.textAlign = 'left';
     for (let x = -10; x < BW; x += 30) { if (x > px - 30 && x < px + 64) continue; B.strokeStyle = '#06070a'; B.lineWidth = 3; B.beginPath(); B.moveTo(x, 150); B.lineTo(x + 15, 100); B.lineTo(x + 30, 150); B.stroke(); B.strokeStyle = 'rgba(160,170,200,0.25)'; B.lineWidth = 0.8; B.beginPath(); B.moveTo(x + 1, 150); B.lineTo(x + 16, 100); B.stroke(); }
     B.fillStyle = '#06070a'; B.fillRect(0, 96, px - 6, 6); B.fillRect(px + 70, 96, BW, 6); B.fillRect(0, 150, BW, 8);
@@ -534,11 +534,10 @@ const STAGES = (() => {
     for (let i = 0; i < 9; i++) { const x = 40 + i * 140 + rr(-20, 20), w = rr(40, 70), h = rr(50, 90); B.fillStyle = '#0e0c18'; B.fillRect(x, FY - 60 - h, w, h + 60); for (let r = 0; r < 6; r++) for (let c = 0; c < 4; c++) if (rand() < 0.35) { B.fillStyle = rand() < 0.5 ? 'rgba(255,210,140,0.5)' : 'rgba(180,200,255,0.4)'; B.fillRect(x + 5 + c * (w - 10) / 4, FY - 54 - h + r * 12, 4, 5); } }
     fog(B, 70, 60, 'rgba(60,30,60,0.4)');
     // one long two-story brick building, storefronts on the ground floor
-    const top = FY - 118, sf = FY - 66, x0 = -10, x1 = BW + 10;
+    const sf = FY - 66, top = sf - 24, x0 = -10, x1 = BW + 10;
     bricks(B, x0, top, x1 - x0, sf - top, '#6a2a22', '#1a0806', 7, 3.2);
     vg(B, x0, top, x1 - x0, sf - top, ['rgba(0,0,0,0.45)', 'rgba(0,0,0,0.1)', 'rgba(255,150,90,0.12)']);
     B.fillStyle = '#2a1a16'; B.fillRect(x0, top - 6, x1 - x0, 7); B.fillStyle = '#8a7a6a'; B.fillRect(x0, top - 7, x1 - x0, 2);
-    for (let x = 14; x < BW; x += 34) { win(B, x, top + 12, 14, 20, rand() < 0.45, rand() < 0.3 ? '#a0c0ff' : '#ffc070', '#1a1412'); B.fillStyle = '#9a8a7a'; B.fillRect(x - 2, top + 32, 18, 2.4); }
     const shops = [
       { n: 'MIDNIGHT COOKIES', aw: '#c8402a', neon: '#ffb0d0', fill: (x, w) => { for (let i = 0; i < 6; i++) { R.ball(B, x + 12 + i * (w - 24) / 5, sf + 38, 5, '#c08040'); R.ball(B, x + 11 + i * (w - 24) / 5, sf + 37, 1.2, '#3a1a08'); } B.fillStyle = '#e8e0d0'; B.fillRect(x + 6, sf + 43, w - 12, 3); } },
       { n: 'BEAN THERE COFFEE', aw: '#2a5a3a', neon: '#a0ffc0', fill: (x, w) => { B.fillStyle = '#3a2416'; B.fillRect(x + 6, sf + 36, w - 12, 12); for (let i = 0; i < 4; i++) { B.fillStyle = '#f0ece0'; B.fillRect(x + 12 + i * 12, sf + 31, 5, 5); } B.fillStyle = '#1a1a1a'; B.fillRect(x + w - 24, sf + 22, 12, 14); } },
@@ -567,8 +566,9 @@ const STAGES = (() => {
       B.fillStyle = s.neon; B.shadowColor = s.neon; B.shadowBlur = 8; B.fillText(s.n, x + w / 2, sf - 4); B.shadowBlur = 0; B.textAlign = 'left';
       x += w + 34; i++;
       if (i === 4) { // THE VILLAGE arch sign mid-block
-        B.fillStyle = '#1a0a08'; B.fillRect(x - 4, top - 30, 120, 24); B.strokeStyle = '#c8b060'; B.lineWidth = 1.5; B.strokeRect(x - 3, top - 29, 118, 22);
-        B.font = '14px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillStyle = '#ff3030'; B.shadowColor = '#ff2020'; B.shadowBlur = 10; B.fillText('THE VILLAGE', x + 56, top - 12); B.shadowBlur = 0; B.textAlign = 'left';
+        B.fillStyle = '#0c0c0e'; B.fillRect(x + 20, top - 12, 2, 8); B.fillRect(x + 90, top - 12, 2, 8);
+        B.fillStyle = '#1a0a08'; B.fillRect(x - 4, top - 34, 120, 24); B.strokeStyle = '#c8b060'; B.lineWidth = 1.5; B.strokeRect(x - 3, top - 33, 118, 22);
+        B.font = '14px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillStyle = '#ff3030'; B.shadowColor = '#ff2020'; B.shadowBlur = 10; B.fillText('THE VILLAGE', x + 56, top - 16); B.shadowBlur = 0; B.textAlign = 'left';
       }
     }
     grime(B, 0, top, BW, FY - top, 30, 0.2);
@@ -588,23 +588,136 @@ const STAGES = (() => {
   // the crowd of bros on the sidewalk (back-layer coords), drawn faded every frame
   const BROS = (() => { const a = []; let s = 77; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; for (let i = 0; i < 16; i++) a.push({ x: 80 + i * 72 + r() * 30, h: 40 + r() * 8, ph: r() * 6, cap: r() < 0.7, can: r() < 0.75, col: ['#5a2a2a', '#2a3a5a', '#4a4a4a', '#5a4a2a', '#2a4a3a'][i % 5] }); return a; })();
   function bros(g, t) {
-    g.save(); g.globalAlpha = 0.55;
-    for (const b of BROS) {
-      const bob = Math.abs(Math.sin(t * 5 + b.ph)) * 3, x = b.x, y = FY - 2 - bob, h = b.h, up = Math.sin(t * 2.5 + b.ph) > 0;
-      g.fillStyle = b.col; g.fillRect(x - 7, y - h * 0.62, 14, h * 0.32);
-      g.fillStyle = '#1a1a24'; g.fillRect(x - 6, y - h * 0.32, 5, h * 0.32); g.fillRect(x + 1, y - h * 0.32, 5, h * 0.32);
-      g.fillStyle = '#c89070'; g.beginPath(); g.arc(x, y - h * 0.72, 5, 0, PI * 2); g.fill();
-      if (b.cap) { g.fillStyle = b.col; g.fillRect(x - 5, y - h * 0.8, 10, 3.5); g.fillRect(x - 9, y - h * 0.77, 5, 1.6); }
-      // arms: one pumping, one holding a can up
-      const ay = y - h * 0.58, a1 = up ? -2.2 : -1.2, a2 = up ? -1.0 : -2.4;
-      g.strokeStyle = b.col; g.lineWidth = 3;
-      g.beginPath(); g.moveTo(x - 6, ay); g.lineTo(x - 6 + Math.cos(a1) * 12, ay + Math.sin(a1) * 12); g.stroke();
-      g.beginPath(); g.moveTo(x + 6, ay); g.lineTo(x + 6 - Math.cos(a2) * 12, ay + Math.sin(a2) * 12); g.stroke();
-      if (b.can) { g.fillStyle = '#c8c8d0'; g.fillRect(x + 6 - Math.cos(a2) * 12 - 1.5, ay + Math.sin(a2) * 12 - 5, 3.5, 5); }
-    }
+    g.save(); g.globalAlpha = 0.82;
+    for (const b of BROS2) person(g, b, t);
     g.restore();
-    fog(g, FY - 60, 64, 'rgba(60,40,70,0.4)');
+    fog(g, FY - 56, 60, 'rgba(50,30,60,0.22)');
   }
+
+  // ---------- crowds: small shaded people for the Village bros and the beach ----------
+  function person(g, p, t) {
+    const sp = p.speed || 4, bob = Math.abs(Math.sin(t * sp + p.ph)) * (p.bob ?? 2.2), x = p.x, y = p.y - bob, h = p.h, up = Math.sin(t * sp * 0.5 + p.ph) > 0;
+    const hip = y - h * 0.47, sh = y - h * 0.8, w = h * 0.15;
+    g.fillStyle = p.legs || p.skin; g.fillRect(x - w * 0.8, hip, w * 0.65, y - hip); g.fillRect(x + w * 0.15, hip, w * 0.65, y - hip);
+    g.fillStyle = p.bottom; g.fillRect(x - w * 0.95, hip - 1, w * 1.9, h * (p.longShorts ? 0.2 : 0.12));
+    g.fillStyle = p.top && p.topKind === 'shirt' ? p.top : p.skin; g.beginPath(); g.moveTo(x - w, hip); g.lineTo(x - w * 1.05, sh + 2); g.quadraticCurveTo(x, sh - 2, x + w * 1.05, sh + 2); g.lineTo(x + w, hip); g.closePath(); g.fill();
+    if (p.topKind === 'bikini') { g.fillStyle = p.top; g.fillRect(x - w * 0.9, sh + h * 0.07, w * 0.8, h * 0.06); g.fillRect(x + w * 0.1, sh + h * 0.07, w * 0.8, h * 0.06); }
+    // arms: cheering, clapping or hanging
+    const ay = sh + 2, L = h * 0.3;
+    const arm = (sx, a) => { g.strokeStyle = p.topKind === 'shirt' && p.sleeves ? p.top : p.skin; g.lineWidth = Math.max(2, w * 0.55); g.lineCap = 'round'; g.beginPath(); g.moveTo(sx, ay); g.lineTo(sx + Math.sin(a) * L, ay + Math.cos(a) * L); g.stroke(); g.lineCap = 'butt'; };
+    const s1 = p.style === 'cheer' ? (up ? 2.7 : 2.2) : p.style === 'clap' ? 0.9 + Math.abs(Math.sin(t * 9 + p.ph)) * 0.4 : 0.15, s2 = p.style === 'cheer' ? (up ? 2.3 : 2.8) : s1;
+    arm(x - w, -s1); arm(x + w, s2);
+    if (p.can) { const cx = x + w + Math.sin(s2) * L, cy = ay + Math.cos(s2) * L; g.fillStyle = '#c8c8d0'; g.fillRect(cx - 1.5, cy - 4, 3, 4.5); }
+    g.fillStyle = p.skin; g.beginPath(); g.arc(x, sh - h * 0.08, h * 0.1, 0, PI * 2); g.fill();
+    g.fillStyle = p.hair; g.beginPath(); g.arc(x, sh - h * 0.1, h * 0.105, PI * 1.05, PI * 1.95); g.fill();
+    if (p.longHair) g.fillRect(x - h * 0.1, sh - h * 0.12, h * 0.05, h * 0.16);
+    if (p.cap) { g.fillStyle = p.cap; g.fillRect(x - h * 0.1, sh - h * 0.2, h * 0.2, h * 0.07); g.fillRect(x - h * 0.2, sh - h * 0.15, h * 0.11, h * 0.025); }
+    // shade one side, rim-light the other so they read as round
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.fillRect(x + w * 0.2, sh - h * 0.18, w * 0.9, y - sh + h * 0.18);
+    g.fillStyle = p.rim || 'rgba(255,200,140,0.35)'; g.fillRect(x - w * 1.05, sh, 0.9, hip - sh);
+  }
+  const prng = s => () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  const SKINS = ['#e8c0a0', '#c89070', '#8a5a3a', '#5a3a26', '#f0d0b8', '#a87050'], HAIRS = ['#1a1008', '#4a2a12', '#8a6a3a', '#d8b870', '#2a1a10'];
+
+  // ---------- THE OVERPASS: Tillotson Avenue over State Road 32 and the railroad ----------
+  function overpass(B, F) {
+    vg(B, 0, 0, BW, H, ['#020208', '#080a1a', '#141428', '#2a1e26']);
+    stars(B, 70, 70);
+    clouds(B, 10, 80, 10, 'rgba(24,20,36,0.6)', 'rgba(140,100,90,0.2)', 1);
+    seed = 401;
+    glow(B, 700, 150, 260, 'rgba(255,140,60,0.16)', 1);
+    // downtown in the distance: low brick blocks, a couple of towers, a steeple, a water tower
+    const hz = 150;
+    for (let i = 0; i < 36; i++) {
+      const x = 380 + i * 20 + rr(-6, 6), w = rr(14, 26), h = i % 9 === 4 ? rr(60, 78) : rr(12, 40);
+      B.fillStyle = shade('#14121a', rr(-0.1, 0.15)); B.fillRect(x, hz - h, w, h);
+      for (let r = hz - h + 4; r < hz - 3; r += 5) for (let c = x + 2; c < x + w - 2; c += 4) if (rand() < 0.18) { B.fillStyle = rand() < 0.7 ? 'rgba(255,200,120,0.8)' : 'rgba(170,200,255,0.7)'; B.fillRect(c, r, 1.6, 2); }
+      if (h > 58) glow(B, x + w / 2, hz - h - 2, 4, 'rgba(255,30,30,1)', 0.9);
+    }
+    B.fillStyle = '#14121a'; B.beginPath(); B.moveTo(586, hz - 40); B.lineTo(592, hz - 88); B.lineTo(598, hz - 40); B.fill(); B.fillRect(584, hz - 40, 16, 40);
+    B.fillStyle = '#1a181e'; B.fillRect(960, hz - 64, 2, 64); B.fillRect(978, hz - 64, 2, 64); B.beginPath(); B.ellipse(970, hz - 70, 16, 9, 0, 0, PI * 2); B.fill();
+    B.fillStyle = 'rgba(200,190,170,0.35)'; B.font = '5px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('MUNCIE', 970, hz - 68); B.textAlign = 'left';
+    treeline(B, hz, 30, '#05060a', 6, 22, BW);
+    // the cut below: State Road 32 and the tracks, lit orange
+    vg(B, 0, hz, BW, FY - hz, ['#0c0c12', '#16141a', '#0a0a0e']);
+    for (const [y, c] of [[hz + 10, '#3a3a40'], [hz + 14, '#3a3a40'], [hz + 22, '#2a2a30']]) { B.fillStyle = c; B.fillRect(0, y, BW, 1.2); }
+    for (let x = 0; x < BW; x += 6) { B.fillStyle = '#1e1a16'; B.fillRect(x, hz + 11, 2, 3); }
+    vg(B, 0, hz + 26, BW, 10, ['#1a1a20', '#242428']); for (let x = 0; x < BW; x += 30) { B.fillStyle = 'rgba(230,200,90,0.5)'; B.fillRect(x, hz + 31, 14, 0.8); }
+    for (const x of [140, 420, 760, 1080]) { B.fillStyle = '#0a0a0c'; B.fillRect(x, hz - 8, 1.4, 36); glow(B, x, hz - 9, 16, 'rgba(255,150,60,0.8)', 0.7); }
+    fog(B, hz - 10, 50, 'rgba(90,60,60,0.3)');
+    vignette(B, BW);
+    // the deck: cracked four-lane concrete, a pothole, lane paint
+    pfloor(F, 'stone', '#5a5a5c', '#2a2a2c', { rows: 8, span: 60, edge: '#7a7a78' });
+    F.fillStyle = 'rgba(240,240,230,0.55)'; for (let x = 10; x < AWX; x += 60) { F.beginPath(); F.moveTo(x, H - 18); F.lineTo(x + 26, H - 18); F.lineTo(x + 28, H - 15); F.lineTo(x - 1, H - 15); F.fill(); }
+    F.fillStyle = 'rgba(230,190,60,0.6)'; F.fillRect(0, FY + 8, AWX, 1.2); F.fillRect(0, FY + 10.5, AWX, 1.2);
+    F.fillStyle = '#121214'; F.beginPath(); F.ellipse(720, H - 10, 26, 5, 0, 0, PI * 2); F.fill(); F.fillStyle = 'rgba(60,70,90,0.6)'; F.beginPath(); F.ellipse(722, H - 9, 18, 3, 0, 0, PI * 2); F.fill();
+    // jersey barrier along the back edge, tagged end to end
+    const by = FY - 24;
+    F.fillStyle = '#6a6a66'; F.beginPath(); F.moveTo(0, FY); F.lineTo(0, FY - 8); F.lineTo(0, by); F.lineTo(AWX, by); F.lineTo(AWX, FY); F.fill();
+    vg(F, 0, by, AWX, 24, ['#8a8a84', '#6a6a66', '#4a4a48']);
+    F.fillStyle = 'rgba(0,0,0,0.25)'; F.fillRect(0, FY - 9, AWX, 2); F.fillStyle = 'rgba(255,255,255,0.15)'; F.fillRect(0, by, AWX, 1.2);
+    for (let x = 0; x < AWX; x += 70) { F.fillStyle = 'rgba(0,0,0,0.35)'; F.fillRect(x, by, 1, 24); }
+    grime(F, 0, by, AWX, 24, 40, 0.3);
+    const tags = [['MUNCIE EATS ITS OWN', '#e83030', 60], ['NO WAY OUT', '#30d0ff', 230], ['THE PLANT CLOSED', '#ffd040', 370], ['SO DID WE', '#ff60c0', 500], ["DON'T LOOK DOWN", '#40ff70', 610], ['RUST BELT FOREVER', '#ff8a30', 770], ['NOBODY GETS OUT', '#e83030', 930], ['765', '#b070ff', 1060]];
+    for (const [t, c, x] of tags) {
+      F.save(); F.translate(x, by + 16); F.rotate(rr(-0.06, 0.06)); F.font = '11px Anton, Impact, sans-serif'; F.textAlign = 'left';
+      F.fillStyle = '#0a0a0a'; for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) F.fillText(t, dx, dy);
+      F.fillStyle = shade(c, -0.15); F.fillText(t, 0, 0);
+      const w = F.measureText(t).width; for (let i = 0; i < 4; i++) { F.fillStyle = shade(c, -0.3); F.fillRect(rr(0, w), 1, 1, rr(3, 8)); }
+      F.restore();
+    }
+    // chain-link fence on top of the barrier, and the lights
+    F.strokeStyle = 'rgba(160,160,170,0.22)'; F.lineWidth = 0.6;
+    for (let x = -60; x < AWX + 60; x += 7) { F.beginPath(); F.moveTo(x, by); F.lineTo(x + 40, by - 40); F.moveTo(x, by); F.lineTo(x - 40, by - 40); F.stroke(); }
+    F.fillStyle = '#2a2a2e'; for (let x = 0; x < AWX; x += 110) F.fillRect(x, by - 42, 2, 42); F.fillRect(0, by - 42, AWX, 1.6);
+    for (const x of [200, 640, 1000]) lamp(F, x, by, 88, 'rgba(255,160,70,0.9)');
+  }
+
+  // ---------- PRAIRIE CREEK BEACH: the reservoir at dusk ----------
+  function beach(B, F) {
+    vg(B, 0, 0, BW, 120, ['#1a1438', '#3e2250', '#8a3a58', '#d8684a', '#f4a858']);
+    clouds(B, 20, 80, 10, 'rgba(90,40,70,0.55)', 'rgba(255,170,120,0.35)', 1);
+    seed = 503;
+    const hz = 118, sx = 820;
+    glow(B, sx, hz, 120, 'rgba(255,170,80,0.45)', 1); R.ball(B, sx, hz, 15, '#ffd27a'); B.fillStyle = 'rgba(255,240,200,0.6)'; B.beginPath(); B.arc(sx, hz, 11, 0, PI * 2); B.fill();
+    // the far shore: flat, solid with trees
+    for (let x = -10; x < BW; x += 7) { const h = rr(8, 20); B.fillStyle = rand() < 0.5 ? '#0e140e' : '#141a10'; B.beginPath(); B.ellipse(x, hz - h * 0.5, rr(5, 9), h * 0.6, 0, 0, PI * 2); B.fill(); }
+    B.fillStyle = '#0e140e'; B.fillRect(0, hz - 6, BW, 6);
+    // the reservoir
+    vg(B, 0, hz, BW, FY - 30 - hz, ['#6a3a5a', '#4a2a4a', '#2a1a32']);
+    for (let i = 0; i < 70; i++) { B.fillStyle = `rgba(255,200,120,${rr(0.15, 0.5)})`; B.fillRect(sx + rr(-26, 26) * (1 + i / 30), hz + 2 + i * 0.5, rr(4, 14), 0.8); }
+    for (let i = 0; i < 90; i++) { B.fillStyle = 'rgba(255,220,200,0.12)'; B.fillRect(rr(0, BW), rr(hz + 3, FY - 32), rr(6, 20), 0.6); }
+    // sand
+    vg(B, 0, FY - 32, BW, 34, ['#c8906a', '#b07a58', '#8a5e44']);
+    B.fillStyle = 'rgba(255,255,255,0.35)'; for (let x = 0; x < BW; x += 3) B.fillRect(x, FY - 32 + Math.sin(x * 0.07) * 1.2, 3, 1);
+    speckle(B, 0, FY - 30, BW, 30, 900, 0.25, 0.12);
+    // umbrellas, towels and the torch posts
+    for (const [x, c] of [[120, '#d8304a'], [330, '#2a8ad8'], [960, '#e8c020'], [1150, '#30a060']]) {
+      B.fillStyle = '#3a2a1a'; B.fillRect(x - 0.8, FY - 46, 1.6, 30);
+      for (let i = 0; i < 6; i++) { B.fillStyle = i % 2 ? c : '#f0ead8'; B.beginPath(); B.moveTo(x, FY - 50); B.lineTo(x - 22 + i * 7.3, FY - 40); B.lineTo(x - 14.7 + i * 7.3, FY - 40); B.fill(); }
+      B.fillStyle = shade(c, -0.2); B.fillRect(x - 14, FY - 18, 26, 4);
+    }
+    for (const x of TIKI) { B.fillStyle = '#5a3a1e'; B.fillRect(x - 1.2, FY - 50, 2.4, 44); B.fillStyle = '#3a2410'; B.fillRect(x - 2.5, FY - 54, 5, 6); }
+    fog(B, hz - 6, 20, 'rgba(255,170,140,0.25)');
+    vignette(B, BW);
+    // the fighting sand
+    vg(F, 0, FY, AWX, H - FY, ['#a87452', '#8a5a3e', '#6a4230']);
+    for (let i = 0; i < 3000; i++) { F.fillStyle = rand() < 0.5 ? 'rgba(255,230,190,0.18)' : 'rgba(60,30,10,0.2)'; F.fillRect(rand() * AWX, FY + rand() * (H - FY), 1, 1); }
+    for (let i = 0; i < 40; i++) { const x = rand() * AWX, y = FY + 4 + rand() * (H - FY - 8); F.fillStyle = 'rgba(60,30,10,0.25)'; F.beginPath(); F.ellipse(x, y, 2.2, 1, 0.3, 0, PI * 2); F.fill(); F.beginPath(); F.ellipse(x + 7, y + 2, 2.2, 1, 0.3, 0, PI * 2); F.fill(); }
+    for (let i = 0; i < 10; i++) { F.fillStyle = '#f0e0d0'; F.beginPath(); F.ellipse(rand() * AWX, FY + 6 + rand() * 40, 1.6, 1, 0, 0, PI * 2); F.fill(); }
+    F.fillStyle = '#2a6ad8'; F.fillRect(820, H - 18, 18, 10); F.fillStyle = '#f0f0f0'; F.fillRect(820, H - 18, 18, 3);
+    const dg = F.createLinearGradient(0, FY, 0, FY + 20); dg.addColorStop(0, 'rgba(0,0,0,0.35)'); dg.addColorStop(1, 'rgba(0,0,0,0)'); F.fillStyle = dg; F.fillRect(0, FY, AWX, 20);
+  }
+  const TIKI = [70, 250, 470, 640, 800, 1010, 1220];
+  const BOATS = (() => { const r = prng(91), a = []; for (let i = 0; i < 6; i++) a.push({ x0: r() * 1280, y: 124 + r() * 20, s: 0.5 + r() * 0.6, v: (r() < 0.5 ? -1 : 1) * (4 + r() * 7), sail: ['#f4ece0', '#f4ece0', '#e86a5a', '#f0d070'][i % 4], ph: r() * 6 }); return a; })();
+  const SWIMMERS = (() => { const r = prng(57), a = [];
+    for (let i = 0; i < 24; i++) { const g = r() < 0.5, x = 40 + i * 52 + r() * 24; a.push({ x, y: 184 - (i % 3) * 2, h: 40 + r() * 8, ph: r() * 6, speed: 2.5 + r() * 2, skin: SKINS[(r() * SKINS.length) | 0], hair: HAIRS[(r() * HAIRS.length) | 0], longHair: g && r() < 0.8,
+      topKind: g ? 'bikini' : (r() < 0.25 ? 'shirt' : 'none'), top: ['#e83a5a', '#2a9ad8', '#f0d040', '#30b070', '#f08030', '#c050c0'][(r() * 6) | 0], bottom: ['#1a4a9a', '#d83040', '#2a2a2a', '#f0a020', '#208a6a', '#e050a0'][(r() * 6) | 0],
+      style: r() < 0.5 ? 'cheer' : r() < 0.6 ? 'clap' : 'stand', cap: r() < 0.15 ? '#f0f0f0' : null, can: r() < 0.25, rim: 'rgba(255,170,110,0.5)' }); }
+    return a; })();
+  const BRO_COLS = ['#7a3a3a', '#3a4a7a', '#5a5a5a', '#7a6a3a', '#3a6a5a', '#8a2a2a'];
+  const BROS2 = (() => { const r = prng(77), a = []; for (let i = 0; i < 18; i++) a.push({ x: 60 + i * 66 + r() * 26, y: FY - 1, h: 42 + r() * 7, ph: r() * 6, speed: 3 + r() * 1.5, skin: SKINS[(r() * SKINS.length) | 0], hair: HAIRS[(r() * HAIRS.length) | 0],
+    topKind: 'shirt', sleeves: true, top: BRO_COLS[i % 6], bottom: r() < 0.5 ? '#3a3a42' : '#6a5a3a', longShorts: true, legs: r() < 0.4 ? '#2a3448' : null, style: r() < 0.6 ? 'cheer' : 'stand', cap: r() < 0.7 ? BRO_COLS[(i + 3) % 6] : null, can: r() < 0.75, rim: 'rgba(255,210,150,0.55)' }); return a; })();
 
   // ---------- THE RENTAL: Slum Lord's condemned house on the east side ----------
   function rental(B, F) {
@@ -664,7 +777,9 @@ const STAGES = (() => {
     cityhall: { name: 'CITY HALL', draw: (B, F) => cityhall(B, F, false) },
     hell: { name: 'CITY HALL BASEMENT', draw: (B, F) => cityhall(B, F, true) },
     benny: { name: 'BENEFICENCE', draw: benny },
-    bridge: { name: 'WHITE RIVER RAILROAD BRIDGE', draw: bridge, pit: true },
+    bridge: { name: 'WHITE RIVER RAILROAD BRIDGE', draw: bridge, pit: 'bridge' },
+    overpass: { name: 'TILLOTSON OVERPASS', draw: overpass, pit: 'overpass' },
+    beach: { name: 'PRAIRIE CREEK BEACH', draw: beach },
     minnetrista: { name: 'MINNETRISTA', draw: minnetrista },
     westend: { name: 'GILLESPIE TOWER', draw: westend },
     greenway: { name: 'WYSOR STREET DEPOT', draw: greenway },
@@ -707,6 +822,24 @@ const STAGES = (() => {
         for (let k = 0; k < 4; k++) glow(g, x - 12 + k * 8, y + 1, 4, (Math.floor(t * 8) + k) % 2 ? 'rgba(255,60,60,1)' : 'rgba(80,255,120,1)');
       }
     }
+    if (id === 'beach') {
+      for (const b of BOATS) {
+        const x = ((b.x0 + t * b.v) % 1400 + 1400) % 1400 - 60, y = b.y + Math.sin(t * 1.3 + b.ph) * 0.8, s = b.s * (0.6 + (b.y - 120) / 40);
+        g.fillStyle = '#1a1018'; g.beginPath(); g.moveTo(x - 9 * s, y); g.lineTo(x + 9 * s, y); g.lineTo(x + 6 * s, y + 3 * s); g.lineTo(x - 6 * s, y + 3 * s); g.fill();
+        g.fillStyle = '#2a2026'; g.fillRect(x - 0.5, y - 22 * s, 1, 22 * s);
+        g.fillStyle = b.sail; g.beginPath(); g.moveTo(x + 0.8, y - 21 * s); g.lineTo(x + 0.8, y - 1.5 * s); g.lineTo(x + 11 * s * Math.sign(b.v || 1), y - 1.5 * s); g.fill();
+        g.fillStyle = 'rgba(255,150,90,0.35)'; g.beginPath(); g.moveTo(x - 0.8, y - 17 * s); g.lineTo(x - 0.8, y - 1.5 * s); g.lineTo(x - 7 * s * Math.sign(b.v || 1), y - 1.5 * s); g.fill();
+        g.fillStyle = 'rgba(255,200,160,0.25)'; g.fillRect(x - 8 * s, y + 3.5 * s, 16 * s, 0.8);
+      }
+      g.save(); g.globalAlpha = 0.9; for (const p of SWIMMERS) person(g, p, t); g.restore();
+      for (const x of TIKI) { const fl = Math.sin(t * 13 + x) * 1.5; glow(g, x, FY - 58, 26, 'rgba(255,140,40,0.5)', 0.8); g.fillStyle = '#ff8a20'; g.beginPath(); g.moveTo(x - 3, FY - 54); g.quadraticCurveTo(x - 2 + fl, FY - 64, x + fl * 0.5, FY - 69); g.quadraticCurveTo(x + 2 + fl, FY - 62, x + 3, FY - 54); g.fill(); g.fillStyle = '#ffe080'; g.beginPath(); g.ellipse(x, FY - 57, 1.6, 3, 0, 0, PI * 2); g.fill(); }
+    }
+    if (id === 'overpass') {
+      // traffic on 32 and, now and then, a freight train down in the cut
+      for (let i = 0; i < 6; i++) { const dir = i % 2 ? 1 : -1, x = ((t * 90 * dir + i * 260) % 1400 + 1400) % 1400 - 60, y = 150 + 28 + (i % 2) * 3; g.fillStyle = dir > 0 ? 'rgba(255,250,220,0.9)' : 'rgba(255,40,30,0.9)'; g.fillRect(x, y, 2, 1.2); g.fillRect(x + 4, y, 2, 1.2); }
+      const cyc = t % 22;
+      if (cyc < 9) { const x = 1400 - cyc * 220; glow(g, x, 160, 14, 'rgba(255,250,200,0.9)', 0.9); g.fillStyle = '#0a0a0c'; g.fillRect(x, 157, 26, 7); for (let c = 0; c < 26; c++) { g.fillStyle = ['#2a1a14', '#1a1a1e', '#2a2018'][c % 3]; g.fillRect(x + 28 + c * 23, 156, 21, 8); } }
+    }
     if (id === 'rental') { const fl = Math.sin(t * 13) * Math.sin(t * 7.3) > 0.1 ? 0.22 : 0.08; g.fillStyle = `rgba(120,170,240,${fl})`; g.fillRect(CX - 150 + 170, FY - 150 + 8, 44, 54); for (let i = 0; i < 6; i++) { g.fillStyle = 'rgba(20,20,10,0.8)'; g.fillRect(CX - 60 + Math.sin(t * 3 + i * 2) * 30 + i * 8, FY - 40 + Math.cos(t * 4 + i) * 12, 1, 1); } }
     if (id === 'village') { bros(g, t); for (let i = 0; i < 4; i++) { const on = Math.sin(t * 3 + i * 2) > -0.7; if (on) glow(g, 78 + i * 166, FY - 75, 30, 'rgba(255,120,200,0.1)'); } }
     if (id === 'glassworks') for (const x of [230, 640, 1050]) glow(g, x, 160, 40 + Math.sin(t * 6 + x) * 8, 'rgba(255,140,40,0.3)');
@@ -714,7 +847,9 @@ const STAGES = (() => {
     if (id === 'bridge') { for (let i = 0; i < 30; i++) { g.fillStyle = `rgba(230,230,210,${0.1 + 0.25 * Math.abs(Math.sin(t * 2 + i))})`; g.fillRect(800 + Math.sin(i * 7.1) * 70 * (1 + i / 30), 175 + i * 2, 8 + (i % 4) * 4, 0.8); } }
   }
   // the view from under the bridge for the stage fatality
-  function drawBelow(g, W, t) {
+  function drawBelow(g, W, t, kind) {
+    if (kind === 'river') return belowRiver(g, W, t);
+    if (kind === 'overpass') return belowOverpass(g, W, t);
     vg(g, 0, 0, W, H, ['#05060c', '#0e1424', '#141a24']);
     g.fillStyle = '#2a2620'; g.fillRect(0, 0, W, 22);
     for (let x = 0; x < W; x += 34) { g.fillStyle = '#1a1814'; g.fillRect(x, 0, 6, 70); }
@@ -723,6 +858,42 @@ const STAGES = (() => {
     for (let x = -10; x < W; x += 14) { g.fillStyle = '#3a2a1a'; g.fillRect(x, 203, 9, 14); }
     g.fillStyle = '#8a8a90'; g.fillRect(0, 202, W, 2.5); g.fillRect(0, 214, W, 2.5);
     g.fillStyle = '#c8c8d0'; g.fillRect(0, 202, W, 0.8); g.fillRect(0, 214, W, 0.8);
+  }
+  function belowRiver(g, W, t) {
+    vg(g, 0, 0, W, H, ['#02030a', '#08101e', '#0e1828']);
+    seed = 61; for (let i = 0; i < 60; i++) { g.fillStyle = `rgba(255,255,255,${0.2 + rand() * 0.5})`; g.fillRect(rand() * W, rand() * 110, 1, 1); }
+    R.ball(g, W * 0.78, 70, 12, '#ece6cf');
+    for (let x = -10; x < W; x += 9) { const h = rr(18, 46); g.fillStyle = '#05080a'; g.beginPath(); g.ellipse(x, 140 - h * 0.4, rr(6, 12), h * 0.6, 0, 0, PI * 2); g.fill(); }
+    g.fillStyle = '#05080a'; g.fillRect(0, 128, W, 14);
+    // the trestle overhead
+    g.fillStyle = '#06070a'; g.fillRect(0, 0, W, 16); g.fillRect(0, 38, W, 5);
+    for (let x = -20; x < W; x += 28) { g.strokeStyle = '#06070a'; g.lineWidth = 3; g.beginPath(); g.moveTo(x, 40); g.lineTo(x + 14, 14); g.lineTo(x + 28, 40); g.stroke(); }
+    g.fillStyle = 'rgba(140,150,180,0.25)'; g.fillRect(0, 16, W, 0.8);
+    // shallow river, moonlight, and the rocks
+    vg(g, 0, 140, W, 100, ['#0c1626', '#122236', '#0a1420']);
+    for (let i = 0; i < 40; i++) { g.fillStyle = `rgba(230,230,210,${0.1 + 0.25 * Math.abs(Math.sin(t * 2 + i))})`; g.fillRect(W * 0.78 + Math.sin(i * 7.1) * 40 * (1 + i / 30), 146 + i * 2, 8 + (i % 4) * 4, 0.8); }
+    const rock = (x, y, w, h, c) => { g.fillStyle = c; g.beginPath(); g.moveTo(x - w, y + h * 0.3); g.quadraticCurveTo(x - w * 0.9, y - h * 0.6, x - w * 0.2, y - h); g.quadraticCurveTo(x + w * 0.6, y - h * 1.05, x + w, y - h * 0.1); g.quadraticCurveTo(x + w * 0.9, y + h * 0.4, x, y + h * 0.45); g.closePath(); g.fill();
+      g.fillStyle = 'rgba(200,210,230,0.18)'; g.beginPath(); g.ellipse(x - w * 0.2, y - h * 0.75, w * 0.5, h * 0.18, -0.1, 0, PI * 2); g.fill();
+      g.fillStyle = 'rgba(230,240,255,0.35)'; g.fillRect(x - w, y + h * 0.3, w * 2, 0.8); };
+    rock(W * 0.5, 214, 62, 18, '#4a4a4c'); rock(W * 0.5 - 70, 222, 30, 12, '#3a3a3e'); rock(W * 0.5 + 76, 220, 34, 14, '#424246'); rock(W * 0.2, 226, 22, 8, '#323236'); rock(W * 0.82, 230, 26, 9, '#36363a');
+    for (let i = 0; i < 10; i++) { const x = (i * 97 + t * 30) % W; g.fillStyle = 'rgba(200,220,255,0.15)'; g.fillRect(x, 232 + (i % 3) * 2, 12, 0.8); }
+  }
+  function belowOverpass(g, W, t) {
+    vg(g, 0, 0, W, H, ['#05060c', '#0e1020', '#161420']);
+    // the overpass deck above, the barrier face with its tags
+    vg(g, 0, 0, W, 30, ['#4a4a48', '#3a3a38']); g.fillStyle = '#2a2a28'; g.fillRect(0, 30, W, 4);
+    g.font = '10px Anton, Impact, sans-serif'; g.fillStyle = '#e83030'; g.fillText('NO WAY OUT', 30, 22); g.fillStyle = '#30d0ff'; g.fillText("DON'T LOOK DOWN", W - 120, 20);
+    for (const x of [W * 0.15, W * 0.85]) { vg(g, x - 12, 34, 24, 160, ['#5a5a58', '#3a3a38']); g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(x + 4, 34, 8, 160); }
+    glow(g, W * 0.5, 60, 120, 'rgba(255,150,60,0.25)', 1);
+    // the cut: chain link, gravel, the rails
+    g.strokeStyle = 'rgba(150,150,160,0.18)'; g.lineWidth = 0.6; for (let x = -40; x < W + 40; x += 7) { g.beginPath(); g.moveTo(x, 150); g.lineTo(x + 30, 120); g.moveTo(x, 150); g.lineTo(x - 30, 120); g.stroke(); }
+    vg(g, 0, 150, W, 40, ['#14141a', '#1e1c1c']);
+    vg(g, 0, 190, W, 50, ['#3a342c', '#26221c']);
+    seed = 83; for (let i = 0; i < 500; i++) { g.fillStyle = rand() < 0.5 ? 'rgba(150,140,130,0.35)' : 'rgba(0,0,0,0.35)'; g.fillRect(rand() * W, 190 + rand() * 50, 1.4, 1); }
+    for (let x = -10; x < W; x += 14) { g.fillStyle = '#3a2a1a'; g.fillRect(x, 203, 9, 14); }
+    g.fillStyle = '#8a8a90'; g.fillRect(0, 202, W, 2.5); g.fillRect(0, 214, W, 2.5);
+    g.fillStyle = '#c8c8d0'; g.fillRect(0, 202, W, 0.8); g.fillRect(0, 214, W, 0.8);
+    g.fillStyle = '#0a0a0c'; g.fillRect(W * 0.7, 120, 2, 82); R.ball(g, W * 0.7 + 1, 118, 3, '#2a0a0a'); glow(g, W * 0.7 + 1, 118, 8, 'rgba(255,30,20,0.9)', 0.9);
   }
   function drawTrain(g, x, y) {
     // locomotive facing left, then boxcars
@@ -741,5 +912,5 @@ const STAGES = (() => {
     }
   }
 
-  return { AW: AWX, H, FLOOR, get, name, live, drawBelow, drawTrain, ROTATION: ['benny', 'bridge', 'minnetrista', 'westend', 'greenway', 'shedtown', 'cornbread', 'cityhall', 'village'] };
+  return { AW: AWX, H, FLOOR, get, name, live, drawBelow, drawTrain, ROTATION: ['benny', 'bridge', 'minnetrista', 'westend', 'greenway', 'shedtown', 'cornbread', 'cityhall', 'village', 'overpass', 'beach'] };
 })();

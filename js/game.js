@@ -114,7 +114,7 @@
   let screen = 'title', paused = false, mode = 'ladder';
   const game = { phase: 'intro', pt: 0, round: 1, timer: 99, time: 0, freeze: 0, shake: 0, flash: 0, banners: [], bubbles: [], toasty: 0, scene: null, script: null };
   const ladder = { pick: 0, opps: [], rung: 0, stages: [] };
-  let p1 = null, p2 = null, projs = [], stage = null, cam = 0, zoom = 1;
+  let p1 = null, p2 = null, projs = [], stage = null, cam = 0, zoom = 1, camDY = 0;
   const sel = { i: 0, o: 0, s: 0 };
   let ui = [];
 
@@ -265,12 +265,12 @@
   }
   function winText(a) {
     const flawless = a.dmgTaken <= 0;
-    setTimeout(() => { banner(a.def.name + ' WINS', { size: 26, fill: 'gold', life: 2.4, y: 48 }); say(a.def.name.replace("'", 'g').toLowerCase() + ' wins'); }, 700);
-    if (flawless) setTimeout(() => { banner('FLAWLESS VICTORY', { size: 22, fill: 'fire', y: 76, life: 2 }); say('flawless victory'); }, 2000);
+    setTimeout(() => { banner(a.def.name + ' WINS', { size: 26, fill: 'gold', life: 3.0, y: 74, hold: 0.9, dock: { y: 36, size: 15 } }); say(a.def.name.replace("'", 'g').toLowerCase() + ' wins'); }, 700);
+    if (flawless) setTimeout(() => { banner('FLAWLESS VICTORY', { size: 22, fill: 'fire', y: 104, life: 2.4, hold: 0.7, dock: { y: 53, size: 12 } }); say('flawless victory'); }, 2000);
   }
   function finishBlow(a, v, mv) {
     // stage fatality: uppercut off the trestle
-    if (stage.pit && mv.upper) { startFatality(a, v, 'bridge'); return; }
+    if (stage.pit && mv.upper) { startFatality(a, v, stage.pit === true ? 'bridge' : stage.pit); return; }
     v.dead = true; v.finishing = false;
     SFX[mv.snd || 'punch'](); bleed(v, v.x, v.y - hurtH(v) * 0.7, 30, a.face, 1.4);
     launch(v, a.face * 200, -320);
@@ -464,6 +464,7 @@
       startMove(f, f.jabAlt ? MV.jab2 : MV.jab); return;
     }
     if (c.K) {
+      if (game.phase === 'finish' && game.winner === f && f.def.alt && motion(f, ['F', 'F'], 0.6)) { f.hist = []; startFatality(f, o, f.def.alt.id); return; }
       if (motion(f, ['B', 'B'], 0.6)) { f.hist = []; startWallrun(f); return; }
       if (motion(f, ['D', 'F'])) { f.hist = []; startSP2(f); return; }
       if (D) { startMove(f, MV.sweep); return; }
@@ -488,7 +489,7 @@
       c.fatalT += dt;
       if (c.fatalT > 0.9) {
         if (c.fatalT < 1.15) c.doFatal = !!f.def.fatal;
-        if (c.doFatal) { startFatality(f, o); return out; }
+        if (c.doFatal) { startFatality(f, o, f.def.alt && Math.random() < 0.25 ? f.def.alt.id : null); return out; }
         if (dist > 50) out.tok = 'F'; else out.P = true;
       }
       return out;
@@ -889,7 +890,7 @@
     chucky: { pose: t => P({ hy: 4, lean: -0.3, head: -0.3, aF: [2.0 + Math.sin(t * 18) * 0.45, 0.5], aB: [1.9 + Math.sin(t * 18) * 0.45, 0.6], fF: [12, 0], fB: [-12, 0] }),
       fx(f, t) { if (once(f, 'c1', t, 0.2) || once(f, 'c2', t, 0.9) || once(f, 'c3', t, 1.5)) SFX.chirp(); if (Math.random() < 0.06) { const c = R.jointWorld(f, f.pose, 'chest'); FX.gib('feather', c[0], c[1], rnd(-60, 60), rnd(-120, -40), { grav: 100, vr: 4, draw: g => R.oval(g, 0, 0, 4, 1.4, '#b0141c', 0, true) }); } } },
     turkey: { pose: t => P({ hy: 6, lean: 0.3, head: -0.4 + Math.sin(t * 6) * 0.2, aF: [0.3, 0.2], aB: [0.25, 0.2], fF: [10 + Math.sin(t * 5) * 4, -Math.max(0, Math.sin(t * 5)) * 4], fB: [-10 + Math.sin(t * 5) * 4, -Math.max(0, -Math.sin(t * 5)) * 4] }),
-      fx(f, t) { if (once(f, 'g1', t, 0.3) || once(f, 'g2', t, 1.3)) SFX.gobble(); } },
+      fx(f, t) { if (once(f, 'g1', t, 0.3) || once(f, 'g2', t, 1.3)) SFX.yelp(); } },
     wolfe: { pose: t => t < 1.7 ? P({ hy: 3, lean: -0.35, head: -1.05, jaw: 1, aF: [0.8, 0.6], aB: [0.7, 0.6], fF: [13, 0], fB: [-13, 0] })
         : P({ hy: 6, lean: 0.15, head: 0.35, jaw: 0.1, aF: [2.5, 2.75], aB: [0.6, 1.9], fF: [13, 0], fB: [-13, 0] }),
       fx(f, t) { if (once(f, 'howl', t, 0.15)) SFX.howl(); if (once(f, 'sniff', t, 1.8)) { SFX.sniff(); const h = R.jointWorld(f, f.pose, 'head'); FX.puff(h[0] + f.face * 22, h[1] - 2, 'rgba(250,250,250,0.9)', 10, 2); } } },
@@ -977,15 +978,16 @@
   const VW = () => W / zoom;
   function limits() { return [Math.max(20, cam + VW() * 0.25), Math.min(AW - 20, cam + VW() * 0.75)]; }
   function updateCam(dt) {
-    if (game.phase === 'fatality') { zoom = 1; return; }
+    if (game.phase === 'fatality') { zoom = 1; camDY = 0; return; }
     const w = game.winner;
     if (w && w.state === 'win' && ['roundend', 'matchend', 'fatalend'].includes(game.phase)) {
-      zoom += (1.18 - zoom) * Math.min(1, dt * 2.5);
+      zoom += (1.18 - zoom) * Math.min(1, dt * 2.5); camDY += (14 - camDY) * Math.min(1, dt * 2.5);
       const tc = clamp(w.x - VW() / 2, 0, AW - VW());
       cam += (tc - cam) * Math.min(1, dt * 3);
       p1.px = p1.x; p2.px = p2.x;
       return;
     }
+    camDY += (0 - camDY) * Math.min(1, dt * 4);
     const ext = f => (f.state === 'down' || f.state === 'air') ? -f.face * hurtH(f) * 0.45 : 0;
     // stop whoever is walking or flying away once they reach the widest shot
     const maxSep = W / ZMIN * 0.48;
@@ -1085,9 +1087,9 @@
     game.phase = 'fatalend'; game.pt = 0;
     if (game.loser.bossDie) { winText(w); setWin(w); return; }
     setWin(w); w.scriptPose = null;
-    banner('FATALITY', { size: 34, fill: 'blood', life: 4.2, y: 58, drip: 1, blood: 1 });
+    banner('FATALITY', { size: 38, fill: 'blood', life: 4.4, y: 76, drip: 1, blood: 1, hold: 1.3, dock: { y: 40, size: 21 } });
     say('fatality');
-    setTimeout(() => { banner(w.def.name + ' WINS', { size: 20, fill: 'gold', life: 3, y: 100 }); }, 1300);
+    setTimeout(() => { banner(w.def.name + ' WINS', { size: 20, fill: 'gold', life: 3.1, y: 110, hold: 0.8, dock: { y: 64, size: 13 } }); }, 1300);
   }
   function endMatch() {
     const won = game.winner === p1;
@@ -1161,7 +1163,7 @@
     g.translate(Math.round(sx), Math.round(sy));
     if (game.scene) { game.scene(g, W, H); g.restore(); return; }
     g.imageSmoothingEnabled = false;
-    g.translate(0, FLOOR * (1 - zoom)); g.scale(zoom, zoom); g.translate(-cam, 0);
+    g.translate(0, FLOOR * (1 - zoom) + camDY); g.scale(zoom, zoom); g.translate(-cam, 0);
     const bx = Math.round(cam * 0.4) + (stage.bxOff || -40), bw = stage.back.width;
     g.drawImage(stage.back, 0, 0, bw, 2, bx, -160, bw, 162);
     g.drawImage(stage.back, bx, 0);
@@ -1197,9 +1199,12 @@
     for (const b of game.banners) {
       const a = b.t < 0.12 ? b.t / 0.12 : Math.min(1, (b.life - b.t) * 3);
       const sc = b.t < 0.15 ? 1.5 - b.t / 0.3 : 1;
+      // big hit first, then it slides up into a band under the health bars so the winner stays in view
+      const du = b.dock ? ease((b.t - (b.hold || 0.9)) / 0.35) : 0, by = b.dock ? lerp(b.y, b.dock.y, du) : b.y, bs = b.dock ? lerp(b.size, b.dock.size, du) : b.size;
       ctx.globalAlpha = clamp(a, 0, 1);
-      TXT.draw(ctx, b.str, b.x != null ? b.x : W / 2, b.y - (b.size * sc) / 2, { size: Math.round(b.size * sc), align: 'center', fill: b.fill, blood: b.blood });
-      if (b.drip) { ctx.fillStyle = '#9a000c'; const w = TXT.width(ctx, b.str, b.size, b.blood ? TXT.BLOOD : null); for (let i = 0; i < 9; i++) { const x = W / 2 - w / 2 + (i + 0.5) * w / 9; ctx.fillRect(x, b.y + b.size * 0.45, 2, Math.min(30, b.t * 14 * (1 + (i * 7) % 5 / 3))); } }
+      if (b.dock && du > 0) { ctx.fillStyle = `rgba(0,0,0,${0.35 * du})`; ctx.fillRect(0, by - bs * 0.62, W, bs * 1.24); }
+      TXT.draw(ctx, b.str, b.x != null ? b.x : W / 2, by - (bs * sc) / 2, { size: Math.round(bs * sc), align: 'center', fill: b.fill, blood: b.blood });
+      if (b.drip) { ctx.fillStyle = '#9a000c'; const w = TXT.width(ctx, b.str, bs, b.blood ? TXT.BLOOD : null); for (let i = 0; i < 9; i++) { const x = W / 2 - w / 2 + (i + 0.5) * w / 9; ctx.fillRect(x, by + bs * 0.45, 2, Math.min(bs * 0.5, b.t * 14 * (1 + (i * 7) % 5 / 3))); } }
       ctx.globalAlpha = 1;
     }
     if (game.toasty > 0) {
@@ -1378,7 +1383,7 @@
       ['PUNCH', 'Jab (tap again for a combo)', 0], ['DOWN + PUNCH', 'Uppercut', 0], ['TOWARD + PUNCH (close)', 'Suplex', 0], ['BACK + PUNCH (close)', 'Wad Toss', 0],
       ['KICK', 'Kick', 0], ['DOWN + KICK', 'Sweep', 0], ['BACK + KICK', 'Spinning back kick', 0], ['UP', 'Jump (punch or kick in the air)', 0], ['BLOCK (hold)', 'Block (hold DOWN too to block low)', 0],
       ['BLOCK + UP', 'BULLET DODGE (counters if it dodges)', 2], ['BACK, BACK + KICK', 'WALL RUN', 2], ['IN THE AIR: DOWN + PUNCH', 'HANG TIME', 2],
-      ['BACK, FORWARD + PUNCH', def.proj.name, 1], ['DOWN, FORWARD + KICK', def.sp2.name, 1], ['FINISH: DOWN, DOWN + PUNCH', 'FATALITY: ' + def.fatal.name, 1], ['FINISH at WHITE RIVER GREENWAY: DOWN + PUNCH', 'Stage fatality', 1],
+      ['BACK, FORWARD + PUNCH', def.proj.name, 1], ['DOWN, FORWARD + KICK', def.sp2.name, 1], ['FINISH: DOWN, DOWN + PUNCH', 'FATALITY: ' + def.fatal.name, 1], ['FINISH at RAILROAD BRIDGE or OVERPASS: DOWN + PUNCH', 'Stage fatality', 1],
     ];
     rows.forEach((r, i) => {
       const y = 28 + i * 12.4, hl = r[2];
