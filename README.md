@@ -110,8 +110,6 @@ Plain JavaScript and the HTML canvas, with no build step and no libraries. Every
 
 ## Credits
 
-Made by Andy Shears, vibe coded with Claude.
-
 Fonts, all under the SIL Open Font License (license files are in `fonts/`):
 
 - **Metal Mania** by Open Window
