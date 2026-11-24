@@ -1,1 +1,121 @@
-# Muncie-Kombat
+# Muncie Kombat
+
+A gory, over-the-top, early-90s style arcade fighting game set in Muncie, Indiana. Sixteen Muncie fighters, four bosses, fifteen arenas, and a fatality for every one of them.
+
+**Play it:** https://andyshearsphd.github.io/Muncie-Kombat/
+
+Built for phones in landscape. It also plays in a desktop browser with a keyboard.
+
+Warning: it is very violent and very gross.
+
+## Put it on your iPhone home screen
+
+1. Open the link in Safari.
+2. Tap the Share button.
+3. Tap **Add to Home Screen**.
+
+It then opens full screen like an app. On Android, use the browser menu and choose **Add to Home screen** or **Install app**.
+
+## Modes
+
+- **Arcade Ladder:** pick a fighter and climb the tower. You fight every other fighter in random order on random arenas, then the four bosses: Ofc Tinkle at City Hall, Fruit Jar Golem at the Glass Works, Slum Lord at The Rental, and Devil Dan in City Hall. That is 19 fights.
+- **Single Match:** pick your fighter, your opponent and the arena. Devil Dan can only be reached through the ladder.
+
+Matches are best of three rounds. Win the deciding round and you get FINISH HIM.
+
+## Controls
+
+On a phone, the joystick appears wherever your left thumb touches the left half of the screen. PUNCH, KICK and BLOCK are on the right.
+
+On a keyboard:
+
+| Action | Keys |
+| --- | --- |
+| Move, jump, crouch | Arrow keys or WASD |
+| Punch | J or Z |
+| Kick | K or X |
+| Block | L, C or Left Shift |
+| Pause | P or Esc |
+
+## Moves everyone has
+
+| Input | Move |
+| --- | --- |
+| PUNCH | Jab (tap again for a combo) |
+| DOWN + PUNCH | Uppercut |
+| TOWARD + PUNCH (close) | Suplex |
+| BACK + PUNCH (close) | Wad Toss |
+| KICK | Kick |
+| DOWN + KICK | Sweep |
+| BACK + KICK | Spinning back kick |
+| UP | Jump (punch or kick in the air) |
+| BLOCK (hold) | Block (hold DOWN too to block low) |
+
+### Matrix moves
+
+| Input | Move |
+| --- | --- |
+| BLOCK + UP | Bullet Dodge (counters if it dodges) |
+| BACK, BACK + KICK | Wall Run Flying Kick |
+| In the air: DOWN + PUNCH | Hang Time |
+
+### Special moves and finishers
+
+| Input | Move |
+| --- | --- |
+| BACK, FORWARD + PUNCH | Projectile special |
+| DOWN, FORWARD + KICK | Second special |
+| FINISH: DOWN, DOWN + PUNCH | Fatality |
+| FINISH at the White River Railroad Bridge, Tillotson Overpass or McCulloch Park: DOWN + PUNCH | Stage fatality |
+
+There may be other secrets. Every fighter's moves are also listed on the MOVES screen in the game.
+
+## Fighters
+
+| Fighter | Projectile | Second special | Fatality |
+| --- | --- | --- | --- |
+| Muncie Hippo | Poop Shot | Hippo Ram | Pothole Filler |
+| Painter Dude | Palette Knife | Thinner Splash | Happy Little Accident |
+| Fat Cat | Hairball | Pounce | I Hate Mondays |
+| Late Night Host | Cue Card | Desk Slide | Top Ten List |
+| Ballin' Well | Fireball | Alley-Oop Elbow | Posterized |
+| Gertie | Wing Gust | Dive-Bomb | Honk |
+| Rocky | Trash Can | Claw Roll | Rabies |
+| Millie | Tail Wave | Burrow | Timber |
+| Chucky | Feather Darts | Dive Peck | Bird Strike |
+| Mad Turkey | Leftovers | Turkey Trot | Carved |
+| Coke Wolfe | Howl | Nose Candy | Full Moon |
+| East End Em | Hardcover | Paper Cut | First Edition |
+| Tin Man | Oil Slick | Tin Can Charge | Heartless |
+| Tim Bunyon | Log Toss | Log Roll | Timber |
+| Becky Hack | Shimmer | Blanket Snare | Lights Out |
+| Petey | Fifty Teeth | Play Dead | Playing Possum |
+
+### Bosses
+
+| Boss | Projectile | Second special | Fatality |
+| --- | --- | --- | --- |
+| Ofc Tinkle | Pepper Spray | Tackle | Use of Force |
+| Fruit Jar Golem | Glass Shards | Jar Slam | Canning Season |
+| Slum Lord | Eviction Notice | Late Fee | Condemned |
+| Devil Dan | Hellfire | Hell Warp | Hellfire Pillar |
+
+## Arenas
+
+Campus, White River Railroad Bridge, Minnetrista, Gillespie Tower, Wysor Street Depot, Shedtown Drive-In, Cornbread Road, City Hall, The Village, Tillotson Overpass, Prairie Creek Beach, McCulloch Park, plus the boss arenas: the Glass Works, The Rental and Devil Dan's City Hall.
+
+## How it is built
+
+Plain JavaScript and the HTML canvas, with no build step and no libraries. Every fighter, arena, sound and piece of music is drawn or synthesized in code at runtime. Open `index.html` from any static web server to run it locally.
+
+## Credits
+
+Made by Andy Shears, vibe coded with Claude.
+
+Fonts, all under the SIL Open Font License (license files are in `fonts/`):
+
+- **Metal Mania** by Open Window
+- **Nosifer** by Vernon Adams (Typomondo)
+- **Anton** by The Anton Project Authors
+
+Muncie Kombat is a parody and a homage. It is not affiliated with or endorsed by the makers of Mortal Kombat.
