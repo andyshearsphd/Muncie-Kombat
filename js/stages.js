@@ -346,7 +346,7 @@ const STAGES = (() => {
     B.fillStyle = '#8a8478'; B.fillRect(m - 52, FY - 66, 104, 6);
     B.fillStyle = '#0e0c10'; B.fillRect(m - 30, FY - 56, 60, 56); win(B, m - 24, FY - 48, 20, 48, true, '#ffc860', '#0e0c10'); win(B, m + 4, FY - 48, 20, 48, true, '#ffc860', '#0e0c10');
     glow(B, m, FY - 30, 70, 'rgba(255,190,100,0.35)');
-    B.fillStyle = '#f0e0c0'; B.font = '10px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('MINNETRISTA', m, FY - 136); B.textAlign = 'left';
+    
     B.strokeStyle = '#1a1a1e'; B.lineWidth = 6; B.beginPath(); B.ellipse(m - 92, FY - 60, 26, 38, 0.5, 0, PI * 2); B.stroke(); B.strokeStyle = 'rgba(255,160,100,0.5)'; B.lineWidth = 1.5; B.beginPath(); B.ellipse(m - 92, FY - 60, 26, 38, 0.5, -2.4, -0.6); B.stroke();
     B.strokeStyle = '#141418'; B.lineWidth = 4; B.beginPath(); B.ellipse(m - 92, FY - 60, 14, 33, -0.4, 0, PI * 2); B.stroke();
     // Appeal to the Great Spirit silhouette on its plinth

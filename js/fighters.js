@@ -303,7 +303,7 @@ const ROSTER = (() => {
   const SKB = '#7a4a2a', RED = '#a8132a';
   const ballin = {
     id: 'ballin', name: "BALLIN' WELL", short: 'BALLIN', him: 'HIM', k: 1.1,
-    bio: 'Ball State legend. Number 42. Still has the moves. Still has the elbows.',
+    bio: 'Basketball legend. Number 42. Still has the moves. Still has the elbows.',
     sock: '#ececea', sockLow: true, bicep: 0.38, calf: 0.4, stripe: RED, sleeve: '#f0efea',
     d: dims({ thigh: 31, shin: 31, torso: 37, upper: 23, fore: 22, hipW: 12, shW: 16, chest: 15.5, belly: 11, back: 11, thighR: 7.6, kneeR: 4.6, shR: 6, elbowR: 4.1 }),
     col: { torso: '#eae8e2', armU: SKB, armL: SKB, hand: SKB, legU: '#eae8e2', legL: SKB, foot: '#b8141e', neck: SKB },
