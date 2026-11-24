@@ -81,7 +81,7 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 | Ballin' Well | Fireball | Alley-Oop Elbow | Posterized |
 | Gertie | Wing Gust | Dive-Bomb | Honk |
 | Rocky | Trash Can | Claw Roll | Rabies |
-| Millie | Tail Wave | Burrow | Timber |
+| Millie | Tail Wave | Burrow | Bone Yard |
 | Chucky | Feather Darts | Dive Peck | Bird Strike |
 | Mad Turkey | Leftovers | Turkey Trot | Carved |
 | Coke Wolfe | Howl | Nose Candy | Full Moon |

@@ -465,7 +465,7 @@ const ROSTER = (() => {
       eye(g, 8.5, -12.6, 1.3, st, { animal: 1, iris: '#0a0604', socket: 'rgba(0,0,0,0.2)' });
     },
     proj: { kind: 'wave', name: 'TAIL WAVE' }, sp2: { kind: 'burrow', name: 'BURROW' },
-    fatal: { id: 'millie', name: 'TIMBER' }
+    fatal: { id: 'millie', name: 'BONE YARD' }
   };
 
   // ---------- bosses ----------

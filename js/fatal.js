@@ -684,71 +684,65 @@ const FATAL = (() => {
     };
   };
 
-  // ---------- MILLIE: Timber ----------
+  // ---------- MILLIE: Bone Yard ----------
+  // she burrows under the victim, pulls them down into the hole, throws the bones back out,
+  // then pops up and eats a femur like a corncob, typewriter style
   S.millie = (s, A, V, api) => {
-    const PS = api.PS, k = A.d.k, F = api.FLOOR;
-    let nextGnaw = 0.6, fallU = 0, lodge = null, feetX = 0, bite = 0;
+    const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face;
+    let hx = 0, hole = 0, mound = -1, sink = 0, pile = 0, femur = false, chew = 0, rowX = 0, risen = 0;
+    const brown = '#3a2414', dark = '#120804';
+    prop({ layer: 'back', draw(g) {
+      if (mound >= 0 && mound < 1) { const mx = lerp(A.x, hx, mound); g.fillStyle = brown; g.beginPath(); g.ellipse(mx, F, 14 * k, 6 * k, 0, PI, PI * 2); g.fill(); }
+      if (pile > 0) for (let i = 0; i < Math.min(14, pile); i++) { const px = hx + d * (34 + (i % 5) * 7) * V.d.k, py = F - 2 - ((i / 5) | 0) * 4; g.save(); g.translate(px, py); g.rotate(i * 1.7); R.line(g, -6, 0, 6, 0, '#ece4d0', 2.2); R.ball(g, -6, 0, 1.8, '#ece4d0'); R.ball(g, 6, 0, 1.8, '#ece4d0'); g.restore(); }
+    } });
     prop({ layer: 'front', draw(g) {
-      if (bite <= 0 || V.ro.cutAnkles) return;
-      for (const leg of ['F', 'B']) {
-        const kn = J(V, 'knee' + leg), ft = J(V, 'foot' + leg), p = [lerp(ft[0], kn[0], 0.35), lerp(ft[1], kn[1], 0.35)];
-        g.fillStyle = '#5a0008'; g.beginPath(); g.ellipse(p[0], p[1], V.d.ankleR * 1.3, 1.5 + bite * 4, 0, 0, PI * 2); g.fill();
-        g.fillStyle = '#c8303a'; g.beginPath(); g.ellipse(p[0], p[1], V.d.ankleR * 0.9, 0.8 + bite * 2.6, 0, 0, PI * 2); g.fill();
-        R.line(g, p[0], p[1] - bite * 3, p[0], p[1] + bite * 3, '#ece4d0', 1.3);
+      if (hole <= 0) return;
+      // the pit: an earth plug over everything below the floor line, a dark mouth and a dirt rim
+      const w = 46 * V.d.k * hole;
+      g.fillStyle = brown; g.fillRect(hx - w - 10, F - 1, (w + 10) * 2, api.H ? api.H - F + 30 : 40);
+      g.fillStyle = dark; g.beginPath(); g.ellipse(hx, F + 2, w * 0.8, 5 * hole, 0, 0, PI * 2); g.fill();
+      g.fillStyle = '#5a3a20'; g.beginPath(); g.ellipse(hx - w * 0.9, F, 12 * hole, 6 * hole, 0, PI, PI * 2); g.fill(); g.beginPath(); g.ellipse(hx + w * 0.9, F, 12 * hole, 6 * hole, 0, PI, PI * 2); g.fill();
+      if (femur && A.state === 'script') {
+        const h = J(A, 'head'), bx = h[0] + d * (14 * k) - d * rowX, by = h[1] + 2 * k;
+        g.save(); g.translate(bx, by); R.line(g, -13 * k, 0, 13 * k, 0, '#ece4d0', 3.4 * k); for (const e of [-13, 13]) { R.ball(g, e * k, -1.6 * k, 2.4 * k, '#ece4d0'); R.ball(g, e * k, 1.6 * k, 2.4 * k, '#ece4d0'); }
+        g.fillStyle = 'rgba(140,0,10,0.8)'; for (let i = 0; i < 4; i++) g.fillRect(-10 * k + i * 6 * k, -1.6 * k, 2.4 * k, 1.6 * k); g.restore();
       }
     } });
-    s.at(2.1, () => {
-      api.bubble('TIMBER!', A.x, F - 100, { size: 16, fill: 'gold', life: 1.6 }); api.sfx('crunch');
-      V.ro.cutAnkles = true; feetX = V.x;
-      const fc = V.def.col.foot, d = V.d;
-      prop({ layer: 'back', draw(g) {
-        for (const o of [-d.footL * 0.15, d.footL * 0.45]) {
-          const x = feetX + o * V.face;
-          R.cap(g, [x - V.face * 2, F - 3], [x + V.face * d.footL * 0.6, F - 2], d.footH * 0.8, d.footH * 0.6, fc);
-          R.cap(g, [x, F - 10], [x, F - 3], d.ankleR, d.ankleR, V.def.col.legL || V.def.col.legU);
-          R.ball(g, x, F - 10, d.ankleR * 0.9, '#8a0010'); R.ball(g, x, F - 10.5, d.ankleR * 0.35, '#e8e0d0');
-        }
-      } });
+    s.at(0.5, () => { mound = 0; A.hidden = true; api.sfx('thud'); FX.dust(A.x, F, 18); hx = V.x; });
+    s.at(1.15, () => { mound = -1; hole = 0.01; api.sfx('crunch'); api.shake(6); FX.dust(hx, F, 30); });
+    s.at(1.4, () => { api.sfx('scream'); });
+    s.at(2.6, () => { V.hidden = true; });
+    for (let i = 0; i < 12; i++) s.at(2.4 + i * 0.16, () => {
+      const kind = ['bone', 'bone', 'chunk', 'bone', 'tooth', 'bone', 'guts', 'bone', 'skullfrag', 'bone', 'bone', 'bone'][i];
+      FX.gib(kind, hx + rnd(-6, 6), F - 4, (Math.random() < 0.5 ? d : -d) * rnd(20, 130), rnd(-620, -380)); FX.blood(hx, F - 2, 10, d, 1.3, 1.4);
+      api.sfx(i % 2 ? 'crunch' : 'squish'); if (kind === 'bone') pile++;
     });
-    s.at(2.9, () => { api.sfx('thud'); api.shake(7); const hh = api.hurtH(V); FX.blood(V.x - V.face * hh * 0.8, F - 4, 40, 0, 1); FX.dust(V.x - V.face * hh * 0.5, F, 16); });
-    s.at(3.5, () => {
-      V.hidden = true; api.sfx('crunch'); api.sfx('splat');
-      const hh = api.hurtH(V), cx = V.x - V.face * hh * 0.5;
-      const bones = [];
-      for (let i = 0; i < 22; i++) {
-        const row = i < 9 ? 0 : i < 15 ? 1 : i < 19 ? 2 : 3, n = [9, 6, 4, 3][row], j = row === 0 ? i : row === 1 ? i - 9 : row === 2 ? i - 15 : i - 19;
-        const a = PI * (j + 0.5) / n, rad = 30 - row * 6;
-        bones.push({ x: V.x - V.face * rnd(10, hh), y: F - rnd(2, 12), tx: cx + Math.cos(a) * rad, ty: F - 3 - Math.sin(a) * (6 + row * 7) - row * 4, tr: a + PI / 2 + rnd(-0.3, 0.3), r: rnd(0, 6), t0: 3.5 + i * 0.03 });
-      }
-      lodge = prop({ layer: 'back', draw(g) {
-        for (const b of bones) { g.save(); g.translate(b.x, b.y); g.rotate(b.r); R.bone(g, [-6, 0], [6, 0], 1.5); g.restore(); }
-        if (s.t > 4.4) R.skull(g, cx, F - 6, 7 * V.d.k * (V.def.skullK || 1), 0, V.def.skull);
-      }, update() { for (const b of bones) { const u = ease((s.t - b.t0) / 0.6); b.cx = b.cx == null ? b.x : b.cx; b.cy = b.cy == null ? b.y : b.cy; b.x = lerp(b.cx, b.tx, u); b.y = lerp(b.cy, b.ty, u) - Math.sin(u * PI) * 40; b.r = lerp(b.r, b.tr, u * 0.2); } } });
-      lodge.cx = cx;
-      FX.blood(cx, F - 10, 30, 0, 0.8);
-    });
-    s.at(4.6, () => { A.x = lodge.cx; A.y = F - 32; A.snapPose = true; api.sfx('land'); });
-    s.at(4.9, () => api.bubble('HOME SWEET HOME', A.x, F - 120, { size: 12, fill: 'white', life: 1.6 }));
-    s.at(6.0, () => { s.done = true; });
+    s.at(4.4, () => { skullGib(V, hx, F - 6, d * 160, -620); api.sfx('splat'); api.shake(5); });
+    s.at(4.9, () => { A.hidden = false; A.x = hx; A.y = F + 40 * k; risen = 0.001; femur = true; api.sfx('whoosh'); FX.dust(hx, F, 20); });
+    s.at(6.2, () => api.bubble('BOOM GOES THE DYNAMITE.', A.x, F - 120, { size: 13, fill: 'gold', life: 2.2 }));
+    s.at(8.2, () => { s.done = true; });
     s.tick = (t, dt) => {
-      if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 6 * k, dt, api, 110); return; }
-      if (t < 2.1) {
-        bite = (t - 0.5) / 1.6;
-        A.ro.top = true;
-        { const hd = J(A, 'head'), tx = V.x - A.face * (V.d.ankleR + 6 * k); A.x += (tx - (hd[0] + A.face * 8 * k)) * Math.min(1, dt * 10); }
-        const sh = J(V, 'footF'), sk = J(V, 'kneeF'), sp = [lerp(sh[0], sk[0], 0.35), lerp(sh[1], sk[1], 0.35)];
-        if (Math.random() < 0.6) FX.gib(Math.random() < 0.3 ? 'bone' : 'chunk', sp[0], sp[1], -A.face * rnd(40, 160), rnd(-200, -60), { s: 0.35 });
-        if (Math.random() < 0.5) FX.blood(sp[0], sp[1], 2, -A.face, 0.6);
-        A.scriptPose = P({ hyL: 0.42, lean: 1.45 + Math.sin(t * 34) * 0.08, head: 0.35 + Math.sin(t * 28) * 0.15, jaw: Math.abs(Math.sin(t * 30)), aF: [1.0, 0.8], aB: [0.9, 0.9], fF: [10, 0], fB: [-16, 0] });
-        V.scriptPose = P({ hy: 3, lean: -0.1, head: -0.4, aF: [2.0 + Math.sin(t * 16) * 0.5, 0.4], aB: [1.8, 0.5], fF: [8, 0], fB: [-8, 0] });
-        V.ro.dx = rnd(-1, 1);
-        if (t > nextGnaw) { nextGnaw = t + 0.12; api.sfx('gnaw'); FX.blood(V.x, F - 6, 4, -A.face, 0.6); if (Math.random() < 0.5) FX.gib('bone', V.x, F - 6, rnd(-90, 90), rnd(-160, -60), { s: 0.4 }); }
+      hole = hole > 0 ? Math.min(1, hole + dt * 4) : 0;
+      if (mound >= 0) mound = Math.min(1, mound + dt * 1.6);
+      if (t < 0.5) { A.scriptPose = PS.crouch; V.scriptPose = PS.dizzy(V.t); return; }
+      if (t < 1.15) { V.scriptPose = PS.dizzy(V.t); return; }
+      if (t < 2.6) {
+        sink = Math.min(1, sink + dt * (0.35 + sink * 1.6));
+        V.y = F + sink * api.hurtH(V) * 1.15;
+        V.scriptPose = P({ hy: 4, lean: -0.2 + Math.sin(t * 20) * 0.1, head: -0.8 + Math.sin(t * 17) * 0.3, aF: [2.9 + Math.sin(t * 25) * 0.25, 0.4], aB: [2.7 + Math.cos(t * 23) * 0.25, 0.5], fF: [8, 0], fB: [-8, 0] });
+        if (Math.random() < 0.5) FX.dust(hx + rnd(-30, 30), F, 2);
         return;
       }
-      V.ro.dx = 0;
-      if (t < 2.9) { fallU = Math.min(1, ((t - 2.1) / 0.8) ** 2); A.scriptPose = PS.stance(A.t); V.scriptPose = P({ rot: -PI / 2 * fallU, piv: 1, hy: 0, lean: 0, aF: [2.5, 0.2], aB: [2.3, 0.3], fF: [6, 0], fB: [-6, 0] }); return; }
-      if (t < 4.6) { A.scriptPose = PS.stance(A.t); V.scriptPose = P({ rot: -PI / 2, piv: 1, hy: 0, aF: [2.5, 0.2], aB: [2.3, 0.3], fF: [6, 0], fB: [-6, 0] }); return; }
-      A.scriptPose = PS.win(A.t);
+      if (risen > 0) {
+        risen = Math.min(1, risen + dt * 3); A.y = lerp(F + 40 * k, F, ease(risen));
+        chew += dt;
+        // typewriter: the bone slides across her teeth one bite at a time, then carriage-returns
+        const ROW = 1.0, ph = (chew % ROW) / ROW;
+        rowX = ph < 0.85 ? Math.floor(ph / 0.85 * 7) * 3.4 * k - 10 * k : lerp(14 * k, -10 * k, (ph - 0.85) / 0.15);
+        if (Math.abs(chew % ROW - ROW * 0.85) < dt) api.sfx('ding');
+        if (Math.random() < 0.25) { api.sfx('crunch'); const h = J(A, 'head'); FX.gib('chunk', h[0] + d * 14 * k, h[1], -d * rnd(20, 90), rnd(-160, -40), { s: 0.3 }); }
+        A.scriptPose = P({ hy: 4, lean: 0.15, head: 0.15, jaw: Math.abs(Math.sin(chew * 22)), aF: [1.55, 1.75], aB: [1.45, 1.85], fF: [12, 0], fB: [-12, 0] });
+      }
     };
   };
 
