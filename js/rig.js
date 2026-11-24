@@ -269,7 +269,7 @@ const RIG = (() => {
     if (!o.cutAnkles) foot(g, d, def, L, dark);
     const end = o.cutAnkles ? lerp2(L.knee, L.ank, 0.88) : L.ank;
     seg(g, L.knee, end, d.kneeR, d.ankleR, c.legL || c.legU, ms.legL || ms.legU || 'skin', { bb: (def.calf != null ? def.calf : 0.35), bf: 0.05, bpos: 0.3, seed: sd + 1, dark });
-    if (def.sock && !o.cutAnkles) seg(g, lerp2(L.knee, L.ank, 0.5), L.ank, d.ankleR * 1.1, d.ankleR * 1.05, def.sock, 'cloth', { seed: sd + 2, dark });
+    if (def.sock && !o.cutAnkles) seg(g, lerp2(L.knee, L.ank, def.sockLow ? 0.84 : 0.5), L.ank, d.ankleR * 1.1, d.ankleR * 1.05, def.sock, 'cloth', { seed: sd + 2, dark });
     if (o.cutAnkles) { ball(g, end[0], end[1], d.ankleR * 0.9, '#8a0010'); ball(g, end[0], end[1], d.ankleR * 0.35, '#e8e0d0'); }
     seg(g, L.h, L.knee, d.thighR, d.kneeR, c.legU, ms.legU || 'skin', { bf: 0.22, bb: 0.12, bpos: 0.4, seed: sd + 3, dark });
     if (def.stripe) { const a = lerp2(L.h, L.knee, 0.05), b = lerp2(L.h, L.knee, 0.92); line(g, a[0], a[1], b[0], b[1], shade(def.stripe, dark ? -0.3 : 0), 1.4); }
@@ -386,7 +386,7 @@ const RIG = (() => {
     const sx = o.sx == null ? 1 : o.sx;
     g.save(); g.translate(f.x, f.y); g.scale(sx, 1); if (fp.sway) g.rotate(fp.sway);
     const Lg = (d.thigh + d.shin) * 0.96, sq = (fp.squat || 0) * k, hipY = -Lg + sq + (fp.hy || 0) * k, hx = d.hipW * 0.55;
-    const sY = hipY - d.torso, nY = sY - d.neck * 0.7 - 2 * k, shx = Math.max(d.shW, d.chest * 0.8);
+    const sY = hipY - d.torso, nY = sY - (Fd.neck != null ? Fd.neck * k : d.neck * 0.2 - 1.5 * k), shx = Math.max(d.shW, d.chest * 0.8);
     const legs = [-1, 1].map(sd => { const hip = [sd * hx, hipY], foot = [sd * (hx + (fp.spread ?? 4) * k), -d.footH * 0.4 - (sd < 0 ? fp.liftL || 0 : fp.liftR || 0) * k]; return { sd, hip, foot, knee: [(hip[0] + foot[0]) / 2 + sd * sq * 0.6, (hip[1] + foot[1]) / 2] }; });
     const armPts = (sd, a) => { const s0 = [sd * shx * 0.95, sY + d.shR * 0.6], el = [s0[0] + sd * Math.sin(a[0]) * d.upper, s0[1] + Math.cos(a[0]) * d.upper], b = a[0] + a[1], wr = [el[0] + sd * Math.sin(b) * d.fore, el[1] + Math.cos(b) * d.fore]; return { sd, s0, el, wr }; };
     const arms = { L: armPts(-1, fp.aL || [0.25, 0.1]), R: armPts(1, fp.aR || [0.25, 0.1]) };
@@ -396,7 +396,7 @@ const RIG = (() => {
     else {
       for (const L of legs) {
         seg(g, L.knee, L.foot, d.kneeR, d.ankleR, c.legL || c.legU, ms.legL || ms.legU || 'skin', { seed: 60 + L.sd, bb: 0.2 });
-        if (def.sock) seg(g, lerp2(L.knee, L.foot, 0.5), L.foot, d.ankleR * 1.1, d.ankleR * 1.05, def.sock, 'cloth', { seed: 62 });
+        if (def.sock) seg(g, lerp2(L.knee, L.foot, def.sockLow ? 0.84 : 0.5), L.foot, d.ankleR * 1.1, d.ankleR * 1.05, def.sock, 'cloth', { seed: 62 });
         seg(g, L.hip, L.knee, d.thighR, d.kneeR, c.legU, ms.legU || 'skin', { seed: 64 + L.sd, bf: 0.1 });
         if (def.stripe) { const a = lerp2(L.hip, L.knee, 0.05), b = lerp2(L.hip, L.knee, 0.9); line(g, a[0] - L.sd * d.thighR * 0.8, a[1], b[0] - L.sd * d.kneeR * 0.8, b[1], def.stripe, 1.2); }
         // feet point at the camera
@@ -484,7 +484,6 @@ const RIG = (() => {
         r = l + (r - l) * sat; gg = l + (gg - l) * sat; b = l + (b - l) * sat;
         const n = DNOISE[ny + xx] + (BAYER[((yy + by0) & 3) * 4 + ((xx + bx0) & 3)] - 7.5) * (step / 16);
         r = (r - 120) * con + 116 + n; gg = (gg - 120) * con + 114 + n; b = (b - 120) * con + 112 + n;
-        if (tint) { r = r * tint[0]; gg = gg * tint[1]; b = b * tint[2]; }
         dd[i] = Math.round(r / step) * step; dd[i + 1] = Math.round(gg / step) * step; dd[i + 2] = Math.round(b / step) * step;
       }
     }
@@ -496,6 +495,7 @@ const RIG = (() => {
       if (up || side) { const k = up ? 0.55 : 0.4; dd[i] += (190 - dd[i]) * k; dd[i + 1] += (198 - dd[i + 1]) * k; dd[i + 2] += (220 - dd[i + 2]) * k; }
       else if (down) { dd[i] *= 0.5; dd[i + 1] *= 0.5; dd[i + 2] *= 0.5; }
     }
+    if (tint) for (let i = 0; i < dd.length; i += 4) if (dd[i + 3]) { dd[i] *= tint[0]; dd[i + 1] *= tint[1]; dd[i + 2] *= tint[2]; }
     dg.putImageData(img, bx0, by0);
     g.drawImage(dcv, Math.round(x) - DAX, Math.round(y) - DAY);
   }

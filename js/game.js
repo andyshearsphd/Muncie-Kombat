@@ -265,8 +265,8 @@
   }
   function winText(a) {
     const flawless = a.dmgTaken <= 0;
-    setTimeout(() => { banner(a.def.name + ' WINS', { size: 26, fill: 'gold', life: 3.0, y: 74, hold: 0.9, dock: { y: 36, size: 15 } }); say(a.def.name.replace("'", 'g').toLowerCase() + ' wins'); }, 700);
-    if (flawless) setTimeout(() => { banner('FLAWLESS VICTORY', { size: 13, fill: 'fire', y: 53, life: 2.2 }); say('flawless victory'); }, 2000);
+    setTimeout(() => { banner(a.def.name + ' WINS', { size: 24, fill: 'gold', life: 3.0, y: 40, hold: 0.8, dock: { y: 34, size: 15 } }); say(a.def.name.replace("'", 'g').toLowerCase() + ' wins'); }, 700);
+    if (flawless) setTimeout(() => { banner('FLAWLESS VICTORY', { size: 12, fill: 'fire', y: 52, life: 2.2 }); say('flawless victory'); }, 2000);
   }
   function finishBlow(a, v, mv) {
     // stage fatality: uppercut off the trestle
@@ -317,7 +317,7 @@
     p1 = newFighter(ROSTER.FIGHTERS[ladder.pick], 0);
     p2 = newFighter(oppDef, 1);
     const lv = ladder.rung / Math.max(1, ladder.opps.length - 1);
-    p2.cpu.lvl = oppDef.id === 'tinkle' ? 0.02 : mode === 'single' ? (oppDef.boss ? 0.6 : 0.38) : oppDef.boss ? 0.55 + lv * 0.2 : 0.12 + lv * 0.5;
+    p2.cpu.lvl = oppDef.id === 'tinkle' ? 0.34 : mode === 'single' ? (oppDef.boss ? 0.6 : 0.38) : oppDef.boss ? 0.55 + lv * 0.2 : 0.12 + lv * 0.5;
     stage = STAGES.get(ladder.stages[ladder.rung]);
     game.round = 1;
     screen = 'play'; paused = false;
@@ -524,7 +524,7 @@
       if (r < 0.8 && dist < 50) { out.tok = 'F'; out.P = true; return out; }
       c.blockT = 0.35; out.B = true; return out;
     }
-    if (f.def.id === 'tinkle' && Math.random() < 0.6) { c.blockT = 0; if (Math.random() < 0.02) game.bubbles.push({ str: pick(['STOP RESISTING!', 'HEY! HEY!', 'I NEED BACKUP!', 'THAT HURT!', 'IS THIS ON CAMERA?']), x: f.x, y: f.y - hurtH(f) - 12, t: 0, life: 1.2, size: 10, fill: 'white' }); return out; }
+    if (f.def.id === 'tinkle') { c.blockT = 0; if (Math.random() < 0.003) game.bubbles.push({ str: pick(['STOP RESISTING!', 'ON THE GROUND!', 'I AM THE LAW!', 'GET SOME!']), x: f.x, y: f.y - hurtH(f) - 12, t: 0, life: 1.1, size: 10, fill: 'white' }); }
     c.t -= dt;
     if (c.walk) out.tok = c.walk > 0 ? 'F' : 'B';
     if (c.t > 0) return out;
@@ -848,7 +848,7 @@
       case 'knife': g.rotate(t * 22 * s); R.poly(g, [[-8, -1.5], [8, 0], [-8, 1.5]], '#d8dce4'); g.fillStyle = '#6a4a2a'; g.fillRect(-11, -1.6, 4, 3.2); break;
       case 'hairball': g.rotate(t * 8); R.ball(g, 0, 0, 6, '#7a7a52'); for (let i = 0; i < 10; i++) R.line(g, 0, 0, Math.cos(i) * 8, Math.sin(i * 1.3) * 8, '#5a5a3a', 0.8); g.fillStyle = 'rgba(150,200,60,0.7)'; g.fillRect(-2, 3, 3, 4); break;
       case 'card': g.rotate(t * 16 * s); g.fillStyle = '#f4f2e8'; g.fillRect(-7, -4.5, 14, 9); g.fillStyle = '#2a3a8a'; for (let i = 0; i < 3; i++) g.fillRect(-5, -2.5 + i * 2.5, 10, 0.8); break;
-      case 'bball': g.rotate(t * 12 * s); R.ball(g, 0, 0, 6.5, '#e0701a'); R.line(g, -6.5, 0, 6.5, 0, '#2a1004', 0.8); R.line(g, 0, -6.5, 0, 6.5, '#2a1004', 0.8); break;
+      case 'bball': g.rotate(t * 12 * s); R.ball(g, 0, 0, 10, '#e0701a'); R.line(g, -10, 0, 10, 0, '#2a1004', 1.1); R.line(g, 0, -10, 0, 10, '#2a1004', 1.1); g.strokeStyle = '#2a1004'; g.lineWidth = 0.9; g.beginPath(); g.arc(-13, 0, 10, -0.8, 0.8); g.stroke(); g.beginPath(); g.arc(13, 0, 10, PI - 0.8, PI + 0.8); g.stroke(); break;
       case 'gust': for (let i = 0; i < 3; i++) { g.strokeStyle = `rgba(220,240,255,${0.7 - i * 0.2})`; g.lineWidth = 2; g.beginPath(); g.arc(-s * i * 6, 0, 8 + i * 3 + Math.sin(t * 20) * 2, s > 0 ? -1 : PI - 1, s > 0 ? 1 : PI + 1); g.stroke(); } break;
       case 'can': g.rotate(t * 10 * s); g.fillStyle = '#8a8a90'; g.fillRect(-7, -8, 14, 16); g.fillStyle = '#b0b0b8'; g.fillRect(-7, -8, 14, 2); for (let i = -5; i < 7; i += 3) g.fillRect(i, -6, 0.8, 13); g.fillStyle = '#5a4a2a'; g.fillRect(-4, -11, 7, 3); break;
       case 'wave': g.fillStyle = 'rgba(100,160,210,0.85)'; g.beginPath(); g.moveTo(-14 * s, 8); g.quadraticCurveTo(0, -12 - Math.sin(t * 18) * 3, 14 * s, 8); g.fill(); g.fillStyle = 'rgba(230,245,255,0.8)'; g.fillRect(-3, -4, 6, 2); break;
@@ -881,7 +881,7 @@
         if (once(f, 'glass', t, 1.0)) { SFX.shatter(); game.flash = 0.06; } },
       draw(g, f, t) { if (t < 0.6) { const h = fj(f, 'handR'); g.fillStyle = '#e8c020'; g.fillRect(h[0] - 1, h[1] - 10, 1.8, 10); } } },
     ballin: { fp: t => ({ aR: [2.98, 0.04], aL: t > 1.2 ? [0.45, -2.5] : [0.5, -1.4] }),
-      draw(g, f, t) { const h = fj(f, 'handR'); g.save(); g.translate(h[0], h[1] - 9); g.rotate(t * 16); R.ball(g, 0, 0, 7, '#e0701a'); R.line(g, -7, 0, 7, 0, '#2a1004', 0.9); R.line(g, 0, -7, 0, 7, '#2a1004', 0.9); g.restore(); } },
+      draw(g, f, t) { const h = fj(f, 'handR'); g.save(); g.translate(h[0], h[1] - 13); g.rotate(t * 16); R.ball(g, 0, 0, 11, '#e0701a'); R.line(g, -11, 0, 11, 0, '#2a1004', 1.2); R.line(g, 0, -11, 0, 11, '#2a1004', 1.2); g.strokeStyle = '#2a1004'; g.lineWidth = 1; g.beginPath(); g.arc(-14, 0, 11, -0.8, 0.8); g.stroke(); g.beginPath(); g.arc(14, 0, 11, PI - 0.8, PI + 0.8); g.stroke(); g.restore(); } },
     gertie: { fp: t => ({ jaw: Math.sin(t * 5) > 0 ? 0.9 : 0.1, aL: [1.9 + Math.sin(t * 14) * 0.4, 0.3], aR: [1.9 + Math.sin(t * 14) * 0.4, 0.3], head: Math.sin(t * 3) * 0.15 }),
       fx(f, t) { if (once(f, 'h1', t, 0.1) || once(f, 'h2', t, 0.8) || once(f, 'h3', t, 1.6)) SFX.honk(); } },
     rocky: { fp: t => ({ jaw: 0.4 + Math.abs(Math.sin(t * 7)) * 0.3, aL: [0.35, -1.9 + Math.sin(t * 20) * 0.18], aR: [0.35, -1.9 - Math.sin(t * 20) * 0.18], squat: 4 }),
@@ -910,12 +910,12 @@
   };
   function once2(t) { return Math.sin(t * 5) > 0.8 ? 0.6 : 0; }
   // victory poses turn to face the camera: a quick squash out of profile, then the front view
-  const TURN = 0.17;
+  const TURN = 0.12;
   function fj(f, name) { if (f.fj && f.fj[name]) return f.fj[name]; return R.jointWorld(f, f.pose, { handR: 'handFx', handL: 'handBx' }[name] || name); }
   function winT(f) { return f.t - (f.winAt ?? f.t); }
   function winPose(f) { return PS.win(f.t); }
   function frontPose(f, t) { const w = WIN[f.def.id]; return w && w.fp ? w.fp(t) : { aL: [2.7, 0.3], aR: [2.7, 0.3] }; }
-  function winFx(f) { if (!f.wf) f.wf = {}; const w = WIN[f.def.id], t = winT(f) - TURN * 2; if (w && w.fx && t >= 0 && f.fj) w.fx(f, t); }
+  function winFx(f) { if (!f.wf) f.wf = {}; const w = WIN[f.def.id], t = winT(f) - 0.3; if (w && w.fx && t >= 0 && f.fj) w.fx(f, t); }
 
   // ---------- pose + camera ----------
   function targetPose(f) {
@@ -990,7 +990,8 @@
     if (game.phase === 'fatality') { zoom = 1; camDY = 0; return; }
     const w = game.winner;
     if (w && w.state === 'win' && ['roundend', 'matchend', 'fatalend'].includes(game.phase)) {
-      zoom += (1.18 - zoom) * Math.min(1, dt * 2.5); camDY += (14 - camDY) * Math.min(1, dt * 2.5);
+      const topW = w.y - hurtH(w) * 1.32, zt = clamp((FLOOR + 14 - 72) / Math.max(1, FLOOR - topW), 0.8, 1.18);
+      zoom += (zt - zoom) * Math.min(1, dt * 2.5); camDY += (14 - camDY) * Math.min(1, dt * 2.5);
       const tc = clamp(w.x - VW() / 2, 0, AW - VW());
       cam += (tc - cam) * Math.min(1, dt * 3);
       p1.px = p1.x; p2.px = p2.x;
@@ -1096,9 +1097,9 @@
     game.phase = 'fatalend'; game.pt = 0;
     if (game.loser.bossDie) { winText(w); setWin(w); return; }
     setWin(w); w.scriptPose = null;
-    banner('FATALITY', { size: 38, fill: 'blood', life: 4.4, y: 76, drip: 1, blood: 1, hold: 1.3, dock: { y: 40, size: 21 } });
+    banner('FATALITY', { size: 32, fill: 'blood', life: 4.4, y: 44, drip: 1, blood: 1, hold: 1.3, dock: { y: 36, size: 19 } });
     say('fatality');
-    setTimeout(() => { banner(w.def.name + ' WINS', { size: 20, fill: 'gold', life: 3.1, y: 110, hold: 0.8, dock: { y: 64, size: 13 } }); }, 1300);
+    setTimeout(() => { banner(w.def.name + ' WINS', { size: 13, fill: 'gold', life: 3.1, y: 60 }); }, 1300);
   }
   function endMatch() {
     const won = game.winner === p1;
@@ -1139,14 +1140,16 @@
     const fx = f.x + (f.ro.dx || 0), fy = f.y + (f.ro.dy || 0);
     const spun = f.state === 'attack' && f.move === MV.round && f.mt > 0.05 && f.mt < 0.13;
     const wt = f.state === 'win' && f.def.front ? winT(f) : -1;
+    // the turn: a little hop, a snap to face the camera, and a motion smear over the switch
+    const hop = wt >= 0 && wt < 0.34 ? -Math.sin(wt / 0.34 * PI) * 9 * f.d.k : 0;
     if (wt >= TURN) {
-      // facing the camera
-      const sx = Math.min(1, (wt - TURN) / TURN);
-      R.digi(g, fx, fy, gg => { f.fj = R.drawFront(gg, { def: f.def, d: f.d, x: fx, y: fy, t: f.t, st: f.st2 }, frontPose(f, Math.max(0, wt - TURN * 2)), Object.assign({}, ro, { sx: Math.max(0.05, sx) })); }, { box: [20, 0, 340, 330] });
+      const fp = frontPose(f, Math.max(0, wt - 0.3)), drawF = (gg, ox) => R.drawFront(gg, { def: f.def, d: f.d, x: fx + ox, y: fy + hop, t: f.t, st: f.st2 }, fp, ro);
+      const sm = wt < 0.3 ? 1 - (wt - TURN) / (0.3 - TURN) : 0;
+      if (sm > 0) { const sd = -f.face; for (const [ox, a] of [[14, 0.18], [7, 0.3]]) { g.globalAlpha = a * sm; R.digi(g, fx + sd * ox, fy + hop, gg => drawF(gg, sd * ox), { box: [20, 0, 340, 330] }); } g.globalAlpha = 1; }
+      R.digi(g, fx, fy + hop, gg => { f.fj = drawF(gg, 0); }, { box: [20, 0, 340, 330] });
     } else {
       f.fj = null;
-      const sq = wt >= 0 ? Math.max(0.05, 1 - wt / TURN) : 1;
-      R.digi(g, fx, fy, gg => { if (sq < 1) { gg.translate(fx, 0); gg.scale(sq, 1); gg.translate(-fx, 0); } R.draw(gg, { def: f.def, d: f.d, x: fx, y: fy, face: spun ? -f.face : f.face, t: f.t, st: f.st2 }, f.pose, ro); }, { box: [50, 20, 280, 310], tint: f.ro.char ? [0.45, 0.35, 0.3] : null });
+      R.digi(g, fx, fy + hop, gg => R.draw(gg, { def: f.def, d: f.d, x: fx, y: fy + hop, face: spun ? -f.face : f.face, t: f.t, st: f.st2 }, f.pose, ro), { box: [50, 20, 280, 310], tint: f.ro.ash ? [0.3, 0.3, 0.32] : f.ro.char ? [0.45, 0.35, 0.3] : null });
     }
     // the wounded keep bleeding
     if (!f.hidden && f.hp < 70 && Math.random() < (1 - f.hp / 70) * 0.25 && f.state !== 'script') { const hp = R.jointWorld(f, f.pose, Math.random() < 0.5 ? 'head' : 'chest'); FX.blood(hp[0], hp[1], 1, 0, 0.15); }
@@ -1155,7 +1158,7 @@
       g.fillStyle = 'rgba(255,255,255,0.9)'; for (let i = 0; i < 10; i++) g.fillRect(hp[0] + f.face * (2 + (i * 3.7) % 10) * f.d.k, hp[1] - 12 + (i * 5.3) % 9, 1.4, 1.4);
       g.fillStyle = 'rgba(200,0,20,0.8)'; g.fillRect(hp[0] + f.face * 8 * f.d.k, hp[1] - 9, 1.2, 4 + Math.sin(f.t * 6) * 2);
     }
-    if (f.state === 'win' && f.fj && WIN[f.def.id] && WIN[f.def.id].draw) WIN[f.def.id].draw(g, f, winT(f) - TURN * 2);
+    if (f.state === 'win' && f.fj && WIN[f.def.id] && WIN[f.def.id].draw) WIN[f.def.id].draw(g, f, winT(f) - 0.3);
     if (f.state === 'dizzy' || (f.state === 'hit' && f.daze)) {
       const hp = R.jointWorld(f, f.pose, 'head');
       for (let i = 0; i < 3; i++) { const a = f.t * 4 + i * 2.1; g.fillStyle = '#ffe040'; g.font = '9px Anton, Impact, sans-serif'; g.fillText('*', hp[0] + Math.cos(a) * 12 - 2, hp[1] - 12 + Math.sin(a) * 3); }
@@ -1191,7 +1194,7 @@
     if (game.phase === 'fatality') { g.fillStyle = 'rgba(0,0,0,0.45)'; g.fillRect(cam - 10, -200, VW() + 20, H + 300); }
     FX.drawDecals(g);
     FX.drawProps(g, 'back');
-    const order = [p1, p2].sort((a, b) => (a.state === 'attack' ? 1 : 0) - (b.state === 'attack' ? 1 : 0));
+    const rk = f => (f.ro.top ? 2 : 0) + (f.state === 'attack' ? 1 : 0), order = [p1, p2].sort((a, b) => rk(a) - rk(b));
     for (const f of order) drawFighter(g, f);
     FX.drawGibs(g);
     for (const p of projs) drawProj(g, p);
@@ -1248,11 +1251,33 @@
   }
 
   // ---------- screens ----------
+  // menu buttons: curved slabs of cracked stone with the lettering cut into them
+  let stonePat = null;
+  function stone() {
+    if (stonePat) return stonePat;
+    const c = document.createElement('canvas'); c.width = c.height = 96; const s = c.getContext('2d');
+    s.fillStyle = '#6a625a'; s.fillRect(0, 0, 96, 96);
+    let sd = 7; const r = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+    for (let i = 0; i < 900; i++) { s.fillStyle = r() < 0.5 ? `rgba(255,245,230,${r() * 0.12})` : `rgba(0,0,0,${r() * 0.18})`; s.fillRect(r() * 96, r() * 96, 1 + r() * 2, 1 + r() * 2); }
+    for (let i = 0; i < 14; i++) { s.fillStyle = `rgba(${r() < 0.5 ? '90,70,50' : '40,40,44'},0.15)`; s.beginPath(); s.ellipse(r() * 96, r() * 96, 6 + r() * 14, 4 + r() * 8, r() * 3, 0, Math.PI * 2); s.fill(); }
+    return (stonePat = ctx.createPattern(c, 'repeat'));
+  }
   function uiButton(label, x, y, w, h, fn, fill = 'gold', size = 16) {
-    const g = ctx;
-    g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillRect(x, y, w, h);
-    g.strokeStyle = '#c8a030'; g.lineWidth = 1.5; g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
-    TXT.draw(g, label, x + w / 2, y + h / 2 - size * 0.62, { size, align: 'center', fill });
+    const g = ctx, r = Math.min(h * 0.5, 12), bow = Math.min(4, h * 0.14);
+    const slab = (ox, oy) => { g.beginPath(); g.moveTo(x + ox + r, y + oy + bow); g.quadraticCurveTo(x + ox + w / 2, y + oy - bow, x + ox + w - r, y + oy + bow); g.quadraticCurveTo(x + ox + w, y + oy + bow, x + ox + w, y + oy + r + bow); g.lineTo(x + ox + w, y + oy + h - r); g.quadraticCurveTo(x + ox + w, y + oy + h, x + ox + w - r, y + oy + h); g.lineTo(x + ox + r, y + oy + h); g.quadraticCurveTo(x + ox, y + oy + h, x + ox, y + oy + h - r); g.lineTo(x + ox, y + oy + r + bow); g.quadraticCurveTo(x + ox, y + oy + bow, x + ox + r, y + oy + bow); g.closePath(); };
+    g.save();
+    slab(2, 3); g.fillStyle = 'rgba(0,0,0,0.6)'; g.fill();
+    slab(0, 0); g.fillStyle = stone(); g.fill();
+    const sh = g.createLinearGradient(0, y, 0, y + h); sh.addColorStop(0, 'rgba(255,240,220,0.22)'); sh.addColorStop(0.45, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(0,0,0,0.45)'); g.fillStyle = sh; g.fill();
+    g.clip();
+    g.strokeStyle = 'rgba(20,14,10,0.55)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(x + w * 0.78, y); g.lineTo(x + w * 0.72, y + h * 0.4); g.lineTo(x + w * 0.8, y + h * 0.65); g.lineTo(x + w * 0.76, y + h); g.stroke();
+    g.restore();
+    slab(0, 0); g.strokeStyle = 'rgba(255,235,210,0.35)'; g.lineWidth = 1; g.stroke();
+    // lettering cut in: dark groove, light catching the lower lip, then the color
+    const tx = x + w / 2, ty = y + h / 2 - size * 0.62 + bow * 0.3;
+    TXT.draw(g, label, tx + 0.8, ty + 0.9, { size, align: 'center', fill: 'rgba(255,240,220,0.4)', shadow: false, italic: false, stroke: null });
+    TXT.draw(g, label, tx - 0.6, ty - 0.7, { size, align: 'center', fill: '#140c08', shadow: false, italic: false, stroke: null });
+    TXT.draw(g, label, tx, ty, { size, align: 'center', fill: fill === 'fire' ? 'blood' : fill, shadow: false, italic: false, stroke: null });
     ui.push({ x, y, w, h, fn });
   }
   function bgDark(t) {
@@ -1295,7 +1320,7 @@
     bgDark(); ui = [];
     const t = game.time, g = ctx;
     TXT.draw(g, 'CHOOSE YOUR FIGHTER', W / 2, 6, { size: 20, align: 'center', fill: 'gold' });
-    const cw = 44, chh = 40, gx = 154, gy = 30, NC = 4, cx = (gx + W - 92) / 2;
+    const cw = 44, chh = 40, NC = 4, gw = NC * (cw + 4) - 4, gx = Math.round(150 + (W - 150 - gw) / 2), gy = 30, cx = gx + gw / 2;
     ROSTER.FIGHTERS.forEach((def, i) => {
       const x = gx + (i % NC) * (cw + 4), y = gy + ((i / NC) | 0) * (chh + 4);
       portrait(g, def, x, y, cw, chh, i === sel.i, t);
@@ -1312,7 +1337,7 @@
     g.fillStyle = 'rgba(0,0,0,0.55)'; g.beginPath(); g.ellipse(70, 206, 28, 4, 0, 0, PI * 2); g.fill();
     R.digi(g, f.x, f.y, gg => R.draw(gg, f, PS.stance(t), {}));
     TXT.draw(g, def.name, cx, gy + 3 * (chh + 4), { size: 15, align: 'center', fill: 'fire' });
-    bio(g, def.bio, cx, gy + 3 * (chh + 4) + 20, W - 92 - gx - 4, 3);
+    bio(g, def.bio, cx, gy + 3 * (chh + 4) + 20, Math.min(gw, 2 * (W - 92 - cx) - 6), 3);
     uiButton('FIGHT', W - 86, H - 36, 76, 28, confirmPick, 'fire', 18);
     uiButton('MOVES', W - 86, H - 70, 76, 26, () => { screen = 'moves'; movesBack = 'select'; SFX.blip(); }, 'gold', 14);
     grit();
@@ -1328,14 +1353,14 @@
     newLadder(); screen = 'ladder'; game.pt = 0;
   }
   // ---------- single match: pick the opponent, then the arena ----------
-  const OPPS = () => ROSTER.FIGHTERS.concat(ROSTER.BOSSES);
+  const OPPS = () => ROSTER.FIGHTERS.concat(ROSTER.BOSSES.filter(b => b.id !== 'dan'));
   const ARENAS = () => STAGES.ROTATION.concat(['glassworks', 'rental']);
   function renderOpp() {
     elControls.classList.remove('on'); elPause.classList.remove('on');
     bgDark(); ui = [];
     const t = game.time, g = ctx, list = OPPS();
     TXT.draw(g, 'CHOOSE YOUR OPPONENT', W / 2, 6, { size: 20, align: 'center', fill: 'gold' });
-    const cw = 38, chh = 38, gx = 154, gy = 30, NC = 5;
+    const cw = 38, chh = 38, NC = 5, gw = NC * (cw + 4) - 4, gx = Math.round(150 + (W - 150 - gw) / 2), gy = 30;
     list.forEach((def, i) => {
       const x = gx + (i % NC) * (cw + 4), y = gy + ((i / NC) | 0) * (chh + 4);
       portrait(g, def, x, y, cw, chh, i === sel.o, t);
@@ -1347,9 +1372,9 @@
     g.fillStyle = sp; g.fillRect(0, 10, 150, 210);
     g.fillStyle = '#5a4a3a'; g.beginPath(); g.ellipse(70, 205, 50, 7, 0, 0, PI * 2); g.fill();
     R.digi(g, 70, 206, gg => R.draw(gg, { def, d: def.dk, x: 70, y: 206, face: 1, t }, PS.stance(t), {}));
-    const cx = (gx + W - 92) / 2;
+    const cx = gx + gw / 2;
     TXT.draw(g, def.name, cx, gy + 3 * (chh + 4) + 2, { size: 15, align: 'center', fill: 'fire' });
-    bio(g, def.bio, cx, gy + 3 * (chh + 4) + 22, W - 92 - gx - 4, 3);
+    bio(g, def.bio, cx, gy + 3 * (chh + 4) + 22, Math.min(gw, 2 * (W - 92 - cx) - 6), 3);
     uiButton('NEXT', W - 86, H - 36, 76, 28, () => { screen = 'arena'; SFX.gong(); }, 'fire', 18);
     uiButton('RANDOM', W - 86, H - 70, 76, 26, () => { sel.o = (Math.random() * list.length) | 0; SFX.select(); }, 'gold', 13);
     uiButton('BACK', 6, H - 26, 56, 20, () => { screen = 'select'; SFX.blip(); }, 'gold', 11);

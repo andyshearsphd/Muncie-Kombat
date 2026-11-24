@@ -945,19 +945,30 @@ const STAGES = (() => {
     g.fillStyle = '#0a0a0c'; g.fillRect(W * 0.7, 120, 2, 82); R.ball(g, W * 0.7 + 1, 118, 3, '#2a0a0a'); glow(g, W * 0.7 + 1, 118, 8, 'rgba(255,30,20,0.9)', 0.9);
   }
   function drawTrain(g, x, y) {
-    // locomotive facing left, then boxcars
-    g.fillStyle = '#1a1a1e'; g.fillRect(x, y - 52, 130, 46);
-    g.fillStyle = '#d8a020'; g.fillRect(x, y - 30, 130, 6);
-    g.fillStyle = '#2a2a30'; g.fillRect(x + 6, y - 66, 34, 16);
-    g.fillStyle = '#e8e8b0'; g.fillRect(x + 10, y - 62, 10, 7);
-    R.ball(g, x + 3, y - 40, 4, '#fff8d0');
-    g.fillStyle = '#0a0a0a'; for (let i = 0; i < 4; i++) R.ball(g, x + 16 + i * 30, y - 4, 6, '#2a2a2e');
+    // a big black six-axle road diesel leading a string of hoppers and boxcars
+    const LH = 112, LL = 230;
+    g.fillStyle = '#121214'; g.fillRect(x, y - 30, LL, 16);
+    for (const tx of [x + 22, x + LL - 74]) { g.fillStyle = '#1a1a1c'; g.fillRect(tx, y - 18, 56, 12); for (let i = 0; i < 3; i++) R.ball(g, tx + 9 + i * 19, y - 5, 7.5, '#2a2a2e'); }
+    g.fillStyle = '#101012'; g.fillRect(x + 4, y - LH + 22, LL - 10, LH - 52);
+    g.fillStyle = '#0c0c0e'; g.beginPath(); g.moveTo(x, y - 30); g.lineTo(x, y - 74); g.lineTo(x + 8, y - LH + 6); g.lineTo(x + 48, y - LH + 6); g.lineTo(x + 52, y - 74); g.lineTo(x + 52, y - 30); g.fill();
+    g.fillStyle = '#9ab0c0'; g.fillRect(x + 8, y - LH + 14, 18, 13); g.fillRect(x + 30, y - LH + 14, 16, 13); g.fillStyle = 'rgba(255,255,255,0.4)'; g.fillRect(x + 9, y - LH + 15, 4, 11);
+    g.fillStyle = '#d8d8d8'; g.fillRect(x, y - 50, LL - 6, 4); g.fillStyle = '#8a8a8e'; g.fillRect(x + 52, y - LH + 22, LL - 58, 3);
+    g.fillStyle = '#e8e8e8'; g.font = '11px Anton, Impact, sans-serif'; g.fillText('9265', x + 64, y - 36);
+    for (let i = 0; i < 6; i++) { g.fillStyle = 'rgba(255,255,255,0.08)'; g.fillRect(x + 60 + i * 26, y - LH + 26, 1.2, LH - 58); }
+    g.fillStyle = '#1e1e22'; g.fillRect(x + LL - 60, y - LH + 14, 36, 8);
+    R.ball(g, x + 3, y - 40, 5, '#fffbe0'); R.ball(g, x + 3, y - 92, 4, '#fffbe0');
+    g.fillStyle = 'rgba(255,250,210,0.35)'; g.beginPath(); g.moveTo(x, y - 46); g.lineTo(x - 140, y - 70); g.lineTo(x - 140, y - 10); g.fill();
+    g.fillStyle = '#c8a020'; g.fillRect(x, y - 30, 52, 3);
     for (let c = 0; c < 6; c++) {
-      const cx = x + 140 + c * 120;
-      g.fillStyle = ['#5a2a1a', '#3a3a3a', '#4a1a1a'][c % 3]; g.fillRect(cx, y - 56, 112, 50);
-      g.fillStyle = 'rgba(255,255,255,0.18)'; g.fillRect(cx + 4, y - 50, 104, 2);
-      g.fillStyle = '#c8c8d0'; g.font = '9px Anton, Impact, sans-serif'; g.fillText(['CSX', 'NS', 'MUNCIE'][c % 3], cx + 30, y - 26);
-      R.ball(g, cx + 16, y - 4, 6, '#2a2a2e'); R.ball(g, cx + 96, y - 4, 6, '#2a2a2e');
+      const cx = x + LL + 10 + c * 150, hop = c % 2 === 0;
+      g.fillStyle = ['#3a2418', '#2a2a2e', '#4a1e16'][c % 3];
+      if (hop) { g.beginPath(); g.moveTo(cx, y - 96); g.lineTo(cx + 140, y - 96); g.lineTo(cx + 140, y - 40); g.lineTo(cx + 110, y - 22); g.lineTo(cx + 30, y - 22); g.lineTo(cx, y - 40); g.fill(); }
+      else g.fillRect(cx, y - 100, 140, 80);
+      g.fillStyle = 'rgba(255,255,255,0.14)'; g.fillRect(cx + 4, y - 94, 132, 2);
+      g.fillStyle = 'rgba(0,0,0,0.3)'; for (let r = 0; r < 8; r++) g.fillRect(cx + 8 + r * 17, y - 96, 1.4, 70);
+      g.fillStyle = '#c8c8d0'; g.font = '10px Anton, Impact, sans-serif'; g.fillText('MWRR ' + (40112 + c * 37), cx + 34, y - 58);
+      for (const wx of [cx + 18, cx + 36, cx + 104, cx + 122]) R.ball(g, wx, y - 6, 7, '#2a2a2e');
+      g.fillStyle = '#121214'; g.fillRect(cx - 10, y - 26, 10, 4);
     }
   }
 

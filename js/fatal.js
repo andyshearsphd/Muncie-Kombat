@@ -168,45 +168,48 @@ const FATAL = (() => {
   // ---------- GARF CAT: I Hate Mondays ----------
   S.garf = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR;
-    const sw = [P({ hy: 4, lean: 0.35, aF: [2.5, 0.2], aB: [0.8, 1.6], fF: [16, 0], fB: [-12, 0] }), P({ hy: 4, lean: 0.4, aF: [1.0, 0.3], aB: [2.4, 0.2], fF: [16, 0], fB: [-12, 0] }), P({ hy: 4, lean: 0.4, aF: [2.2, 0.3], aB: [1.0, 0.2], fF: [16, 0], fB: [-12, 0] })];
-    const slashes = prop({ layer: 'front', list: [], draw(g, p) { if (V.hidden) return; for (const l of p.list) R.line(g, V.x + l[0], V.y + l[1], V.x + l[2], V.y + l[3], '#9a000c', 1.6); } });
-    let swipe = 0, nextSwipe = 0.55;
-    s.at(0.5, () => { A.ro.claws = true; });
-    s.at(2.3, () => {
-      V.hidden = true; api.sfx('splat'); api.sfx('crunch'); api.shake(5);
-      const cols = [V.def.col.torso, V.def.col.legU, V.def.col.hand, '#8a0010', '#b0101a', V.def.col.armU];
-      const strips = []; for (let i = 0; i < 46; i++) { const a = rnd(0, PI), r = rnd(0, 1); strips.push({ x: Math.cos(a) * 28 * r, y: -Math.sin(a) * 16 * r, a: rnd(0, PI), l: rnd(5, 11), c: cols[i % cols.length] }); }
-      prop({ layer: 'back', x: V.x, draw(g, p) {
-        g.fillStyle = '#6a0008'; g.beginPath(); g.ellipse(p.x, F + 1, 34, 6, 0, 0, PI * 2); g.fill();
-        for (const s2 of strips) R.line(g, p.x + s2.x - Math.cos(s2.a) * s2.l / 2, F - 3 + s2.y - Math.sin(s2.a) * s2.l / 2, p.x + s2.x + Math.cos(s2.a) * s2.l / 2, F - 3 + s2.y + Math.sin(s2.a) * s2.l / 2, s2.c, 2.4);
-        R.bone(g, [p.x - 14, F - 8], [p.x - 2, F - 14], 1.4); R.bone(g, [p.x + 6, F - 6], [p.x + 18, F - 12], 1.4);
-        R.drawHeadAt(g, { def: V.def, d: V.d }, p.x + 4, F - 14, -0.4, 1, { dead: true });
-      } });
-      FX.blood(V.x, F - 30, 40, 0, 1); for (let i = 0; i < 8; i++) FX.gib('ribbon', V.x, F - 50, rnd(-120, 120), rnd(-260, -100));
+    let can = false, lighter = false, burning = false, ash = 0, pour = 0, x0 = 0;
+    const who = V.def.him === 'HER' ? 'SHE' : 'HE';
+    prop({ layer: 'front', draw(g) {
+      if (can) { const h = J(A, 'handF'); g.save(); g.translate(h[0], h[1]); g.rotate(A.face * (0.3 + pour * 1.3)); g.scale(A.face, 1); g.fillStyle = '#b81c1c'; g.fillRect(-4, -6, 9, 12); g.fillStyle = '#e8c020'; g.fillRect(-4, -2, 9, 2.4); g.fillStyle = '#2a2a2a'; g.fillRect(4, -7, 4, 2.4); g.restore();
+        if (pour > 0.3) { g.strokeStyle = 'rgba(220,200,120,0.7)'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(h[0] + A.face * 8, h[1] - 4); const c = J(V, 'chest'); g.quadraticCurveTo((h[0] + c[0]) / 2, h[1] - 16, c[0], c[1] - 6 + Math.sin(s.t * 30) * 6); g.stroke(); } }
+      if (lighter) { const h = J(A, 'handF'); g.fillStyle = '#c8c8d0'; g.fillRect(h[0] - 1.5, h[1] - 5, 3, 6); g.fillStyle = '#ffd040'; g.beginPath(); g.ellipse(h[0], h[1] - 8, 1.6, 3 + Math.sin(s.t * 40), 0, 0, PI * 2); g.fill(); }
+      if (ash > 0) { g.fillStyle = '#4a4848'; g.beginPath(); g.ellipse(V.x, F, 8 + ash * 30, 3 + ash * 11, 0, PI, PI * 2); g.fill(); g.fillStyle = 'rgba(120,118,115,0.8)'; for (let i = 0; i < 10; i++) g.fillRect(V.x - ash * 18 + (i * 7.3) % (ash * 36 + 1), F - 2 - (i % 3) * ash * 2, 2, 1); if (ash > 0.8) { g.save(); g.filter = 'brightness(0.42)'; R.skull(g, V.x + 8, F - 8, 6 * V.d.k * (V.def.skullK || 1), 0.3, V.def.skull); g.restore(); } }
+    } });
+    s.at(0.5, () => { can = true; api.sfx('clang'); });
+    s.at(0.75, () => { api.sfx('splat'); });
+    s.at(1.35, () => { can = false; lighter = true; api.sfx('blip'); });
+    s.at(1.6, () => {
+      // WHOOMPH
+      lighter = false; burning = true; V.ro.char = true; api.sfx('fire'); api.sfx('big'); api.sfx('scream'); api.shake(12); api.flash();
+      const c = J(V, 'chest'), hh = api.hurtH(V); for (let i = 0; i < 160; i++) FX.fire(c[0] + rnd(-55, 55), V.y - rnd(0, hh * 1.5), 1, 2.4);
+      for (let i = 0; i < 6; i++) FX.puff(c[0] + rnd(-30, 30), c[1] - rnd(0, 60), 'rgba(255,120,30,0.7)', 6, 8);
+      FX.puff(c[0], c[1], 'rgba(255,170,60,0.8)', 24, 6);
     });
-    s.at(2.5, () => api.bubble('MONDAYS.', A.x, F - 140, { size: 15, fill: 'fire', life: 1.6 }));
-    s.at(3.4, () => { A.x = V.x; A.y = F - 12; A.scriptPose = P(Object.assign({}, PS.down(A), { rot: -PI / 2 })); A.snapPose = true; A.ro.claws = false; });
-    s.at(3.7, () => api.bubble('Z', A.x + 10, F - 40, { size: 10, life: 1.2 }));
-    s.at(4.1, () => api.bubble('Z Z', A.x + 18, F - 52, { size: 12, life: 1.2 }));
-    s.at(4.5, () => api.bubble('Z Z Z', A.x + 26, F - 64, { size: 14, life: 1.2 }));
-    s.at(5.2, () => { s.done = true; });
+    s.at(3.4, () => { burning = false; V.ro.skeleton = true; V.ro.ash = true; api.sfx('fire'); });
+    s.at(4.3, () => {
+      V.hidden = true; api.sfx('crunch'); api.shake(3);
+      const hh = api.hurtH(V); for (let i = 0; i < 40; i++) FX.puff(V.x + rnd(-14, 14), F - rnd(0, hh), 'rgba(90,88,86,0.8)', 1, 2);
+    });
+    s.at(5.0, () => api.bubble(`I THINK ${who} SAID I LOVE LASAGNA.`, A.x, F - 150, { size: 11, fill: 'gold', life: 2.4 }));
+    s.at(6.8, () => { s.done = true; });
     s.tick = (t, dt) => {
-      if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 30 * k, dt, api, 110); return; }
-      if (t < 2.3) {
-        if (t >= nextSwipe) {
-          nextSwipe = t + 0.09; swipe++;
-          A.scriptPose = sw[swipe % 3]; A.snapPose = true;
-          api.sfx('slash');
-          const hh = api.hurtH(V), y = -rnd(hh * 0.15, hh * 0.9);
-          FX.blood(V.x + A.face * -4, V.y + y, 6, A.face, 0.8);
-          slashes.list.push([rnd(-10, 6), y - 6, rnd(-4, 10), y + 6]);
-          V.ro.dx = rnd(-2, 2);
-          V.scriptPose = swipe % 2 ? PS.hitHigh : PS.hitLow;
-        }
+      if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 46 * k, dt, api, 110); x0 = A.x; return; }
+      if (t < 1.35) { pour = Math.min(1, (t - 0.6) / 0.3); A.scriptPose = P({ hy: 4, lean: 0.25, aF: [1.9, 0.2], aB: [0.6, 1.6], fF: [15, 0], fB: [-13, 0] }); V.scriptPose = PS.dizzy(V.t); if (pour > 0.3 && Math.random() < 0.5) { const c = J(V, 'chest'); FX.puff(c[0], c[1], 'rgba(220,210,140,0.5)', 1, 1); } return; }
+      if (t < 1.6) { A.scriptPose = P({ hy: 4, lean: 0.1, aF: [1.6, 0.4], aB: [0.6, 1.6], fF: [14, 0], fB: [-13, 0] }); return; }
+      if (t < 3.4) {
+        // he backs off and watches; the victim flails inside the fire
+        A.x = lerp(x0, x0 - A.face * 30, (t - 1.6) / 0.4); A.scriptPose = P({ hy: 6, lean: -0.15, head: -0.1, aF: [0.7, 2.0], aB: [0.6, 2.1], fF: [13, 0], fB: [-13, 0] });
+        V.scriptPose = P({ hy: 5, lean: Math.sin(t * 9) * 0.3, head: Math.sin(t * 13) * 0.5, aF: [2.6 + Math.sin(t * 17) * 0.5, 0.6], aB: [2.4 + Math.cos(t * 15) * 0.5, 0.6], fF: [8 + Math.sin(t * 11) * 5, 0], fB: [-10, 0] });
+        V.ro.dx = Math.sin(t * 7) * 4;
+        if (burning) for (const j of ['head', 'chest', 'belly', 'handF', 'handBx', 'kneeF', 'kneeB']) if (Math.random() < 0.7) { const p = J(V, j); FX.fire(p[0] + rnd(-4, 4), p[1], 1, 1.1); }
+        if (Math.random() < 0.4) FX.puff(V.x, V.y - api.hurtH(V), 'rgba(30,28,26,0.6)', 1, 3);
         return;
       }
-      if (t < 3.4) { walkTo(A, V.x - A.face * 4, dt, api, 60); return; }
-      A.scriptPose = P(Object.assign({}, PS.down(A), { rot: -PI / 2, aF: [1.8, 1.5], aB: [1.6, 1.6], hy: Math.sin(t * 2) * 0.6 }));
+      V.ro.dx = 0;
+      if (t < 4.3) { V.scriptPose = P({ hy: 3, lean: 0.05, head: 0.2, aF: [1.2, 0.8], aB: [1.0, 0.9], fF: [8, 0], fB: [-10, 0] }); if (Math.random() < 0.5) FX.puff(V.x + rnd(-8, 8), V.y - rnd(20, 90), 'rgba(70,68,66,0.5)', 1, 2); return; }
+      ash = Math.min(1, (t - 4.3) / 0.5);
+      A.scriptPose = t < 5.0 ? PS.stance(A.t) : P({ hy: 4, lean: 0.1, head: 0.3, aF: [2.3, 2.6], aB: [0.5, 1.6], fF: [13, 0], fB: [-13, 0] });
     };
   };
 
@@ -243,8 +246,9 @@ const FATAL = (() => {
       A.scriptPose = P({ hy: 2, lean: -0.1, aF: [1.85, 0.0], aB: [0.5, 2.0], fF: [11, 0], fB: [-12, 0] }); A.x -= A.face * 14;
     });
     prop({ layer: 'front', draw(g) { if (!spine) return; const h = J(A, 'handF'); g.save(); g.translate(h[0] + A.face * 3, h[1] + 2); FX.drawSpine(g, 46 * V.d.k, V.d.k, V.def.skull); g.restore(); } });
+    s.at(5.2, () => { spine = false; const h = J(A, 'handF'); FX.gib('spine', h[0], h[1], -A.face * 160, -120, { vr: 8, s: 1, draw: g => FX.drawSpine(g, 46 * V.d.k, V.d.k, V.def.skull) }); api.sfx('thud'); A.scriptPose = P({ hy: 4, lean: 0.3, aF: [0.6, 0.2], aB: [0.6, 1.9], fF: [14, 0], fB: [-13, 0] }); });
     s.at(3.55, () => api.bubble('AND THE NUMBER ONE...', A.x - A.face * 10, F - 168, { size: 11, life: 1.6, fill: 'gold' }));
-    s.at(5.8, () => { s.done = true; });
+    s.at(6.0, () => { s.done = true; });
     s.tick = (t, dt) => {
       if (t < 0.7) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 30 * k, dt, api, 110); return; }
       if (V.ro.dx) V.ro.dx *= 0.8;
@@ -515,6 +519,14 @@ const FATAL = (() => {
   S.nest = (s, A, V, api) => {
     const PS = api.PS, F = api.FLOOR, k = A.d.k;
     let nx = 0, build = 0, egg = 0, crack = 0, chick = false, chickT = 0, pile = false;
+    const sp = A.def.id, N = sp === 'gertie' ? 3 : sp === 'turkey' ? 2 : 1;
+    const babyLine = { chucky: "IT'S A BOY.", gertie: 'HONK HONK HONK.', turkey: "IT'S TWINS." }[sp] || "IT'S A BOY.";
+    const baby = (g, bob) => {
+      if (sp === 'gertie') { R.ball(g, 0, 0, 5.5, '#c8b860'); R.ball(g, 2, -6, 3.8, '#8a8458'); R.poly(g, [[5, -6.6], [8.6, -5.6], [5, -4.6]], '#2a2a26'); R.ball(g, 3.4, -6.8, 0.7, '#000'); g.fillStyle = 'rgba(255,250,200,0.5)'; g.fillRect(-3, -2, 5, 2); }
+      else if (sp === 'turkey') { R.ball(g, 0, 0, 5, '#a8865a'); R.ball(g, 2, -5.6, 3.4, '#b8966a'); g.fillStyle = '#4a3420'; for (let i = 0; i < 5; i++) g.fillRect(-4 + i * 2, -2 + (i % 2) * 2, 1.2, 1.2); R.poly(g, [[4.8, -6], [7.6, -5.2], [4.8, -4.4]], '#c8b080'); R.ball(g, 3.2, -6.4, 0.7, '#000'); }
+      else { R.ball(g, 0, 0, 5.5, '#c01420'); R.ball(g, 2.5, -6, 4, '#c8161e'); R.poly(g, [[0, -9], [1.5, -14], [3, -9.5]], '#c8161e'); g.fillStyle = '#0a0404'; g.beginPath(); g.ellipse(4.5, -6, 2, 1.8, 0, 0, PI * 2); g.fill(); R.poly(g, [[5.5, -7], [9, -5.6], [5.5, -4.4]], '#e8802a'); R.ball(g, 4, -6.6, 0.7, '#fff'); }
+      g.fillStyle = '#8a0010'; g.fillRect(-2, 3, 1, 3 + bob); g.fillRect(2, 2, 1, 2 + bob);
+    };
     prop({ layer: 'back', draw(g) {
       if (!pile) return;
       // a mound of guts first, then woven bones and a ribcage on top
@@ -528,26 +540,21 @@ const FATAL = (() => {
       for (let i = 0; i < n; i++) { const a = R.rr() * 0.9 - 0.45, x = nx - 30 + R.rr() * 60, y = F - 4 - R.rr() * 12 - Math.abs(x - nx) * 0.12; R.line(g, x - Math.cos(a) * 9, y - Math.sin(a) * 9, x + Math.cos(a) * 9, y + Math.sin(a) * 9, R.rr() < 0.7 ? '#e6dcc4' : '#b02030', 2); }
       if (build > 0.6) { g.strokeStyle = '#e6dcc4'; g.lineWidth = 1.6; for (let i = 0; i < 5; i++) { g.beginPath(); g.arc(nx + 22, F - 6, 5 + i * 2.2, PI * 1.1, PI * 1.9); g.stroke(); } }
       if (build > 0.85) R.skull(g, nx - 30, F - 12, 6.5 * V.d.k * (V.def.skullK || 1), -0.3, V.def.skull);
-      if (egg > 0 && !chick) {
-        g.save(); g.translate(nx, F - 18); g.scale(1.9, 1.9); g.rotate(Math.sin(s.t * 18) * 0.25 * (crack > 0 ? 1 : 0));
-        g.fillStyle = '#f2ece0'; g.beginPath(); g.ellipse(0, 0, 6 * egg, 8 * egg, 0, 0, PI * 2); g.fill();
+      const offs = N === 1 ? [0] : N === 2 ? [-9, 9] : [-14, 0, 14];
+      if (egg > 0 && !chick) for (const ox of offs) {
+        g.save(); g.translate(nx + ox, F - 18); g.scale(1.9, 1.9); g.rotate(Math.sin(s.t * 18 + ox) * 0.25 * (crack > 0 ? 1 : 0));
+        g.fillStyle = sp === 'gertie' ? '#f4f0e4' : sp === 'turkey' ? '#e8d4b0' : '#f2ece0'; g.beginPath(); g.ellipse(0, 0, 6 * egg, 8 * egg, 0, 0, PI * 2); g.fill();
         g.fillStyle = '#a0101c'; for (let i = 0; i < 6; i++) g.fillRect(-4 + (i * 3.7) % 8, -5 + (i * 2.9) % 9, 1.2, 1.2);
         if (crack > 0) { g.strokeStyle = '#2a1a10'; g.lineWidth = 0.7; g.beginPath(); g.moveTo(-5, -1); g.lineTo(-2, -3 * crack); g.lineTo(1, 0); g.lineTo(3, -3 * crack); g.lineTo(5, -1); g.stroke(); }
         g.restore();
       }
-      if (chick) {
-        const bob = Math.abs(Math.sin(chickT * 9)) * 2;
-        g.save(); g.translate(nx, F - 16 - bob * 1.8); g.scale(1.9, 1.9);
-        R.ball(g, 0, 0, 5.5, '#c01420'); R.ball(g, 2.5, -6, 4, '#c8161e');
-        R.poly(g, [[0, -9], [1.5, -14], [3, -9.5]], '#c8161e');
-        g.fillStyle = '#0a0404'; g.beginPath(); g.ellipse(4.5, -6, 2, 1.8, 0, 0, PI * 2); g.fill();
-        R.poly(g, [[5.5, -7], [9, -5.6], [5.5, -4.4]], '#e8802a');
-        R.ball(g, 4, -6.6, 0.7, '#fff');
-        g.fillStyle = '#8a0010'; g.fillRect(-2, 3, 1, 3 + bob); g.fillRect(2, 2, 1, 2 + bob);
-        // shell halves
+      if (chick) offs.forEach((ox, i) => {
+        const bob = Math.abs(Math.sin(chickT * 9 + i * 1.7)) * 2;
+        g.save(); g.translate(nx + ox, F - 16 - bob * 1.8); g.scale(N > 1 ? 1.6 : 1.9, N > 1 ? 1.6 : 1.9); if (i % 2) g.scale(-1, 1);
+        baby(g, bob);
         g.fillStyle = '#f2ece0'; g.beginPath(); g.ellipse(-7, 4, 4, 3, 0.4, 0, PI); g.fill(); g.beginPath(); g.ellipse(8, 4, 4, 3, -0.4, 0, PI); g.fill();
         g.restore();
-      }
+      });
     } });
     for (let i = 0; i < 12; i++) s.at(0.5 + i * 0.12, () => {
       api.sfx(i % 3 ? 'chomp' : 'splat'); const c = J(V, pick(['chest', 'belly', 'head', 'hip']));
@@ -561,7 +568,7 @@ const FATAL = (() => {
     s.at(4.9, () => { crack = 0.5; api.sfx('crunch'); });
     s.at(5.2, () => { crack = 1; api.sfx('crunch'); });
     s.at(5.45, () => { chick = true; api.sfx('chirp'); FX.blood(nx, F - 16, 10, 0, 0.5); });
-    s.at(5.8, () => api.bubble("IT'S A BOY.", A.x, F - 150, { size: 13, fill: 'gold', life: 2 }));
+    s.at(5.8, () => api.bubble(babyLine, A.x, F - 150, { size: 13, fill: 'gold', life: 2 }));
     s.at(7.4, () => { s.done = true; });
     s.tick = (t, dt) => {
       if (chick) chickT += dt;
@@ -582,8 +589,8 @@ const FATAL = (() => {
       }
       if (t < 3.3) { const u = (t - 3.0) / 0.3; A.x = lerp(nx - A.face * 34, nx, u); A.y = F - 8 - Math.sin(u * PI) * 30; A.scriptPose = PS.jump; return; }
       if (t < 4.1) { A.x = nx; A.y = F - 8; A.ro.dx = Math.sin(t * 30) * 1.5; A.scriptPose = P({ hyL: 0.7, lean: 0.15, head: -0.1, aF: [1.0 + Math.sin(t * 20) * 0.3, 0.5], aB: [0.9, 0.6], fF: [10, 0], fB: [-10, 0] }); return; }
-      if (t < 4.4) { A.ro.dx = 0; const u = (t - 4.1) / 0.3; A.x = lerp(nx, nx - A.face * 46, u); A.y = F - Math.sin(u * PI) * 26; A.scriptPose = PS.jump; return; }
-      A.y = F; A.x = nx - A.face * 46;
+      if (t < 4.4) { A.ro.dx = 0; const u = (t - 4.1) / 0.3; A.x = lerp(nx, nx - A.face * 78, u); A.y = F - Math.sin(u * PI) * 26; A.scriptPose = PS.jump; return; }
+      A.y = F; A.x = nx - A.face * 78;
       A.scriptPose = chick ? P({ hy: 3, lean: -0.3, head: 0.3, aF: [2.0 + Math.sin(t * 14) * 0.3, 0.5], aB: [1.9, 0.6], fF: [12, 0], fB: [-12, 0] }) : P({ hy: 6, lean: 0.4, head: 0.5, aF: [0.8, 0.8], aB: [0.6, 0.9], fF: [12, 0], fB: [-12, 0] });
     };
   };
@@ -680,7 +687,16 @@ const FATAL = (() => {
   // ---------- MILLIE: Timber ----------
   S.millie = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR;
-    let nextGnaw = 0.6, fallU = 0, lodge = null, feetX = 0;
+    let nextGnaw = 0.6, fallU = 0, lodge = null, feetX = 0, bite = 0;
+    prop({ layer: 'front', draw(g) {
+      if (bite <= 0 || V.ro.cutAnkles) return;
+      for (const leg of ['F', 'B']) {
+        const kn = J(V, 'knee' + leg), ft = J(V, 'foot' + leg), p = [lerp(ft[0], kn[0], 0.35), lerp(ft[1], kn[1], 0.35)];
+        g.fillStyle = '#5a0008'; g.beginPath(); g.ellipse(p[0], p[1], V.d.ankleR * 1.3, 1.5 + bite * 4, 0, 0, PI * 2); g.fill();
+        g.fillStyle = '#c8303a'; g.beginPath(); g.ellipse(p[0], p[1], V.d.ankleR * 0.9, 0.8 + bite * 2.6, 0, 0, PI * 2); g.fill();
+        R.line(g, p[0], p[1] - bite * 3, p[0], p[1] + bite * 3, '#ece4d0', 1.3);
+      }
+    } });
     s.at(2.1, () => {
       api.bubble('TIMBER!', A.x, F - 100, { size: 16, fill: 'gold', life: 1.6 }); api.sfx('crunch');
       V.ro.cutAnkles = true; feetX = V.x;
@@ -715,9 +731,15 @@ const FATAL = (() => {
     s.at(4.9, () => api.bubble('HOME SWEET HOME', A.x, F - 120, { size: 12, fill: 'white', life: 1.6 }));
     s.at(6.0, () => { s.done = true; });
     s.tick = (t, dt) => {
-      if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 16 * k, dt, api, 110); return; }
+      if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 6 * k, dt, api, 110); return; }
       if (t < 2.1) {
-        A.scriptPose = P({ hyL: 0.45, lean: 1.05 + Math.sin(t * 34) * 0.1, head: 0.7, aF: [1.4, 0.6], aB: [1.2, 0.7], fF: [12, 0], fB: [-14, 0] });
+        bite = (t - 0.5) / 1.6;
+        A.ro.top = true;
+        { const hd = J(A, 'head'), tx = V.x - A.face * (V.d.ankleR + 6 * k); A.x += (tx - (hd[0] + A.face * 8 * k)) * Math.min(1, dt * 10); }
+        const sh = J(V, 'footF'), sk = J(V, 'kneeF'), sp = [lerp(sh[0], sk[0], 0.35), lerp(sh[1], sk[1], 0.35)];
+        if (Math.random() < 0.6) FX.gib(Math.random() < 0.3 ? 'bone' : 'chunk', sp[0], sp[1], -A.face * rnd(40, 160), rnd(-200, -60), { s: 0.35 });
+        if (Math.random() < 0.5) FX.blood(sp[0], sp[1], 2, -A.face, 0.6);
+        A.scriptPose = P({ hyL: 0.42, lean: 1.45 + Math.sin(t * 34) * 0.08, head: 0.35 + Math.sin(t * 28) * 0.15, jaw: Math.abs(Math.sin(t * 30)), aF: [1.0, 0.8], aB: [0.9, 0.9], fF: [10, 0], fB: [-16, 0] });
         V.scriptPose = P({ hy: 3, lean: -0.1, head: -0.4, aF: [2.0 + Math.sin(t * 16) * 0.5, 0.4], aB: [1.8, 0.5], fF: [8, 0], fB: [-8, 0] });
         V.ro.dx = rnd(-1, 1);
         if (t > nextGnaw) { nextGnaw = t + 0.12; api.sfx('gnaw'); FX.blood(V.x, F - 6, 4, -A.face, 0.6); if (Math.random() < 0.5) FX.gib('bone', V.x, F - 6, rnd(-90, 90), rnd(-160, -60), { s: 0.4 }); }
@@ -738,13 +760,13 @@ const FATAL = (() => {
     s.at(0.6, () => { lifted = true; api.sfx('scream'); });
     s.at(0.95, () => { A.scriptPose = P({ hy: 2, lean: 0.35, aF: [1.0, 0.2], aB: [0.8, 1.4], fF: [16, 0], fB: [-12, 0] }); A.snapPose = true; api.sfx('big'); FX.blood(V.x, V.y - api.hurtH(V) * 0.85, 30, A.face, 1.3); FX.gib('tooth', V.x, V.y - 100, A.face * 150, -250); });
     s.at(1.2, () => {
-      lifted = false; slammed = true; V.x = A.x + A.face * 10 * k; V.y = F; V.scriptPose = PS.down(V); V.snapPose = true;
+      lifted = false; slammed = true; V.x = A.x + A.face * 34 * k; V.y = F; V.scriptPose = PS.down(V); V.snapPose = true;
       api.sfx('thud'); api.sfx('crunch'); api.shake(8); FX.blood(V.x + A.face * 20, F - 6, 40, 0, 1.2); FX.dust(V.x, F, 20);
     });
     const stomp = (t0, big) => s.at(t0, () => {
       api.sfx('thud'); api.sfx('crunch'); api.sfx('splat'); api.shake(big ? 11 : 7); api.flash();
       V.ro.flat = big ? 0.16 : 0.5;
-      const x = V.x + A.face * 30 * V.d.k;
+      const x = A.x + A.face * 40 * k;
       FX.blood(x, F - 4, big ? 130 : 50, 0, 1.6, 1.4); FX.blood(x, F - 4, 40, A.face, 1.4); FX.blood(x, F - 4, 40, -A.face, 1.4);
       if (big) { FX.burst(x, F - 6, 18, ['eye', 'eye', 'guts', 'guts', 'heart', 'brain', 'skullfrag', 'bone', 'chunk', 'liver', 'kidney', 'tooth'], 1.3); FX.drops(6); }
     });
@@ -752,7 +774,7 @@ const FATAL = (() => {
     s.at(3.3, () => api.bubble('PRESERVED.', A.x, F - 190, { size: 15, fill: 'white', life: 1.8 }));
     s.at(4.6, () => { s.done = true; });
     const raise = P({ hy: 0, lean: -0.15, aF: [1.2, 1.2], aB: [0.8, 1.4], lF: [1.7, 1.5], fB: [-8, 0] });
-    const plant = P({ hy: 4, lean: 0.2, aF: [0.9, 1.3], aB: [0.6, 1.5], fF: [24, 0], fB: [-10, 0] });
+    const plant = P({ hy: 4, lean: 0.2, aF: [0.9, 1.3], aB: [0.6, 1.5], fF: [40, 0], fB: [-10, 0] });
     s.tick = (t, dt) => {
       if (t < 0.6) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 30 * k, dt, api, 80); return; }
       if (lifted) { A.scriptPose = P({ hy: 2, lean: 0.1, aF: [2.2, 0.3], aB: [0.8, 1.4], fF: [14, 0], fB: [-12, 0] }); V.scriptPose = PS.hitHigh || PS.dizzy(V.t); return; }
@@ -760,7 +782,7 @@ const FATAL = (() => {
       if (t < 1.75) { A.scriptPose = P({ hy: 6, lean: 0.4, aF: [1.0, 0.3], aB: [0.8, 0.4], fF: [14, 0], fB: [-12, 0] }); return; }
       if (t < 2.0 || (t > 2.25 && t < 2.7)) { A.scriptPose = raise; return; }
       A.scriptPose = t < 3.2 ? plant : PS.win(A.t);
-      if (t < 3.4 && Math.random() < 0.3) FX.blood(V.x + A.face * 30 * V.d.k, F - 3, 2, 0, 0.4);
+      if (t < 3.4 && Math.random() < 0.3) FX.blood(A.x + A.face * 40 * k, F - 3, 2, 0, 0.4);
     };
   };
 
@@ -1012,7 +1034,7 @@ const FATAL = (() => {
   // ---------- EAST END EM: First Edition ----------
   S.em = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR;
-    const PW = 62, PH = 118;
+    const PW = 66, PH = 128;
     let bookY = -300, close = 0, pressed = false, sign = 0, spineX = 0, dir = 1, drop = false;
     const pageL = () => spineX - dir * PW, pageR = () => spineX;
     prop({ layer: 'back', draw(g) {
@@ -1065,13 +1087,15 @@ const FATAL = (() => {
     s.at(5.8, () => { s.done = true; });
     s.tick = (t, dt) => {
       if (drop) bookY = Math.min(0, bookY + dt * 1400);
-      if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 34 * k, dt, api, 110); return; }
+      if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 36 * k, dt, api, 110); return; }
       if (t < 1.0) { V.scriptPose = PS.dizzy(V.t); A.scriptPose = PS.chopUp; return; }
+      if (t > 1.9 && t < 3.2) walkTo(A, spineX - dir * PW - A.face * 26 * k, dt, api, 120);
       if (t < 1.9) { const n = Math.floor(t / 0.05); A.scriptPose = [PS.chopUp, PS.chopDn, PS.chopUp2, PS.chopDn2][n % 4]; V.scriptPose = P({ hy: 6, lean: -0.35, head: -0.4, aF: [0.8, 0.4], aB: [0.6, 0.4], fF: [8, 0], fB: [-11, 0] }); return; }
       if (t < 2.55) { close = ease((t - 2.15) / 0.4); A.scriptPose = t < 2.2 ? PS.chopUp : P({ hy: 8, lean: 0.4, aF: [1.5, 0.05], aB: [0.6, 1.9], fF: [19, 0], fB: [-14, 0] }); return; }
       close = 1;
       if (Math.random() < 0.5) FX.blood(spineX - dir * rnd(4, PW - 4), F - 2, 1, 0, 0.2);
-      if (t < 3.2) { walkTo(A, spineX - dir * PW / 2 - A.face * 22 * k, dt, api, 80); return; }
+      if (t < 3.2) return;
+      A.x = spineX - dir * PW - A.face * 20 * k;
       if (t < 4.2) { sign = Math.min(1, (t - 3.3) / 0.8); A.scriptPose = P({ hy: 6, lean: 0.2, head: 0.3, aF: [1.6 + Math.sin(t * 30) * 0.05, 1.0], aB: [0.6, 1.9], fF: [14, 0], fB: [-14, 0] }); return; }
       A.scriptPose = P({ hy: 4, lean: -0.1, head: -0.25, aF: [3.0, 0.3], aB: [0.7, 2.3], fF: [12, 0], fB: [-12, 0] });
     };
@@ -1099,7 +1123,7 @@ const FATAL = (() => {
       }
     } });
     s.at(0.55, () => { api.sfx('squish'); api.bubble('RENT IS DUE.', A.x, F - 170, { size: 12, fill: 'gold', life: 1.4 }); });
-    s.at(1.3, () => { tentT = 1; api.sfx('slurp'); api.sfx('scream'); vx0 = V.x; });
+    s.at(1.3, () => { tentT = 1; V.ro.top = true; api.sfx('slurp'); api.sfx('scream'); vx0 = V.x; });
     s.at(3.0, () => { V.hidden = true; tentT = 0; api.sfx('gulp'); api.shake(5); });
     s.at(3.2, () => { for (let i = 0; i < 5; i++) s.at(3.2 + i * 0.22, () => { api.sfx('crunch'); api.shake(3); const [bx, by] = belly(); FX.blood(bx, by, 12, A.face, 0.9); }); });
     s.at(4.5, () => {

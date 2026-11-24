@@ -223,7 +223,7 @@ const ROSTER = (() => {
     tail(g, d, J, st) {
       const w = Math.sin((st.t || 0) * 3) * 0.25;
       let p = [J.hip[0] - d.back * 0.8, J.hip[1] - 2];
-      for (let i = 0; i < 5; i++) { const a = PI * 0.6 + i * 0.32 + w * i * 0.4, q = R.add(p, R.dir(a, 7 * d.k)); R.seg(g, p, q, (4 - i * 0.4) * d.k, (3.6 - i * 0.4) * d.k, i % 2 ? ORD : OR, 'fur', { seed: 200 + i }); p = q; }
+      for (let i = 0; i < 7; i++) { const a = PI * 0.62 + i * 0.26 + w * i * 0.4, q = R.add(p, R.dir(a, 7.5 * d.k)); R.seg(g, p, q, (5.4 - i * 0.45) * d.k, (5 - i * 0.45) * d.k, i % 2 ? ORD : OR, 'fur', { seed: 200 + i }); p = q; }
     },
     head(g, st) {
       // ears
@@ -304,7 +304,7 @@ const ROSTER = (() => {
   const ballin = {
     id: 'ballin', name: "BALLIN' WELL", short: 'BALLIN', him: 'HIM', k: 1.1,
     bio: 'Ball State legend. Number 42. Still has the moves. Still has the elbows.',
-    sock: '#ececea', bicep: 0.38, calf: 0.4, stripe: RED, sleeve: '#f0efea',
+    sock: '#ececea', sockLow: true, bicep: 0.38, calf: 0.4, stripe: RED, sleeve: '#f0efea',
     d: dims({ thigh: 31, shin: 31, torso: 37, upper: 23, fore: 22, hipW: 12, shW: 16, chest: 15.5, belly: 11, back: 11, thighR: 7.6, kneeR: 4.6, shR: 6, elbowR: 4.1 }),
     col: { torso: '#eae8e2', armU: SKB, armL: SKB, hand: SKB, legU: '#eae8e2', legL: SKB, foot: '#b8141e', neck: SKB },
     mat: { torso: 'cloth', armU: 'skin', armL: 'skin', legU: 'cloth', legL: 'skin' },
@@ -394,7 +394,7 @@ const ROSTER = (() => {
       R.poly(g, [[-1, -11], [-5.5, -14.5], [-5.5, -8.5]], '#d8508a'); R.poly(g, [[-1, -11], [3.5, -14.5], [2.5, -8.5]], '#d8508a'); R.ball(g, -1, -11, 1.5, '#a8306a');
     },
     proj: { kind: 'gust', name: 'WING GUST' }, sp2: { kind: 'leap', name: 'DIVE-BOMB' },
-    fatal: { id: 'gertie', name: 'HONK' }
+    fatal: { id: 'gertie', name: 'HONK' }, alt: { id: 'nest', name: 'NEST' }
   };
 
   const RG = '#6e6e72', RGL = '#b0b0b0', RGD = '#222226';
@@ -409,7 +409,7 @@ const ROSTER = (() => {
     tail(g, d, J, st) {
       const w = Math.sin((st.t || 0) * 4) * 0.2;
       let p = [J.hip[0] - d.back * 0.8, J.hip[1] - 2];
-      for (let i = 0; i < 6; i++) { const a = PI * 0.62 + i * 0.12 + w * i * 0.4, q = R.add(p, R.dir(a, 5.5 * d.k)); R.seg(g, p, q, (5.5 - i * 0.3) * d.k, (5.2 - i * 0.3) * d.k, i % 2 ? '#1a1a1c' : '#8a8a8e', 'fur', { seed: 400 + i }); p = q; }
+      for (let i = 0; i < 8; i++) { const a = PI * 0.6 + i * 0.1 + w * i * 0.4, q = R.add(p, R.dir(a, 6 * d.k)); const r0 = (5 + Math.sin(i / 7 * PI) * 3.4) * d.k, r1 = (5 + Math.sin((i + 1) / 7 * PI) * 3.4) * d.k; R.seg(g, p, q, r0, r1, i % 2 ? '#1a1a1c' : '#8a8a8e', 'fur', { seed: 400 + i }); p = q; }
     },
     head(g, st) {
       g.beginPath(); g.ellipse(-4, -20, 3.4, 4.2, -0.2, 0, PI * 2); fillLit(g, RG, -4, -20, 4); g.fillStyle = 'rgba(240,240,240,0.7)'; g.beginPath(); g.ellipse(-4, -20.5, 2.3, 3, -0.2, 0, PI * 2); g.fill(); g.fillStyle = '#2a2a2e'; g.beginPath(); g.ellipse(-3.8, -20, 1.4, 2.1, -0.2, 0, PI * 2); g.fill();
@@ -637,7 +637,7 @@ const ROSTER = (() => {
       if (!st.dead) brow(g, 4.6, -10.3, 4, 0.55, 'rgba(40,10,10,1)', 1.1);
     },
     proj: { kind: 'drumstick', name: 'LEFTOVERS' }, sp2: { kind: 'rush', name: 'TURKEY TROT' },
-    fatal: { id: 'turkey', name: 'CARVED' }
+    fatal: { id: 'turkey', name: 'CARVED' }, alt: { id: 'nest', name: 'NEST' }
   };
 
   // ---------- COKE WOLFE: a werewolf in a white 80s suit with a nose habit ----------
@@ -663,7 +663,7 @@ const ROSTER = (() => {
     tail(g, d, J, st) {
       const w = Math.sin((st.t || 0) * 3) * 0.15;
       let p = [J.hip[0] - d.back * 0.8, J.hip[1] - 2];
-      for (let i = 0; i < 5; i++) { const a = PI * 0.7 + i * 0.1 + w * i, q = R.add(p, R.dir(a, 6 * d.k)); R.seg(g, p, q, (4.5 + Math.sin(i / 4 * PI) * 2) * d.k, (4.2 + Math.sin((i + 1) / 4 * PI) * 2) * d.k, i === 4 ? '#2a221c' : WF, 'fur', { seed: 450 + i }); p = q; }
+      for (let i = 0; i < 7; i++) { const a = PI * 0.68 + i * 0.1 + w * i, q = R.add(p, R.dir(a, 6.5 * d.k)); R.seg(g, p, q, (5 + Math.sin(i / 6 * PI) * 3.4) * d.k, (5 + Math.sin((i + 1) / 6 * PI) * 3.4) * d.k, i >= 5 ? '#2a221c' : WF, 'fur', { seed: 450 + i }); p = q; }
     },
     head(g, st) {
       const jaw = Math.max(0, st.jaw || 0);
@@ -849,46 +849,42 @@ const ROSTER = (() => {
     fatal: { id: 'slumlord', name: 'CONDEMNED' }
   };
 
-  // ---------- OFC TINKLE: the worst cop in Delaware County ----------
-  const NAVY = '#1c2238';
+  // ---------- OFC TINKLE: six-foot-three, two-fifty, all of it soft ----------
+  const NAVY = '#16161a', VEST = '#0b0b0d', TSK = '#f0c4a4';
   const tinkle = {
-    id: 'tinkle', name: 'OFC TINKLE', short: 'TINKLE', him: 'HIM', k: 1.02, boss: true, noMatrix: true, plainFinish: true, bicep: 0.05, calf: 0.15,
-    bio: 'Twelve years on the force. Zero arrests that held up. Bruises like a peach and fights like one too.',
-    d: dims({ thigh: 26, shin: 25, torso: 35, upper: 20, fore: 19, hipW: 13, shW: 14.5, chest: 14.5, belly: 16, back: 11.5, thighR: 7.4, kneeR: 4.8, shR: 5.4, elbowR: 3.8, wristR: 3.1, fist: 3.8 }),
-    col: { torso: NAVY, armU: NAVY, armL: NAVY, cuff: NAVY, hand: '#f0c8a8', legU: NAVY, legL: NAVY, foot: '#0c0c0e', neck: '#f0c8a8' },
-    mat: { torso: 'cloth', armU: 'cloth', armL: 'cloth', legU: 'cloth', legL: 'cloth' },
-    stats: { speed: 0.8, power: 0.55, weight: 0.95, frail: 3.2 },
-    stripe: '#c8a840',
+    id: 'tinkle', name: 'OFC TINKLE', short: 'TINKLE', him: 'HIM', k: 1.16, boss: true, noMatrix: true, plainFinish: true, bicep: 0.15, calf: 0.2,
+    bio: 'Six-three, two-fifty, high and tight. He thinks he\'s a badass. He is a wimpy little bitch.',
+    d: dims({ thigh: 26, shin: 25, torso: 36, upper: 21, fore: 20, hipW: 16, shW: 18, chest: 21, belly: 27, back: 15, thighR: 10, kneeR: 5.6, ankleR: 3.8, shR: 7.6, elbowR: 5.4, wristR: 4, fist: 4.6 }),
+    col: { torso: NAVY, armU: NAVY, armL: TSK, hand: TSK, legU: NAVY, legL: NAVY, foot: '#0c0c0e', neck: TSK },
+    mat: { torso: 'cloth', armU: 'cloth', armL: 'skin', legU: 'cloth', legL: 'cloth' },
+    stats: { speed: 0.95, power: 0.85, weight: 1.35, frail: 3.2 },
     torsoDetail(g, d, st, L) {
-      // badge, name plate, shoulder patch, and a duty belt that does him no good
-      g.fillStyle = '#d8b840'; g.beginPath(); for (let i = 0; i < 6; i++) { const a = i * PI / 3, r = i % 2 ? 2 : 3.4; g.lineTo(d.belly * 0.35 + Math.cos(a) * r, -L * 0.78 + Math.sin(a) * r); } g.fill();
-      g.fillStyle = '#e8e4d8'; g.fillRect(d.belly * 0.1, -L * 0.6, 6, 1.8);
-      R.line(g, d.belly * 0.55, -L * 1.0, d.belly * 0.55, -L * 0.2, 'rgba(0,0,0,0.35)', 0.8);
-      for (let i = 0; i < 4; i++) g.fillRect(d.belly * 0.52, -L * 0.88 + i * 8, 1.2, 1.2);
-      g.fillStyle = '#0a0a0c'; g.fillRect(-d.hipW * 1.25, -6, d.hipW * 2.7, 6);
-      g.fillStyle = '#2a2a2e'; g.fillRect(-d.hipW * 0.9, -9, 5, 8); g.fillRect(d.hipW * 0.5, -8, 4, 7);
-      g.fillStyle = '#c8c8d0'; g.fillRect(-d.hipW * 0.2, -5, 3, 3);
+      // flak vest over a black uniform, POLICE across the chest, a shoulder radio, a duty belt
+      g.fillStyle = VEST; g.beginPath(); g.moveTo(-d.back * 1.1, -L * 0.98); g.lineTo(d.belly * 0.9, -L * 0.98); g.quadraticCurveTo(d.belly * 1.25, -L * 0.5, d.belly * 1.05, -L * 0.14); g.lineTo(-d.back * 1.1, -L * 0.14); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(255,255,255,0.08)'; g.lineWidth = 0.8; for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(-d.back, -L * (0.14 + i * 0.2)); g.lineTo(d.belly, -L * (0.14 + i * 0.2)); g.stroke(); }
+      g.save(); g.font = '400 5px Anton, Impact, sans-serif'; g.fillStyle = '#e8e8e8'; g.fillText('POLICE', d.belly * 0.05, -L * 0.62); g.restore();
+      g.fillStyle = '#1e1e22'; g.fillRect(d.belly * 0.45, -L * 0.98, 4, 6); g.fillRect(d.belly * 0.55, -L * 1.06, 1, 4);
+      g.strokeStyle = '#2a2a30'; g.lineWidth = 0.7; g.beginPath(); for (let i = 0; i < 8; i++) g.lineTo(d.belly * 0.5 + Math.sin(i * 2) * 1.2, -L * 0.9 + i * 2); g.stroke();
+      g.fillStyle = '#d8b840'; g.beginPath(); for (let i = 0; i < 6; i++) { const a = i * PI / 3, r = i % 2 ? 1.8 : 3; g.lineTo(-d.back * 0.3 + Math.cos(a) * r, -L * 0.8 + Math.sin(a) * r); } g.fill();
+      g.fillStyle = '#0a0a0c'; g.fillRect(-d.hipW * 1.3, -6, d.hipW * 2.8, 6);
+      g.fillStyle = '#26262a'; g.fillRect(-d.hipW * 0.9, -10, 6, 9); g.fillRect(d.hipW * 0.55, -9, 5, 8); g.fillStyle = '#c8c8d0'; g.fillRect(-d.hipW * 0.15, -5, 3, 3);
     },
     head(g, st) {
       humanHead(g, st, {
-        skin: '#f0c8a8', chin: 0.2, nose: 0.2, eyeC: '#5a7aa8', browC: 'rgba(200,170,100,0.9)', cleanJaw: 1,
+        skin: TSK, chin: 1.8, nose: 0.5, eyeC: '#5a7aa8', browC: 'rgba(200,170,100,0.9)', cleanJaw: 1,
         front(g) {
-          // blonde buzz showing under the cap, a peaked police cap
-          g.beginPath(); g.moveTo(-6, -11); g.quadraticCurveTo(-7.5, -16, -4, -18); g.lineTo(-3.4, -12); g.closePath(); g.fillStyle = '#e0c070'; g.fill();
-          g.beginPath(); g.moveTo(-8, -18.5); g.bezierCurveTo(-8, -27, 6, -29, 12, -22.5); g.lineTo(12, -19); g.quadraticCurveTo(2, -20.5, -8, -18.5); g.closePath(); fillLit(g, NAVY, 2, -23, 10, 0.25, -0.5);
-          g.fillStyle = '#0a0a0e'; g.beginPath(); g.moveTo(6, -19.6); g.quadraticCurveTo(12, -19.8, 16, -17.6); g.lineTo(6, -18.2); g.fill();
-          g.fillStyle = '#d8b840'; g.fillRect(2.4, -24, 3, 3);
-          g.fillStyle = '#0a0a0e'; g.fillRect(-8, -19.4, 18, 1.2);
-          // a wispy blonde mustache
-          g.fillStyle = 'rgba(220,190,110,0.85)'; g.fillRect(8.6, -6.8, 3, 0.9);
+          // high and tight: buzzed nearly to the skin on the sides, a flat little crop on top
+          g.fillStyle = 'rgba(190,160,110,0.45)'; g.beginPath(); g.moveTo(-7.5, -8); g.quadraticCurveTo(-9.5, -16, -6, -21); g.lineTo(4, -22); g.quadraticCurveTo(-1, -15, -2.5, -8); g.closePath(); g.fill();
+          g.beginPath(); g.moveTo(-6.5, -21.5); g.quadraticCurveTo(-4, -26.6, 3, -26.6); g.quadraticCurveTo(9, -26.2, 10.4, -22); g.quadraticCurveTo(3, -23, -6.5, -21.5); g.closePath(); fillLit(g, '#e0c070', 2, -24, 8, 0.3, -0.5);
+          g.fillStyle = 'rgba(120,60,40,0.25)'; g.beginPath(); g.ellipse(4, -9, 4, 2.4, 0, 0, PI * 2); g.fill();
         },
         mouth(g) {
           if (st.dead) { g.fillStyle = '#2a0404'; g.beginPath(); g.ellipse(10, -4.6, 1.4, 1.2, 0, 0, PI * 2); g.fill(); return; }
-          g.fillStyle = '#5a1a1a'; g.beginPath(); g.ellipse(10, -4.8, 1.2, 0.9, 0, 0, PI * 2); g.fill();
+          g.fillStyle = '#4a1414'; g.beginPath(); g.moveTo(8, -4.8); g.quadraticCurveTo(10, -5.8, 12, -4.4); g.lineTo(8, -4.8); g.fill();
         }
       });
     },
-    proj: { kind: 'spray', name: 'PEPPER SPRAY' }, sp2: { kind: 'rush', name: 'DONUT RUN' },
+    proj: { kind: 'spray', name: 'PEPPER SPRAY' }, sp2: { kind: 'rush', name: 'TACKLE' },
     fatal: { id: 'tinkle', name: 'USE OF FORCE' }
   };
 
@@ -928,6 +924,12 @@ const ROSTER = (() => {
   const belt = (g, G, c, buckle) => { g.fillStyle = c; g.fillRect(-G.shx * 2, G.hipY - 2, G.shx * 4, 3); if (buckle) { g.fillStyle = buckle; g.fillRect(-1.8, G.hipY - 2.4, 3.6, 3.6); } };
   const bellyPatch = (g, G, c, wk = 0.6) => { g.fillStyle = c; g.beginPath(); g.ellipse(0, (G.sY + G.hipY) / 2 + 3, G.shx * wk, (G.hipY - G.sY) * 0.42, 0, 0, PI * 2); g.fill(); };
 
+  // a tail curling out from behind the hip, seen from the front
+  function frontTail(g, d, G, st, cols, n, len, r0, bushy) {
+    const k = d.k, w = Math.sin((st.t || 0) * 3) * 0.15;
+    let p = [G.hx * 0.6, G.hipY - 3 * k];
+    for (let i = 0; i < n; i++) { const a = 1.2 - i * (1.9 / n) + w * i * 0.3, q = [p[0] + Math.cos(-a + 0.4) * len * k, p[1] - Math.sin(a) * len * k * 0.9]; const t0 = i / n, t1 = (i + 1) / n, ra = (bushy ? r0 * (0.7 + Math.sin(t0 * PI) * 0.6) : r0 * (1 - t0 * 0.6)) * k, rb = (bushy ? r0 * (0.7 + Math.sin(t1 * PI) * 0.6) : r0 * (1 - t1 * 0.6)) * k; R.seg(g, p, q, ra, rb, cols[i % cols.length], 'fur', { seed: 900 + i }); p = q; }
+  }
   const FRONT = {
     hippo: {
       detail: (g, d, G) => { bellyPatch(g, G, 'rgba(230,190,220,0.35)', 0.65); },
@@ -959,6 +961,7 @@ const ROSTER = (() => {
       }
     },
     garf: {
+      behind: (g, d, G, st) => frontTail(g, d, G, st, [OR, ORD], 7, 7.5, 5, false),
       detail: (g, d, G) => { bellyPatch(g, G, 'rgba(250,220,170,0.6)', 0.6); g.strokeStyle = 'rgba(150,60,0,0.45)'; g.lineWidth = 1.4; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(-G.shx, G.sY + 6 + i * 7); g.lineTo(-G.shx * 0.6, G.sY + 8 + i * 7); g.moveTo(G.shx, G.sY + 6 + i * 7); g.lineTo(G.shx * 0.6, G.sY + 8 + i * 7); g.stroke(); } },
       head(g, st) {
         const O = '#e08a2a', jaw = st.jaw || 0;
@@ -1003,6 +1006,7 @@ const ROSTER = (() => {
       }
     },
     gertie: {
+      neck: 30,
       body(g, d, G) {
         const k = d.k, cy = G.hipY - 6 * k;
         for (const L of G.legs) { R.line(g, L.hip[0] * 0.6, cy + 10 * k, L.foot[0], L.foot[1], '#1a1612', 2.4 * k); R.poly(g, [[L.foot[0] - 5 * k, L.foot[1] + 2 * k], [L.foot[0] + 5 * k, L.foot[1] + 2 * k], [L.foot[0], L.foot[1] - 2 * k]], '#1a1612'); }
@@ -1023,6 +1027,7 @@ const ROSTER = (() => {
       }
     },
     rocky: {
+      behind: (g, d, G, st) => frontTail(g, d, G, st, ['#8a8a8e', '#1a1a1c'], 8, 6, 6, true),
       detail: (g, d, G) => { bellyPatch(g, G, 'rgba(190,190,185,0.55)', 0.6); },
       head(g, st) {
         const jaw = st.jaw || 0;
@@ -1039,6 +1044,7 @@ const ROSTER = (() => {
       }
     },
     millie: {
+      behind: (g, d, G, st) => frontTail(g, d, G, st, ['#3a2a1e'], 7, 6, 2.4, false),
       detail: (g, d, G) => { bellyPatch(g, G, 'rgba(200,170,130,0.45)', 0.55); },
       head(g, st) {
         const jaw = st.jaw || 0;
@@ -1069,6 +1075,7 @@ const ROSTER = (() => {
       }
     },
     turkey: {
+      neck: 20,
       body(g, d, G) {
         const k = d.k, cy = G.hipY - 4 * k;
         for (const L of G.legs) { R.line(g, L.hip[0] * 0.6, cy + 12 * k, L.foot[0], L.foot[1], '#9a7a70', 2.2 * k); for (let i = -1; i <= 1; i++) R.line(g, L.foot[0], L.foot[1], L.foot[0] + i * 4 * k, L.foot[1] + 3 * k, '#8a6a60', 1.2 * k); }
@@ -1089,6 +1096,7 @@ const ROSTER = (() => {
       }
     },
     wolfe: {
+      behind: (g, d, G, st) => frontTail(g, d, G, st, [WF, WF, WF, WF, WF, '#2a221c', '#2a221c'], 7, 6.5, 6, true),
       detail: (g, d, G) => { R.poly(g, [[-G.shx * 0.5, G.sY - 1], [G.shx * 0.5, G.sY - 1], [G.shx * 0.35, G.hipY - 2], [-G.shx * 0.35, G.hipY - 2]], '#e8a0b8'); for (const sd of [-1, 1]) R.poly(g, [[sd * G.shx * 0.5, G.sY - 1], [sd * G.shx * 0.3, G.sY + (G.hipY - G.sY) * 0.55], [sd * G.shx * 0.85, G.sY + 6]], '#d8d2c4');
         R.line(g, -3, G.sY, 0, G.sY + 12, '#d8b040', 0.7); R.line(g, 3, G.sY, 0, G.sY + 12, '#d8b040', 0.7); g.fillStyle = '#c8c8d0'; g.fillRect(-1.2, G.sY + 12, 2.4, 4.5); g.fillStyle = '#f8f8f8'; g.fillRect(-0.8, G.sY + 13, 1.6, 2.6); },
       head(g, st) {
@@ -1167,17 +1175,18 @@ const ROSTER = (() => {
       }
     },
     tinkle: {
-      detail: (g, d, G) => { g.fillStyle = 'rgba(0,0,0,0.3)'; g.fillRect(-0.4, G.sY + 2, 0.8, G.hipY - G.sY - 4); g.fillStyle = '#d8b840'; g.beginPath(); for (let i = 0; i < 6; i++) { const a = i * PI / 3, r = i % 2 ? 2 : 3.4; g.lineTo(-G.shx * 0.5 + Math.cos(a) * r, G.sY + 9 + Math.sin(a) * r); } g.fill(); g.fillStyle = '#e8e4d8'; g.fillRect(G.shx * 0.25, G.sY + 8, 6, 1.8);
-        belt(g, G, '#0a0a0c', '#c8c8d0'); g.fillStyle = '#2a2a2e'; g.fillRect(-G.shx * 0.95, G.hipY - 4, 4, 7); g.fillRect(G.shx * 0.75, G.hipY - 4, 4, 7); },
+      detail: (g, d, G) => { g.fillStyle = VEST; g.beginPath(); g.moveTo(-G.shx * 0.95, G.sY + 1); g.lineTo(G.shx * 0.95, G.sY + 1); g.lineTo(G.shx * 1.05, G.hipY - 5); g.lineTo(-G.shx * 1.05, G.hipY - 5); g.closePath(); g.fill();
+        g.save(); g.font = '400 7px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillStyle = '#e8e8e8'; g.fillText('POLICE', 0, G.sY + 15); g.restore();
+        g.fillStyle = '#d8b840'; g.beginPath(); for (let i = 0; i < 6; i++) { const a = i * PI / 3, r = i % 2 ? 2 : 3.4; g.lineTo(-G.shx * 0.5 + Math.cos(a) * r, G.sY + 6 + Math.sin(a) * r); } g.fill();
+        g.fillStyle = '#1e1e22'; g.fillRect(G.shx * 0.45, G.sY + 1, 5, 7); g.fillRect(G.shx * 0.6, G.sY - 4, 1.2, 5);
+        belt(g, G, '#0a0a0c', '#c8c8d0'); g.fillStyle = '#26262a'; g.fillRect(-G.shx * 0.95, G.hipY - 4, 5, 8); g.fillRect(G.shx * 0.7, G.hipY - 4, 5, 8); },
       head(g, st) {
-        humanFront(g, st, { skin: '#f0c8a8', chin: 0.6, eyeC: '#5a7aa8', browC: 'rgba(200,170,100,0.9)',
+        humanFront(g, st, { skin: TSK, chin: 2.2, w: 9, eyeC: '#5a7aa8', browC: 'rgba(200,170,100,0.9)', angry: 1,
           front(g) {
-            g.fillStyle = '#e0c070'; g.fillRect(-8.6, -18, 2.4, 6); g.fillRect(6.2, -18, 2.4, 6);
-            g.beginPath(); g.moveTo(-9.4, -18.5); g.bezierCurveTo(-10, -30, 10, -30, 9.4, -18.5); g.closePath(); fillLit(g, NAVY, 0, -24, 10, 0.25, -0.5);
-            g.fillStyle = '#0a0a0e'; g.beginPath(); g.ellipse(0, -17.6, 10, 2.2, 0, 0, PI); g.fill(); g.fillRect(-9.6, -19.4, 19.2, 1.4);
-            g.fillStyle = '#d8b840'; g.fillRect(-1.5, -25, 3, 3);
-            g.fillStyle = 'rgba(220,190,110,0.85)'; g.fillRect(-2.8, -6.2, 5.6, 0.9);
-          } });
+            g.fillStyle = 'rgba(190,160,110,0.45)'; g.fillRect(-9, -21, 3, 9); g.fillRect(6, -21, 3, 9);
+            g.beginPath(); g.moveTo(-6.5, -21.5); g.quadraticCurveTo(0, -28, 6.5, -21.5); g.quadraticCurveTo(0, -23.5, -6.5, -21.5); g.closePath(); fillLit(g, '#e0c070', 0, -24, 7, 0.3, -0.5);
+          },
+          mouth(g, jaw) { if (st.dead) return; g.fillStyle = '#4a1414'; if (jaw > 0.2) { g.beginPath(); g.ellipse(0, -3.4 + jaw, 2.4, 0.8 + jaw * 1.8, 0, 0, PI * 2); g.fill(); } else g.fillRect(-2.4, -4, 4.8, 0.9); } });
       }
     },
   };
