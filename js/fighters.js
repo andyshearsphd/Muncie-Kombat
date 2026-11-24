@@ -796,7 +796,7 @@ const ROSTER = (() => {
   const BY = '#e6c02a', BJ = '#2a4a78', BSK = '#e6c4a4', BRD = '#141010', BCAP = '#b8161c';
   const bunyon = {
     id: 'bunyon', name: 'TIM BUNYON', short: 'BUNYON', him: 'HIM', k: 1.3, bicep: 0.42, calf: 0.35, sock: '#c0181c', sockLow: true,
-    bio: 'Yellow shirt, black beard, and an axe he saves for special occasions. You look like kindling.',
+    bio: 'Yellow shirt, black beard, an axe the size of a canoe. Stood by the road for decades. You look like kindling.',
     d: dims({ thigh: 30, shin: 29, torso: 38, neck: 4, upper: 22, fore: 21, hipW: 14, shW: 19, chest: 19, belly: 16, back: 14, thighR: 9, kneeR: 6, ankleR: 4.6, shR: 7.6, elbowR: 5.6, wristR: 4.6, fist: 5.6, footL: 15, footH: 5.5 }),
     col: { torso: BY, armU: BY, armL: BSK, hand: BSK, legU: BJ, legL: BJ, foot: '#4a3626', neck: BSK },
     mat: { torso: 'cloth', armU: 'cloth', armL: 'skin', legU: 'denim', legL: 'denim' },
