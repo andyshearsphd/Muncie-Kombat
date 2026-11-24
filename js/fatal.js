@@ -481,7 +481,7 @@ const FATAL = (() => {
     s.at(1.95, () => { api.sfx('thud'); api.shake(4); });
     s.at(3.3, () => { heart = false; const h = J(A, 'head'); FX.gib('heart', h[0] + A.face * 17 * k, h[1], 0, -330, { s: 1.3, vr: 10 }); api.sfx('whoosh'); });
     s.at(3.75, () => { api.sfx('gulp'); FX.gibs.forEach(g => { if (g.kind === 'heart') g.dead = true; }); });
-    s.at(4.0, () => { api.sfx('chirp'); api.bubble('CHIRP CHIRP.', A.x, F - 150, { size: 13, fill: 'white', life: 1.8 }); });
+    s.at(4.0, () => { api.sfx('chirp'); api.bubble('CHIRP CHIRP, MFER.', A.x, F - 150, { size: 13, fill: 'white', life: 1.8 }); });
     s.at(5.6, () => { s.done = true; });
     s.tick = (t, dt) => {
       if (t < 0.35) { V.scriptPose = PS.dizzy(V.t); A.scriptPose = P({ hyL: 0.5, lean: 0.4, aF: [2.2, 0.4], aB: [2.0, 0.5], fF: [12, 0], fB: [-12, 0] }); return; }
