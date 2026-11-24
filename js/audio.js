@@ -135,6 +135,7 @@ const SFX = (() => {
     sniff: () => { noise(0.12, 0.35, 3000, 1.5, 'bandpass'); noise(0.12, 0.35, 3200, 1.5, 'bandpass', 0.16); noise(0.35, 0.4, 2600, 1.2, 'bandpass', 0.32, 0.02, 4200); },
     ding: () => { tone(2100, 0.5, 'sine', 0.25); tone(4200, 0.25, 'sine', 0.08); },
     squish: () => { noise(0.3, 0.4, 400, 3, 'bandpass', 0, 0.01, 150); tone(90, 0.3, 'sine', 0.25, -40); },
+    shot: () => { noise(0.18, 0.55, 1800, 0.6, 'bandpass'); noise(0.06, 0.5, 5000, 0.6, 'highpass'); tone(110, 0.12, 'square', 0.25, -60); },
     yelp: () => { for (let i = 0; i < 4; i++) { tone(980, 0.09, 'triangle', 0.22, -380, i * 0.16); tone(1960, 0.06, 'sine', 0.05, -700, i * 0.16); } },
     gobble: () => { for (let i = 0; i < 6; i++) tone(520 + (i % 2) * 140, 0.05, 'sawtooth', 0.18, -120, i * 0.055); },
     chirp: () => { tone(2600, 0.06, 'sine', 0.2, 1400); tone(3200, 0.08, 'sine', 0.16, -1200, 0.07); },

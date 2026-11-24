@@ -806,28 +806,36 @@ const FATAL = (() => {
         FX.drawDecals(g); FX.drawGibs(g);
         if (!smashed) {
           const f = { def: V.def, d: V.d, x: bx(), y: by, face: 1, t: s.t, st: { dead: landed } };
-          R.draw(g, f, landed ? PS.down(f) : PS.air(s.t * 9), {});
+          R.draw(g, f, landed ? P({ rot: -PI / 2, hyA: 4, aF: [2.6, 0.3], aB: [1.2, 0.8], lF: [0.3, 0.2], lB: [-0.4, 0.4], head: 0.4 + Math.sin(s.t * 6) * 0.2 }) : PS.air(s.t * 9), {});
         }
-        if (trainX != null) STAGES.drawTrain(g, trainX, 214);
+        // headlight sweeping in from the right before the train arrives
+        if (s.t > 1.4 && (trainX == null || trainX > W)) { const a = Math.min(1, (s.t - 1.4) / 0.8); const gr = g.createLinearGradient(W, 0, W * 0.2, 0); gr.addColorStop(0, `rgba(255,250,210,${0.55 * a})`); gr.addColorStop(1, 'rgba(255,250,210,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(W, 176); g.lineTo(W * 0.15, 196); g.lineTo(W * 0.15, 222); g.lineTo(W, 206); g.fill(); }
+        if (smear > 0) { g.fillStyle = 'rgba(130,0,10,0.85)'; g.fillRect(0, 201, bx() * smear + 40, 3.5); g.fillRect(0, 213, bx() * smear + 30, 3.5); }
+        if (trainX != null) { STAGES.drawTrain(g, trainX, 214); g.strokeStyle = 'rgba(255,255,255,0.25)'; g.lineWidth = 1; for (let i = 0; i < 14; i++) { const y = 160 + i * 4; g.beginPath(); g.moveTo(trainX + 20 + (i * 53) % 700, y); g.lineTo(trainX + 80 + (i * 53) % 700, y); g.stroke(); } }
         FX.drawParts(g);
       });
     });
-    s.at(1.6, () => api.sfx('horn'));
-    s.at(1.9, () => { trainX = api.W + 30; api.sfx('train'); });
-    s.at(3.9, () => { api.scene(null); FX.reset(); V.hidden = true; A.scriptPose = PS.win(A.t); });
-    s.at(4.6, () => { s.done = true; });
+    let smear = 0;
+    s.at(1.35, () => api.sfx('horn'));
+    s.at(1.85, () => api.sfx('horn'));
+    s.at(2.2, () => { trainX = api.W + 30; api.sfx('train'); });
+    s.at(4.4, () => { api.scene(null); FX.reset(); V.hidden = true; A.scriptPose = PS.win(A.t); });
+    s.at(5.0, () => { s.done = true; });
     s.tick = (t, dt) => {
       if (t < 0.75) { V.y += vy * dt; V.x += A.face * 40 * dt; V.scriptPose = PS.air(t * 12); A.scriptPose = PS.up1 || PS.stance(A.t); return; }
       if (!landed) { bvy += 1300 * dt; by += bvy * dt; if (by >= 210) { by = 210; landed = true; api.sfx('thud'); api.shake(5); FX.blood(bx(), 205, 30, 0, 0.8); } }
       if (trainX != null) {
-        trainX -= 950 * dt;
+        trainX -= 1450 * dt;
         if (!smashed && trainX < bx() + 10) {
-          smashed = true; api.sfx('splat'); api.sfx('crunch'); api.shake(10);
-          FX.burst(bx(), 200, 26, ['chunk', 'bone', 'guts', 'skullfrag', 'eye', 'chunk', 'heart', 'brain'], 1.4);
-          for (const gb of FX.gibs) gb.vx -= 380;
-          FX.blood(bx(), 200, 120, -1, 1.8, 1.3); FX.drops(18);
+          // obliterated: a red cloud of meat and bone flung down the line
+          smashed = true; api.sfx('splat'); api.sfx('crunch'); api.sfx('big'); api.sfx('splat'); api.shake(16); api.flash();
+          FX.burst(bx(), 200, 48, ['chunk', 'bone', 'guts', 'skullfrag', 'eye', 'chunk', 'heart', 'brain', 'liver', 'lung', 'bone', 'tooth'], 1.8);
+          skullGib(V, bx(), 196, -700, -420);
+          for (const gb of FX.gibs) gb.vx -= rnd(500, 1100);
+          for (let i = 0; i < 4; i++) FX.blood(bx(), 186 + i * 6, 120, -1, 2.4, 1.6);
+          FX.drops(40);
         }
-        if (smashed && Math.random() < 0.6) FX.blood(trainX + 10, 190 + rnd(-20, 10), 2, -1, 0.8);
+        if (smashed) { smear = Math.min(1, smear + dt * 2); if (Math.random() < 0.9) FX.blood(trainX + rnd(0, 300), 170 + rnd(-30, 20), 3, -1, 1.2); }
       }
       A.scriptPose = PS.win(A.t);
     };
@@ -871,6 +879,48 @@ const FATAL = (() => {
         }
       } else { pool = Math.min(1, pool + dt * 0.9); stream = Math.min(1, stream + dt * 0.45); }
       A.scriptPose = PS.win(A.t);
+    };
+  };
+  // ---------- OFC TINKLE: Use of Force ----------
+  S.tinkle = (s, A, V, api) => {
+    const PS = api.PS, F = api.FLOOR, k = A.d.k;
+    let drawn = false, shots = 0, flash = 0;
+    const aim = P({ hy: 6, lean: -0.05, head: 0.1, aF: [1.62, 0.02], aB: [1.5, 0.1], fF: [16, 0], fB: [-16, 0] });
+    prop({ layer: 'front', draw(g) {
+      if (drawn) {
+        const h = J(A, 'handF');
+        g.save(); g.translate(h[0], h[1]); g.scale(A.face, 1);
+        g.fillStyle = '#141416'; g.fillRect(0, -3, 11, 3.4); g.fillRect(0, -1, 3, 6); g.fillStyle = '#3a3a3e'; g.fillRect(0, -3, 11, 0.8);
+        if (flash > 0) { g.fillStyle = '#fff6b0'; g.beginPath(); g.moveTo(11, -1.5); g.lineTo(22, -5); g.lineTo(19, -1.5); g.lineTo(22, 2); g.fill(); }
+        g.restore();
+      }
+      if (shots > 0) TXT.draw(g, 'SHOTS FIRED: ' + shots, api.cam + api.W / 2, 40, { size: 13, align: 'center', fill: 'white' });
+    } });
+    s.at(0.3, () => api.bubble('STOP RESISTING!', A.x, F - 150, { size: 12, fill: 'white', life: 1 }));
+    s.at(0.75, () => { drawn = true; api.sfx('clang'); });
+    for (let i = 0; i < 40; i++) s.at(1.0 + i * 0.075, () => {
+      shots = i + 1; flash = 0.04; api.sfx('shot'); api.shake(2);
+      const j = J(V, pick(['chest', 'chest', 'belly', 'head', 'hip', 'neck']));
+      FX.blood(j[0], j[1], 8, A.face, 1.1); FX.spurt(j[0], j[1], A.face, 0.6);
+      const w = V.st2.wounds || (V.st2.wounds = []); if (w.length < 40) w.push({ j: pick(['head', 'chest', 'chest', 'belly']), dx: rnd(-4, 8), dy: rnd(-6, 6), r: 1.2, a: 0, drip: rnd(3, 9) });
+      const h = J(A, 'handF'); FX.gib('casing', h[0], h[1] - 4, -A.face * rnd(40, 120), rnd(-220, -120), { s: 0.6, vr: 20, draw: g => { g.fillStyle = '#d8b040'; g.fillRect(-1.5, -0.8, 3, 1.6); } });
+      V.ro.dx = rnd(-3, 3) + A.face * 2;
+    });
+    s.at(4.1, () => { V.ro.dx = 0; V.scriptPose = PS.down(V); api.sfx('thud'); FX.blood(V.x, F - 8, 40, 0, 0.8); });
+    s.at(4.7, () => { drawn = false; api.sfx('clang'); });
+    s.at(5.0, () => api.bubble('USE OF FORCE JUSTIFIED.', A.x, F - 150, { size: 12, fill: 'gold', life: 2.2 }));
+    s.at(6.8, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (flash > 0) flash -= dt;
+      if (t < 0.4) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 70 * k, dt, api, 80); return; }
+      if (t < 0.75) { A.scriptPose = P({ hy: 6, lean: 0.2, head: 0.4, aF: [0.4, 0.9], aB: [0.3, 0.6], fF: [14, 0], fB: [-14, 0] }); return; }
+      if (t < 4.1) {
+        A.scriptPose = aim;
+        if (t > 1.0) V.scriptPose = P({ hy: 6 + (t - 1) * 2, lean: -0.35 + Math.sin(t * 50) * 0.2, head: -0.4 + Math.sin(t * 43) * 0.4, aF: [1.0 + Math.sin(t * 37) * 0.8, 0.5], aB: [0.8 + Math.cos(t * 41) * 0.8, 0.6], fF: [9, 0], fB: [-10, 0] });
+        return;
+      }
+      if (t < 4.7) { A.scriptPose = aim; return; }
+      A.scriptPose = P({ hy: 4, lean: -0.1, head: -0.1, aF: [0.5, 2.2], aB: [0.5, 2.2], fF: [13, 0], fB: [-13, 0] });
     };
   };
   S.golemDie = (s, A, V, api) => {

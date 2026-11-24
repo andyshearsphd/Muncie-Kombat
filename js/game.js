@@ -197,7 +197,7 @@
 
   function applyHit(a, v, mv, blocked, cx, cy, proj) {
     const dir = proj ? Math.sign(proj.vx) : a.face;
-    const power = a.def.stats.power * (v.def.stats.armor || 1);
+    const power = a.def.stats.power * (v.def.stats.armor || 1) * (v.def.stats.frail || 1);
     if (blocked) {
       const chip = (mv.chip ? mv.dmg * 0.2 : 0) * power;
       damage(v, chip, a);
@@ -256,8 +256,8 @@
     a.wins++;
     game.loser = v; game.winner = a;
     const decided = a.wins >= 2;
-    if (decided && !v.def.boss) { game.phase = 'finishwait'; game.pt = 0; v.finishing = true; return; }
-    if (decided && v.def.boss) { game.phase = 'finishwait'; game.pt = 0; v.finishing = true; v.bossDie = true; return; }
+    if (decided && (!v.def.boss || v.def.plainFinish)) { game.phase = 'finishwait'; game.pt = 0; v.finishing = true; return; }
+    if (decided && v.def.boss && !v.def.plainFinish) { game.phase = 'finishwait'; game.pt = 0; v.finishing = true; v.bossDie = true; return; }
     v.dead = true;
     if (v.state === 'hit' || actionable(v) || v.state === 'attack') launch(v, a.face * 140, -260);
     game.phase = 'roundend'; game.pt = 0;
@@ -266,7 +266,7 @@
   function winText(a) {
     const flawless = a.dmgTaken <= 0;
     setTimeout(() => { banner(a.def.name + ' WINS', { size: 26, fill: 'gold', life: 3.0, y: 74, hold: 0.9, dock: { y: 36, size: 15 } }); say(a.def.name.replace("'", 'g').toLowerCase() + ' wins'); }, 700);
-    if (flawless) setTimeout(() => { banner('FLAWLESS VICTORY', { size: 22, fill: 'fire', y: 104, life: 2.4, hold: 0.7, dock: { y: 53, size: 12 } }); say('flawless victory'); }, 2000);
+    if (flawless) setTimeout(() => { banner('FLAWLESS VICTORY', { size: 13, fill: 'fire', y: 53, life: 2.2 }); say('flawless victory'); }, 2000);
   }
   function finishBlow(a, v, mv) {
     // stage fatality: uppercut off the trestle
@@ -317,7 +317,7 @@
     p1 = newFighter(ROSTER.FIGHTERS[ladder.pick], 0);
     p2 = newFighter(oppDef, 1);
     const lv = ladder.rung / Math.max(1, ladder.opps.length - 1);
-    p2.cpu.lvl = mode === 'single' ? (oppDef.boss ? 0.6 : 0.38) : oppDef.boss ? 0.55 + lv * 0.2 : 0.12 + lv * 0.5;
+    p2.cpu.lvl = oppDef.id === 'tinkle' ? 0.02 : mode === 'single' ? (oppDef.boss ? 0.6 : 0.38) : oppDef.boss ? 0.55 + lv * 0.2 : 0.12 + lv * 0.5;
     stage = STAGES.get(ladder.stages[ladder.rung]);
     game.round = 1;
     screen = 'play'; paused = false;
@@ -330,7 +330,7 @@
     ladder.opps = others.concat(ROSTER.BOSSES);
     const rot = STAGES.ROTATION.slice();
     for (let i = rot.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [rot[i], rot[j]] = [rot[j], rot[i]]; }
-    ladder.stages = others.map((f, i) => rot[i % rot.length]).concat(['glassworks', 'rental', 'hell']);
+    ladder.stages = others.map((f, i) => rot[i % rot.length]).concat(['cityhall', 'glassworks', 'rental', 'hell']);
     ladder.rung = 0;
   }
 
@@ -450,7 +450,7 @@
     // c: { tok, P, K, B }
     const tok = c.tok, D = tok.includes('D'), U = tok.includes('U'), F = tok.includes('F'), B = tok.includes('B');
     if (f.state === 'jump') {
-      if (!f.airAtk && c.P && D && !f.hangUsed && f.y < FLOOR - 30 && Math.abs(o.x - f.x) < 160) { f.hangUsed = true; f.hangSide = Math.sign(o.x - f.x) || f.face; f.airAtk = MV.hang; f.at = 0; f.airHit = false; f.hangN = 0; f.matrix = 1.2; game.slow = Math.max(game.slow || 0, 0.5); SFX.whoosh(); SFX.gong(); return; }
+      if (!f.airAtk && c.P && D && !f.hangUsed && !f.def.noMatrix && f.y < FLOOR - 30 && Math.abs(o.x - f.x) < 160) { f.hangUsed = true; f.hangSide = Math.sign(o.x - f.x) || f.face; f.airAtk = MV.hang; f.at = 0; f.airHit = false; f.hangN = 0; f.matrix = 1.2; game.slow = Math.max(game.slow || 0, 0.5); SFX.whoosh(); SFX.gong(); return; }
       if (!f.airAtk && (c.P || c.K)) { f.airAtk = c.K ? MV.jkick : MV.jpunch; f.at = 0; f.airHit = false; SFX.whoosh(); }
       return;
     }
@@ -465,13 +465,13 @@
     }
     if (c.K) {
       if (game.phase === 'finish' && game.winner === f && f.def.alt && motion(f, ['F', 'F'], 0.6)) { f.hist = []; startFatality(f, o, f.def.alt.id); return; }
-      if (motion(f, ['B', 'B'], 0.6)) { f.hist = []; startWallrun(f); return; }
+      if (!f.def.noMatrix && motion(f, ['B', 'B'], 0.6)) { f.hist = []; startWallrun(f); return; }
       if (motion(f, ['D', 'F'])) { f.hist = []; startSP2(f); return; }
       if (D) { startMove(f, MV.sweep); return; }
       if (B) { startMove(f, MV.round); return; }
       startMove(f, MV.kick); return;
     }
-    if (c.B && U) { startMove(f, MV.bdodge); f.dodged = false; f.matrix = 0.9; game.slow = Math.max(game.slow || 0, 0.55); SFX.whoosh(); return; }
+    if (c.B && U && !f.def.noMatrix) { startMove(f, MV.bdodge); f.dodged = false; f.matrix = 0.9; game.slow = Math.max(game.slow || 0, 0.55); SFX.whoosh(); return; }
     if (c.B) { f.state = D ? 'cblock' : 'block'; return; }
     if (U) { doJump(f, F ? f.face : B ? -f.face : 0); return; }
     if (D) { f.state = 'crouch'; return; }
@@ -524,6 +524,7 @@
       if (r < 0.8 && dist < 50) { out.tok = 'F'; out.P = true; return out; }
       c.blockT = 0.35; out.B = true; return out;
     }
+    if (f.def.id === 'tinkle' && Math.random() < 0.6) { c.blockT = 0; if (Math.random() < 0.02) game.bubbles.push({ str: pick(['STOP RESISTING!', 'HEY! HEY!', 'I NEED BACKUP!', 'THAT HURT!', 'IS THIS ON CAMERA?']), x: f.x, y: f.y - hurtH(f) - 12, t: 0, life: 1.2, size: 10, fill: 'white' }); return out; }
     c.t -= dt;
     if (c.walk) out.tok = c.walk > 0 ? 'F' : 'B';
     if (c.t > 0) return out;
@@ -802,6 +803,7 @@
     else if (kind === 'shards') { for (const v of [-70, 0, 70]) list.push(Object.assign({}, base, { vy: v, dmg: 6, w: 6, h: 5 })); }
     else if (kind === 'feather') { for (const v of [-40, 0, 40]) list.push(Object.assign({}, base, { vy: v, vx: f.face * 300, dmg: 5, w: 8, h: 5 })); }
     else if (kind === 'drumstick') list.push(Object.assign(base, { vy: -150, grav: 380, vx: f.face * 240, w: 12, h: 10, dmg: 11 }));
+    else if (kind === 'spray') list.push(Object.assign(base, { vx: f.face * 160, w: 10, h: 10, dmg: 3, life: 0.5 }));
     else if (kind === 'howl') list.push(Object.assign(base, { y: FLOOR - 92 * k, w: 14, h: 20, vx: f.face * 250, dmg: 6, push: 280 }));
     else if (kind === 'book') list.push(Object.assign(base, { vy: -200, grav: 520, vx: f.face * 260, w: 10, h: 10, dmg: 11 }));
     else if (kind === 'notice') list.push(Object.assign(base, { vx: f.face * 210, w: 10, h: 9, dmg: 10 }));
@@ -833,7 +835,7 @@
         if (p.kind === 'poop') FX.puff(p.x, p.y, 'rgba(90,60,26,0.9)', 10, 3);
       }
       for (const q of projs) if (q !== p && q.o !== p.o && !q.dead && Math.abs(q.x - p.x) < p.w + q.w && Math.abs(q.y - p.y) < p.h + q.h) { p.dead = q.dead = true; FX.spark(p.x, p.y, '#fff', 14); SFX.block(); }
-      if (p.x < cam - 60 || p.x > cam + VW() + 60 || p.t > 4) p.dead = true;
+      if (p.x < cam - 60 || p.x > cam + VW() + 60 || p.t > (p.life || 4)) p.dead = true;
     }
     for (const p of projs) if (p.dead) p.o.projOut = Math.min(p.o.projOut, 0.25);
     projs = projs.filter(p => !p.dead);
@@ -853,6 +855,7 @@
       case 'shards': g.rotate(t * 18); R.poly(g, [[-6, -2], [7, 0], [-4, 3]], 'rgba(190,230,250,0.9)'); break;
       case 'feather': g.scale(s, 1); g.rotate(Math.atan2(p.vy, Math.abs(p.vx))); g.fillStyle = '#b0141c'; g.beginPath(); g.moveTo(9, 0); g.quadraticCurveTo(0, -4, -9, -2); g.lineTo(-7, 0); g.lineTo(-9, 2); g.quadraticCurveTo(0, 4, 9, 0); g.fill(); R.line(g, -10, 0, 10, 0, '#4a0408', 0.7); g.fillStyle = '#e8e0d0'; g.fillRect(8, -0.6, 3, 1.2); break;
       case 'drumstick': g.rotate(t * 11 * s); R.ball(g, -2, 0, 6, '#8a4a1a'); R.ball(g, -3, -2, 3, '#b8702a'); g.fillStyle = '#7a3a12'; g.beginPath(); g.moveTo(2, -3); g.lineTo(9, -1.4); g.lineTo(9, 1.4); g.lineTo(2, 3); g.fill(); R.ball(g, 10, -1.6, 1.8, '#f0e8d4'); R.ball(g, 10, 1.6, 1.8, '#f0e8d4'); break;
+      case 'spray': for (let i = 0; i < 6; i++) { g.fillStyle = `rgba(255,140,60,${0.5 - i * 0.07})`; g.beginPath(); g.arc(-s * i * 3, Math.sin(t * 30 + i) * 2, 3 + i * 1.2, 0, PI * 2); g.fill(); } break;
       case 'howl': for (let i = 0; i < 4; i++) { g.strokeStyle = `rgba(230,220,255,${0.75 - i * 0.16})`; g.lineWidth = 1.6; g.beginPath(); g.arc(-s * i * 5, 0, 5 + i * 3.5 + Math.sin(t * 24 + i) * 1.5, s > 0 ? -1.1 : PI - 1.1, s > 0 ? 1.1 : PI + 1.1); g.stroke(); } break;
       case 'book': g.rotate(t * 9 * s); g.fillStyle = '#6a1420'; g.fillRect(-7, -5, 14, 10); g.fillStyle = '#f0e8d0'; g.fillRect(-6, -4, 12, 8); g.fillStyle = '#6a1420'; g.fillRect(-7, -5, 14, 2.4); g.fillStyle = '#d8b040'; g.fillRect(-4, -4.6, 8, 0.8); break;
       case 'notice': g.rotate(Math.sin(t * 14) * 0.35); g.fillStyle = '#f2eedc'; g.fillRect(-6, -8, 12, 16); g.fillStyle = '#b01018'; g.font = '5px Anton, Impact, sans-serif'; g.fillText('EVICT', -5.5, -2); g.fillStyle = 'rgba(40,40,40,0.6)'; for (let i = 0; i < 4; i++) g.fillRect(-5, 1 + i * 1.8, 10, 0.7); g.strokeStyle = '#b01018'; g.lineWidth = 0.8; g.strokeRect(-4, -7, 8, 6); break;
@@ -865,48 +868,54 @@
   function setWin(f) { if (f.state === 'win') return; f.state = 'win'; f.winAt = f.t; f.wf = {}; f.snapPose = false; }
   const once = (f, key, t, at) => { if (t >= at && !f.wf[key]) { f.wf[key] = 1; return true; } return false; };
   const WIN = {
-    hippo: { pose: t => P({ hy: 4, lean: -0.15, head: -0.25, jaw: t > 1.6 && t < 2.3 ? 1 : 0.15, aF: [1.6 + Math.sin(t * 16) * 0.5 * (t < 1.6), 1.9], aB: [1.6 - Math.sin(t * 16) * 0.5 * (t < 1.6), 1.9], fF: [13, 0], fB: [-13, 0] }),
-      fx(f, t) { if (t < 1.6 && Math.sin(t * 16) > 0.97) SFX.thud(); if (once(f, 'burp', t, 1.65)) { SFX.gulp(); SFX.fart(); const h = R.jointWorld(f, f.pose, 'head'); FX.puff(h[0] + f.face * 14, h[1] + 4, 'rgba(160,110,200,0.7)', 14, 4); } } },
-    painter: { pose: t => P({ hy: 7, lean: 0.05, head: -0.1, aF: [2.25 + Math.sin(t * 6) * 0.25, 0.8 + Math.cos(t * 6) * 0.25], aB: [0.9, 2.0], fF: [14, 0], fB: [-14, 0] }),
-      fx(f, t) { if (t > 0.3 && t < 2.6 && Math.random() < 0.25) { const h = R.jointWorld(f, f.pose, 'handFx'); FX.puff(h[0] + f.face * 10, h[1] - 8, 'rgba(250,250,255,0.75)', 1, 1); } },
-      draw(g, f) { const h = R.jointWorld(f, f.pose, 'handFx'); R.line(g, h[0], h[1], h[0] + f.face * 10, h[1] - 6, '#6a4a2a', 1.4); R.ball(g, h[0] + f.face * 10.5, h[1] - 6.5, 1.4, '#f8f8ff'); } },
-    garf: { pose: t => t < 1.0 ? P({ hy: 2, lean: -0.3, head: -0.5, jaw: 1, aF: [3.05, 0.1], aB: [2.95, 0.1], fF: [11, 0], fB: [-11, 0] })
-        : P({ hy: 9, lean: 0.2, head: 0.45 + Math.sin(t * 9) * 0.08, jaw: 0.25, aF: [2.35, 2.6], aB: [0.5, 1.6], fF: [13, 0], fB: [-13, 0] }),
-      fx(f, t) { if (once(f, 'yawn', t, 0.2)) SFX.squeak(); } },
-    host: { pose: t => t < 0.55 ? P({ hy: 6, lean: 0.05, aF: [2.55, 1.7], aB: [0.5, 2.0], fF: [13, 0], fB: [-13, 0] })
-        : t < 0.9 ? P({ hy: 5, lean: -0.25, head: -0.2, aF: [3.5, 0.25], aB: [0.5, 2.0], fF: [13, 0], fB: [-13, 0] })
-        : P({ hy: 5, lean: -0.05, head: -0.15, aF: [0.75, 2.3], aB: [0.7, 2.3], fF: [14, 0], fB: [-14, 0] }),
-      fx(f, t) { if (once(f, 'toss', t, 0.6)) { const h = R.jointWorld(f, f.pose, 'handFx'); FX.gib('pencil', h[0], h[1] - 8, -f.face * 320, -260, { vr: 18, draw: g => { g.fillStyle = '#e8c020'; g.fillRect(-6, -0.9, 10, 1.8); g.fillStyle = '#f0c8a0'; g.fillRect(4, -0.9, 2, 1.8); g.fillStyle = '#e88aa0'; g.fillRect(-7.5, -0.9, 1.5, 1.8); } }); }
+    hippo: { fp: t => ({ jaw: t > 1.6 && t < 2.3 ? 1 : 0.15, aL: t < 1.6 ? [0.5, -2.8 + Math.sin(t * 16) * 0.35] : [1.4, 0.4], aR: t < 1.6 ? [0.5, -2.8 - Math.sin(t * 16) * 0.35] : [1.4, 0.4], squat: t < 1.6 ? 2 : 0 }),
+      fx(f, t) { if (t < 1.6 && Math.sin(t * 16) > 0.97) SFX.thud(); if (once(f, 'burp', t, 1.65)) { SFX.gulp(); SFX.fart(); const h = fj(f, 'head'); FX.puff(h[0], h[1] + 10, 'rgba(160,110,200,0.7)', 14, 4); } } },
+    painter: { fp: t => ({ aR: [2.3 + Math.sin(t * 6) * 0.25, 0.6 + Math.cos(t * 6) * 0.25], aL: [0.7, -1.3] }),
+      fx(f, t) { if (t > 0.2 && t < 2.6 && Math.random() < 0.25) { const h = fj(f, 'handR'); FX.puff(h[0] + 8, h[1] - 8, 'rgba(250,250,255,0.75)', 1, 1); } },
+      draw(g, f) { const h = fj(f, 'handR'), l = fj(f, 'handL'); R.line(g, h[0], h[1], h[0] + 6, h[1] - 9, '#6a4a2a', 1.4); R.ball(g, h[0] + 6.5, h[1] - 9.5, 1.4, '#f8f8ff');
+        g.save(); g.translate(l[0] - 4, l[1] + 2); g.fillStyle = '#a87a48'; g.beginPath(); g.ellipse(0, 0, 9, 6, -0.3, 0, PI * 2); g.fill(); ['#f4f4f4', '#2a5ad0', '#e8c020', '#c02020', '#2a8a3a'].forEach((c, i) => { g.fillStyle = c; g.beginPath(); g.arc(-5 + i * 2.6, -1.5 + (i % 2) * 2.5, 1.3, 0, PI * 2); g.fill(); }); g.restore(); } },
+    garf: { fp: t => t < 1.0 ? ({ jaw: 1, aL: [2.9, 0.1], aR: [2.9, 0.1], hy: -2 }) : ({ jaw: 0.25 + Math.abs(Math.sin(t * 9)) * 0.2, head: 0.18, aR: [0.45, -3.2], aL: [0.3, 0.1], squat: 3 }),
+      fx(f, t) { if (once(f, 'yawn', t, 0.1)) SFX.squeak(); } },
+    host: { fp: t => t < 0.55 ? ({ aR: [2.2, 1.0], aL: [0.6, -1.5] }) : t < 0.9 ? ({ aR: [3.3, 0.3], aL: [0.6, -1.5] }) : ({ aR: [0.6, -1.5], aL: [0.6, -1.5] }),
+      fx(f, t) { if (once(f, 'toss', t, 0.6)) { const h = fj(f, 'handR'); FX.gib('pencil', h[0], h[1] - 8, 260, -300, { vr: 18, draw: g => { g.fillStyle = '#e8c020'; g.fillRect(-6, -0.9, 10, 1.8); g.fillStyle = '#f0c8a0'; g.fillRect(4, -0.9, 2, 1.8); g.fillStyle = '#e88aa0'; g.fillRect(-7.5, -0.9, 1.5, 1.8); } }); }
         if (once(f, 'glass', t, 1.0)) { SFX.shatter(); game.flash = 0.06; } },
-      draw(g, f, t) { if (t < 0.6) { const h = R.jointWorld(f, f.pose, 'handFx'); g.fillStyle = '#e8c020'; g.fillRect(h[0] - 1, h[1] - 10, 1.8, 10); } } },
-    ballin: { pose: t => P({ hy: 6, lean: -0.05, head: -0.35, aF: [3.08, 0.04], aB: t > 1.4 ? [1.15, 2.55] : [0.6, 1.9], fF: [12, 0], fB: [-12, 0] }),
-      draw(g, f, t) { const h = R.jointWorld(f, f.pose, 'handFx'); g.save(); g.translate(h[0], h[1] - 9); g.rotate(t * 16); R.ball(g, 0, 0, 7, '#e0701a'); R.line(g, -7, 0, 7, 0, '#2a1004', 0.9); R.line(g, 0, -7, 0, 7, '#2a1004', 0.9); g.restore(); } },
-    gertie: { pose: t => P({ hy: 2, lean: -0.2, head: -0.6 + Math.sin(t * 5) * 0.15, jaw: Math.sin(t * 5) > 0 ? 0.8 : 0.1, aF: [2.3 + Math.sin(t * 14) * 0.35, 0.3], aB: [2.1 + Math.sin(t * 14) * 0.35, 0.35], fF: [12, 0], fB: [-12, 0] }),
-      fx(f, t) { if (once(f, 'h1', t, 0.2) || once(f, 'h2', t, 0.8) || once(f, 'h3', t, 1.6)) SFX.honk(); } },
-    rocky: { pose: t => P({ hy: 9, lean: 0.35, head: 0.15, jaw: 0.4 + Math.abs(Math.sin(t * 7)) * 0.3, aF: [1.45 + Math.sin(t * 20) * 0.18, 2.35], aB: [1.35 - Math.sin(t * 20) * 0.18, 2.45], fF: [12, 0], fB: [-13, 0] }),
-      fx(f, t) { if (Math.random() < 0.2) { const h = R.jointWorld(f, f.pose, 'head'); FX.puff(h[0] + f.face * 10, h[1] + 5, 'rgba(245,245,235,0.9)', 1, 1); } if (once(f, 'c', t, 0.4) || once(f, 'c2', t, 1.4)) SFX.squeak(); } },
-    millie: { pose: t => P({ hy: 3, lean: -0.15, head: -0.2, jaw: Math.abs(Math.sin(t * 30)) * 0.6, aF: [2.4, 1.2], aB: [2.2, 1.3], fF: [12, 0], fB: [-12, 0] }),
-      fx(f, t) { if (once(f, 's1', t, 0.4) || once(f, 's2', t, 1.1) || once(f, 's3', t, 1.8)) { SFX.thud(); FX.dust(f.x - f.face * 26, FLOOR, 8); } if (Math.random() < 0.15) SFX.gnaw && Math.random() < 0.2 && SFX.gnaw(); } },
-    chucky: { pose: t => P({ hy: 4, lean: -0.3, head: -0.3, aF: [2.0 + Math.sin(t * 18) * 0.45, 0.5], aB: [1.9 + Math.sin(t * 18) * 0.45, 0.6], fF: [12, 0], fB: [-12, 0] }),
-      fx(f, t) { if (once(f, 'c1', t, 0.2) || once(f, 'c2', t, 0.9) || once(f, 'c3', t, 1.5)) SFX.chirp(); if (Math.random() < 0.06) { const c = R.jointWorld(f, f.pose, 'chest'); FX.gib('feather', c[0], c[1], rnd(-60, 60), rnd(-120, -40), { grav: 100, vr: 4, draw: g => R.oval(g, 0, 0, 4, 1.4, '#b0141c', 0, true) }); } } },
-    turkey: { pose: t => P({ hy: 6, lean: 0.3, head: -0.4 + Math.sin(t * 6) * 0.2, aF: [0.3, 0.2], aB: [0.25, 0.2], fF: [10 + Math.sin(t * 5) * 4, -Math.max(0, Math.sin(t * 5)) * 4], fB: [-10 + Math.sin(t * 5) * 4, -Math.max(0, -Math.sin(t * 5)) * 4] }),
-      fx(f, t) { if (once(f, 'g1', t, 0.3) || once(f, 'g2', t, 1.3)) SFX.yelp(); } },
-    wolfe: { pose: t => t < 1.7 ? P({ hy: 3, lean: -0.35, head: -1.05, jaw: 1, aF: [0.8, 0.6], aB: [0.7, 0.6], fF: [13, 0], fB: [-13, 0] })
-        : P({ hy: 6, lean: 0.15, head: 0.35, jaw: 0.1, aF: [2.5, 2.75], aB: [0.6, 1.9], fF: [13, 0], fB: [-13, 0] }),
-      fx(f, t) { if (once(f, 'howl', t, 0.15)) SFX.howl(); if (once(f, 'sniff', t, 1.8)) { SFX.sniff(); const h = R.jointWorld(f, f.pose, 'head'); FX.puff(h[0] + f.face * 22, h[1] - 2, 'rgba(250,250,250,0.9)', 10, 2); } } },
-    em: { pose: t => t < 1.0 ? P({ hy: 13, lean: 0.22, head: 0.35, aF: [0.55, 0.6], aB: [0.45, 0.6], fF: [6, 0], fB: [-15, 0] })
-        : P({ hy: 4, lean: -0.1, head: -0.25, aF: [3.0, 0.3], aB: [0.7, 2.3], fF: [12, 0], fB: [-12, 0] }),
+      draw(g, f, t) { if (t < 0.6) { const h = fj(f, 'handR'); g.fillStyle = '#e8c020'; g.fillRect(h[0] - 1, h[1] - 10, 1.8, 10); } } },
+    ballin: { fp: t => ({ aR: [2.98, 0.04], aL: t > 1.2 ? [0.45, -2.5] : [0.5, -1.4] }),
+      draw(g, f, t) { const h = fj(f, 'handR'); g.save(); g.translate(h[0], h[1] - 9); g.rotate(t * 16); R.ball(g, 0, 0, 7, '#e0701a'); R.line(g, -7, 0, 7, 0, '#2a1004', 0.9); R.line(g, 0, -7, 0, 7, '#2a1004', 0.9); g.restore(); } },
+    gertie: { fp: t => ({ jaw: Math.sin(t * 5) > 0 ? 0.9 : 0.1, aL: [1.9 + Math.sin(t * 14) * 0.4, 0.3], aR: [1.9 + Math.sin(t * 14) * 0.4, 0.3], head: Math.sin(t * 3) * 0.15 }),
+      fx(f, t) { if (once(f, 'h1', t, 0.1) || once(f, 'h2', t, 0.8) || once(f, 'h3', t, 1.6)) SFX.honk(); } },
+    rocky: { fp: t => ({ jaw: 0.4 + Math.abs(Math.sin(t * 7)) * 0.3, aL: [0.35, -1.9 + Math.sin(t * 20) * 0.18], aR: [0.35, -1.9 - Math.sin(t * 20) * 0.18], squat: 4 }),
+      fx(f, t) { if (Math.random() < 0.2) { const h = fj(f, 'head'); FX.puff(h[0], h[1] + 12, 'rgba(245,245,235,0.9)', 1, 1); } if (once(f, 'c', t, 0.3) || once(f, 'c2', t, 1.3)) SFX.squeak(); } },
+    millie: { fp: t => ({ jaw: Math.abs(Math.sin(t * 30)) * 0.6, aL: [2.5, 0.8], aR: [2.5, 0.8], hy: -Math.abs(Math.sin(t * 4)) * 3 }),
+      fx(f, t) { if (once(f, 's1', t, 0.3) || once(f, 's2', t, 1.0) || once(f, 's3', t, 1.7)) { SFX.thud(); FX.dust(f.x, FLOOR, 6); } } },
+    chucky: { fp: t => ({ aL: [1.65, 1.45 + Math.sin(t * 6) * 0.1], aR: [1.65, 1.45 + Math.sin(t * 6) * 0.1], hy: -2, jaw: once2(t) }),
+      fx(f, t) { if (once(f, 'c1', t, 0.1) || once(f, 'c2', t, 0.8) || once(f, 'c3', t, 1.4)) SFX.chirp(); if (Math.random() < 0.05) { const c = fj(f, 'chest'); FX.gib('feather', c[0], c[1], rnd(-60, 60), rnd(-120, -40), { grav: 100, vr: 4, draw: g => R.oval(g, 0, 0, 4, 1.4, '#b0141c', 0, true) }); } } },
+    turkey: { fp: t => ({ aL: [0.45, 0.1], aR: [0.45, 0.1], head: Math.sin(t * 6) * 0.2, squat: Math.abs(Math.sin(t * 5)) * 3, jaw: Math.sin(t * 9) > 0.5 ? 0.6 : 0 }),
+      fx(f, t) { if (once(f, 'g1', t, 0.2) || once(f, 'g2', t, 1.2)) SFX.yelp(); } },
+    wolfe: { fp: t => t < 1.7 ? ({ jaw: 1, aL: [1.0, 0.5], aR: [1.0, 0.5], hy: -2 }) : ({ jaw: 0.1, aR: [0.45, -3.25], aL: [0.6, -1.5] }),
+      fx(f, t) { if (once(f, 'howl', t, 0.05)) SFX.howl(); if (once(f, 'sniff', t, 1.8)) { SFX.sniff(); const h = fj(f, 'head'); FX.puff(h[0], h[1] + 6, 'rgba(250,250,250,0.9)', 10, 2); } } },
+    em: { fp: t => t < 1.0 ? ({ squat: 10, head: 0.1, aL: [0.35, -0.35], aR: [0.35, -0.35], spread: 1 }) : ({ aR: [2.95, 0.15], aL: [0.6, -1.5] }),
       fx(f, t) { if (once(f, 'ding', t, 1.05)) SFX.ding(); },
-      draw(g, f, t) { if (t < 1.0) return; const h = R.jointWorld(f, f.pose, 'handFx'); g.save(); g.translate(h[0], h[1] - 8); g.fillStyle = '#6a1420'; g.fillRect(-6, -8, 12, 16); g.fillStyle = '#d8b040'; g.fillRect(-4, -4, 8, 1); g.fillRect(-4, -2, 8, 0.7); g.fillStyle = '#f0e8d0'; g.fillRect(6, -7, 1.4, 14); g.restore(); } },
-    golem: { pose: t => P({ hy: 3, lean: -0.1, head: Math.sin(t * 20) * 0.1, aF: [2.9 + Math.sin(t * 22) * 0.15, 0.3], aB: [2.8 - Math.sin(t * 22) * 0.15, 0.3], fF: [13, 0], fB: [-13, 0] }),
-      fx(f, t) { if (once(f, 'c', t, 0.3) || once(f, 'c2', t, 1.0)) SFX.clang(); } },
-    slumlord: { pose: t => P({ hy: 4, lean: -0.08, head: -0.2, aF: [2.85 + Math.sin(t * 7) * 0.15, 2.5], aB: [1.75, 2.45], fF: [12, 0], fB: [-12, 0] }),
-      fx(f, t) { if (once(f, 'b', t, 0.5)) game.bubbles.push({ str: 'STILL GORGEOUS.', x: f.x, y: f.y - hurtH(f) - 16, t: 0, life: 1.8, size: 11, fill: 'gold' }); } },
-    dan: { pose: t => P({ hy: 4, lean: -0.25, head: -0.45, jaw: Math.abs(Math.sin(t * 18)) * 0.8, aF: [1.05, 2.3], aB: [2.95, 0.1], fF: [13, 0], fB: [-13, 0] }),
-      fx(f, t) { if (Math.random() < 0.4) FX.fire(f.x + rnd(-24, 24), FLOOR, 1, 0.9); if (once(f, 'f', t, 0.1)) SFX.fire(); } },
+      draw(g, f, t) { if (t < 1.0) return; const h = fj(f, 'handR'); g.save(); g.translate(h[0], h[1] - 8); g.fillStyle = '#6a1420'; g.fillRect(-6, -8, 12, 16); g.fillStyle = '#d8b040'; g.fillRect(-4, -4, 8, 1); g.fillRect(-4, -2, 8, 0.7); g.fillStyle = '#f0e8d0'; g.fillRect(6, -7, 1.4, 14); g.restore(); } },
+    golem: { fp: t => ({ aL: [2.9 + Math.sin(t * 22) * 0.15, 0.3], aR: [2.9 - Math.sin(t * 22) * 0.15, 0.3], sway: Math.sin(t * 20) * 0.03 }),
+      fx(f, t) { if (once(f, 'c', t, 0.2) || once(f, 'c2', t, 0.9)) SFX.clang(); } },
+    slumlord: { fp: t => ({ aL: [1.9, 1.7], aR: [2.6 + Math.sin(t * 7) * 0.15, 1.6], head: -0.12 }),
+      fx(f, t) { if (once(f, 'b', t, 0.4)) game.bubbles.push({ str: 'STILL GORGEOUS.', x: f.x, y: f.y - hurtH(f) - 20, t: 0, life: 1.8, size: 11, fill: 'gold' }); },
+      draw(g, f) { const h = fj(f, 'handL'); g.save(); g.translate(h[0], h[1]); g.fillStyle = '#c89830'; g.fillRect(-1.2, -2, 2.4, 9); g.beginPath(); g.ellipse(0, -8, 5.5, 7, 0, 0, PI * 2); g.fill(); g.fillStyle = '#b8d0e0'; g.beginPath(); g.ellipse(0, -8, 4.2, 5.6, 0, 0, PI * 2); g.fill(); g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(-2, -12, 1.2, 4); g.restore(); } },
+    dan: { fp: t => ({ jaw: Math.abs(Math.sin(t * 18)) * 0.8, aR: [2.98, 0.08], aL: [0.5, -2.0] }),
+      fx(f, t) { if (Math.random() < 0.4) FX.fire(f.x + rnd(-24, 24), FLOOR, 1, 0.9); if (once(f, 'f', t, 0.1)) SFX.fire(); },
+      draw(g, f) { const h = fj(f, 'handR'); R.line(g, h[0], h[1] + 26, h[0], h[1] - 40, '#4a2e12', 2.2); R.line(g, h[0] - 6, h[1] - 40, h[0] + 6, h[1] - 40, '#b8b8c0', 1.8); for (let i = -1; i <= 1; i++) R.line(g, h[0] + i * 5.5, h[1] - 40, h[0] + i * 5.5, h[1] - 49, '#c8c8d0', 1.4); } },
+    tinkle: { fp: t => ({ aL: [0.95, 1.25], aR: [0.95, 1.25], jaw: 0.3, head: Math.sin(t * 2) * 0.1 }),
+      fx(f, t) { if (once(f, 'b', t, 0.3)) game.bubbles.push({ str: 'I FEARED FOR MY LIFE.', x: f.x, y: f.y - hurtH(f) - 20, t: 0, life: 2, size: 11, fill: 'white' }); } },
   };
-  function winPose(f) { const t = f.t - (f.winAt ?? f.t), w = WIN[f.def.id]; return w ? w.pose(t) : PS.win(f.t); }
-  function winFx(f) { if (!f.wf) f.wf = {}; const w = WIN[f.def.id]; if (w && w.fx) w.fx(f, f.t - (f.winAt ?? f.t)); }
+  function once2(t) { return Math.sin(t * 5) > 0.8 ? 0.6 : 0; }
+  // victory poses turn to face the camera: a quick squash out of profile, then the front view
+  const TURN = 0.17;
+  function fj(f, name) { if (f.fj && f.fj[name]) return f.fj[name]; return R.jointWorld(f, f.pose, { handR: 'handFx', handL: 'handBx' }[name] || name); }
+  function winT(f) { return f.t - (f.winAt ?? f.t); }
+  function winPose(f) { return PS.win(f.t); }
+  function frontPose(f, t) { const w = WIN[f.def.id]; return w && w.fp ? w.fp(t) : { aL: [2.7, 0.3], aR: [2.7, 0.3] }; }
+  function winFx(f) { if (!f.wf) f.wf = {}; const w = WIN[f.def.id], t = winT(f) - TURN * 2; if (w && w.fx && t >= 0 && f.fj) w.fx(f, t); }
 
   // ---------- pose + camera ----------
   function targetPose(f) {
@@ -1129,7 +1138,16 @@
     if (f.ro.scale) ro.scale = f.ro.scale;
     const fx = f.x + (f.ro.dx || 0), fy = f.y + (f.ro.dy || 0);
     const spun = f.state === 'attack' && f.move === MV.round && f.mt > 0.05 && f.mt < 0.13;
-    R.digi(g, fx, fy, gg => R.draw(gg, { def: f.def, d: f.d, x: fx, y: fy, face: spun ? -f.face : f.face, t: f.t, st: f.st2 }, f.pose, ro), { box: [50, 20, 280, 310], tint: f.ro.char ? [0.45, 0.35, 0.3] : null });
+    const wt = f.state === 'win' && f.def.front ? winT(f) : -1;
+    if (wt >= TURN) {
+      // facing the camera
+      const sx = Math.min(1, (wt - TURN) / TURN);
+      R.digi(g, fx, fy, gg => { f.fj = R.drawFront(gg, { def: f.def, d: f.d, x: fx, y: fy, t: f.t, st: f.st2 }, frontPose(f, Math.max(0, wt - TURN * 2)), Object.assign({}, ro, { sx: Math.max(0.05, sx) })); }, { box: [20, 0, 340, 330] });
+    } else {
+      f.fj = null;
+      const sq = wt >= 0 ? Math.max(0.05, 1 - wt / TURN) : 1;
+      R.digi(g, fx, fy, gg => { if (sq < 1) { gg.translate(fx, 0); gg.scale(sq, 1); gg.translate(-fx, 0); } R.draw(gg, { def: f.def, d: f.d, x: fx, y: fy, face: spun ? -f.face : f.face, t: f.t, st: f.st2 }, f.pose, ro); }, { box: [50, 20, 280, 310], tint: f.ro.char ? [0.45, 0.35, 0.3] : null });
+    }
     // the wounded keep bleeding
     if (!f.hidden && f.hp < 70 && Math.random() < (1 - f.hp / 70) * 0.25 && f.state !== 'script') { const hp = R.jointWorld(f, f.pose, Math.random() < 0.5 ? 'head' : 'chest'); FX.blood(hp[0], hp[1], 1, 0, 0.15); }
     if (f.blind > 0 && f.state === 'hit') {
@@ -1137,7 +1155,7 @@
       g.fillStyle = 'rgba(255,255,255,0.9)'; for (let i = 0; i < 10; i++) g.fillRect(hp[0] + f.face * (2 + (i * 3.7) % 10) * f.d.k, hp[1] - 12 + (i * 5.3) % 9, 1.4, 1.4);
       g.fillStyle = 'rgba(200,0,20,0.8)'; g.fillRect(hp[0] + f.face * 8 * f.d.k, hp[1] - 9, 1.2, 4 + Math.sin(f.t * 6) * 2);
     }
-    if (f.state === 'win' && WIN[f.def.id] && WIN[f.def.id].draw) WIN[f.def.id].draw(g, f, f.t - (f.winAt ?? f.t));
+    if (f.state === 'win' && f.fj && WIN[f.def.id] && WIN[f.def.id].draw) WIN[f.def.id].draw(g, f, winT(f) - TURN * 2);
     if (f.state === 'dizzy' || (f.state === 'hit' && f.daze)) {
       const hp = R.jointWorld(f, f.pose, 'head');
       for (let i = 0; i < 3; i++) { const a = f.t * 4 + i * 2.1; g.fillStyle = '#ffe040'; g.font = '9px Anton, Impact, sans-serif'; g.fillText('*', hp[0] + Math.cos(a) * 12 - 2, hp[1] - 12 + Math.sin(a) * 3); }
@@ -1267,7 +1285,7 @@
     const gr = g.createLinearGradient(0, y, 0, y + h); gr.addColorStop(0, on ? '#7a1a1a' : '#2a0a10'); gr.addColorStop(1, on ? '#3a0606' : '#100206');
     g.fillStyle = gr; g.fillRect(x, y, w, h);
     g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
-    const sc = w / 36, adj = { gertie: [0.42, 0.78, 1.5], painter: [0.5, 0.86, 0.85], hippo: [0.3, 0.9, 0.85], garf: [0.4, 0.9, 0.95], turkey: [0.36, 0.94, 1.45], chucky: [0.38, 0.95, 0.85], wolfe: [0.3, 0.92, 0.8], em: [0.42, 0.96, 0.95], slumlord: [0.42, 0.92, 0.85], golem: [0.5, 0.7, 1], dan: [0.42, 0.95, 0.85] }[def.id] || [0.4, 0.88, 1];
+    const sc = w / 36, adj = { gertie: [0.42, 0.78, 1.5], painter: [0.5, 0.86, 0.85], hippo: [0.3, 0.9, 0.85], garf: [0.4, 0.9, 0.95], turkey: [0.36, 0.94, 1.45], chucky: [0.38, 0.95, 0.85], wolfe: [0.3, 0.92, 0.8], em: [0.42, 0.96, 0.95], slumlord: [0.42, 0.92, 0.85], tinkle: [0.42, 0.96, 0.9], golem: [0.5, 0.7, 1], dan: [0.42, 0.95, 0.85] }[def.id] || [0.4, 0.88, 1];
     R.drawHeadAt(g, { def, d: def.dk }, x + w * adj[0], y + h * adj[1], 0, sc / def.k * adj[2], { t, hurt: false });
     g.restore();
     g.strokeStyle = on ? '#ffe060' : '#6a4a20'; g.lineWidth = on ? 2 : 1; g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
@@ -1311,7 +1329,7 @@
   }
   // ---------- single match: pick the opponent, then the arena ----------
   const OPPS = () => ROSTER.FIGHTERS.concat(ROSTER.BOSSES);
-  const ARENAS = () => STAGES.ROTATION.concat(['glassworks', 'rental', 'hell']);
+  const ARENAS = () => STAGES.ROTATION.concat(['glassworks', 'rental']);
   function renderOpp() {
     elControls.classList.remove('on'); elPause.classList.remove('on');
     bgDark(); ui = [];
@@ -1365,7 +1383,7 @@
     elControls.classList.remove('on'); elPause.classList.remove('on');
     bgDark(); ui = [];
     const g = ctx, t = game.time, w = game.winner, def = w.def, won = w === p1;
-    R.digi(g, W / 2, 200, gg => R.draw(gg, { def, d: def.dk, x: W / 2, y: 200, face: 1, t }, winPose({ def, t, winAt: 0.5 }), {}));
+    R.digi(g, W / 2, 200, gg => R.drawFront(gg, { def, d: def.dk, x: W / 2, y: 200, t }, frontPose({ def }, t % 3)), { box: [20, 0, 340, 330] });
     TXT.draw(g, won ? 'YOU WIN' : 'YOU LOSE', W / 2, 8, { size: 30, align: 'center', fill: won ? 'gold' : 'blood' });
     TXT.draw(g, def.name + ' WINS', W / 2, 44, { size: 13, align: 'center', fill: 'white' });
     uiButton('REMATCH', 10, H - 100, 110, 26, () => { SFX.gong(); startMatch(); }, 'fire', 14);
@@ -1437,7 +1455,7 @@
     const g = ctx, t = game.time, def = ROSTER.FIGHTERS[ladder.pick];
     if (Math.random() < 0.6) FX.blood(rnd(0, W), -4, 1, 0, 0.2);
     FX.setFloor(H + 20); FX.update(1 / 60); FX.drawParts(g); FX.setFloor(FLOOR);
-    R.digi(g, W / 2, 206, gg => R.draw(gg, { def, d: def.dk, x: W / 2, y: 206, face: 1, t }, PS.win(t)));
+    R.digi(g, W / 2, 206, gg => R.drawFront(gg, { def, d: def.dk, x: W / 2, y: 206, t }, frontPose({ def }, t % 3)), { box: [20, 0, 340, 330] });
     TXT.draw(g, def.name, W / 2, 10, { size: 30, align: 'center', fill: 'fire' });
     TXT.draw(g, 'IS THE CHAMPION OF', W / 2, 46, { size: 14, align: 'center', fill: 'white' });
     TXT.draw(g, 'MUNCIE KOMBAT', W / 2, 62, { size: 24, align: 'center', fill: 'blood' });

@@ -377,6 +377,76 @@ const RIG = (() => {
     g.restore();
     return J;
   }
+  // ---------- front view: the fighter turns to face the camera for the victory pose ----------
+  // fp: { hy, squat, spread, sway, head (tilt), jaw, aL/aR: [upper angle from straight down, outward +; elbow bend, + outward/up] }
+  // L is screen left. Returns joints in world coordinates.
+  function drawFront(g, f, fp, o = {}) {
+    const def = f.def, d = f.d, Fd = def.front || {}, c = def.col, ms = def.mat || {}, k = d.k;
+    const st = Object.assign({ t: f.t || 0, face: 1 }, f.st || {}, o);
+    const sx = o.sx == null ? 1 : o.sx;
+    g.save(); g.translate(f.x, f.y); g.scale(sx, 1); if (fp.sway) g.rotate(fp.sway);
+    const Lg = (d.thigh + d.shin) * 0.96, sq = (fp.squat || 0) * k, hipY = -Lg + sq + (fp.hy || 0) * k, hx = d.hipW * 0.55;
+    const sY = hipY - d.torso, nY = sY - d.neck * 0.7 - 2 * k, shx = Math.max(d.shW, d.chest * 0.8);
+    const legs = [-1, 1].map(sd => { const hip = [sd * hx, hipY], foot = [sd * (hx + (fp.spread ?? 4) * k), -d.footH * 0.4 - (sd < 0 ? fp.liftL || 0 : fp.liftR || 0) * k]; return { sd, hip, foot, knee: [(hip[0] + foot[0]) / 2 + sd * sq * 0.6, (hip[1] + foot[1]) / 2] }; });
+    const armPts = (sd, a) => { const s0 = [sd * shx * 0.95, sY + d.shR * 0.6], el = [s0[0] + sd * Math.sin(a[0]) * d.upper, s0[1] + Math.cos(a[0]) * d.upper], b = a[0] + a[1], wr = [el[0] + sd * Math.sin(b) * d.fore, el[1] + Math.cos(b) * d.fore]; return { sd, s0, el, wr }; };
+    const arms = { L: armPts(-1, fp.aL || [0.25, 0.1]), R: armPts(1, fp.aR || [0.25, 0.1]) };
+    const G = { hipY, sY, nY, shx, hx, legs, arms, k };
+    if (Fd.behind) Fd.behind(g, d, G, st);
+    if (Fd.body) Fd.body(g, d, G, st);
+    else {
+      for (const L of legs) {
+        seg(g, L.knee, L.foot, d.kneeR, d.ankleR, c.legL || c.legU, ms.legL || ms.legU || 'skin', { seed: 60 + L.sd, bb: 0.2 });
+        if (def.sock) seg(g, lerp2(L.knee, L.foot, 0.5), L.foot, d.ankleR * 1.1, d.ankleR * 1.05, def.sock, 'cloth', { seed: 62 });
+        seg(g, L.hip, L.knee, d.thighR, d.kneeR, c.legU, ms.legU || 'skin', { seed: 64 + L.sd, bf: 0.1 });
+        if (def.stripe) { const a = lerp2(L.hip, L.knee, 0.05), b = lerp2(L.hip, L.knee, 0.9); line(g, a[0] - L.sd * d.thighR * 0.8, a[1], b[0] - L.sd * d.kneeR * 0.8, b[1], def.stripe, 1.2); }
+        // feet point at the camera
+        if (def.talons) { for (let i = -1; i <= 1; i++) line(g, L.foot[0], L.foot[1], L.foot[0] + i * 4 * k, L.foot[1] + 3 * k, c.foot, 1.6 * k); }
+        else { g.fillStyle = litFill(g, L.foot, 0, -1, d.footH * 2, c.foot, false); g.beginPath(); g.ellipse(L.foot[0] + L.sd * 1.5, L.foot[1] + d.footH * 0.2, d.ankleR * 1.5, d.footH * 0.75, 0, 0, PI * 2); g.fill(); }
+      }
+      // torso, front on
+      const wy = hipY - d.torso * 0.4, ww = Math.max(d.hipW * 0.95, d.belly * 0.72);
+      g.beginPath();
+      g.moveTo(-shx, sY + 1);
+      g.quadraticCurveTo(0, sY - 3 * k, shx, sY + 1);
+      g.quadraticCurveTo(shx * 1.05, sY + d.torso * 0.3, ww, wy);
+      g.quadraticCurveTo(ww * 1.02, hipY - 2, d.hipW * 1.05, hipY + 3 * k);
+      g.lineTo(-d.hipW * 1.05, hipY + 3 * k);
+      g.quadraticCurveTo(-ww * 1.02, hipY - 2, -ww, wy);
+      g.quadraticCurveTo(-shx * 1.05, sY + d.torso * 0.3, -shx, sY + 1);
+      g.closePath();
+      const tg = g.createLinearGradient(-shx, 0, shx, 0); tg.addColorStop(0, shade(c.torso, -0.4)); tg.addColorStop(0.55, c.torso); tg.addColorStop(0.85, shade(c.torso, 0.12)); tg.addColorStop(1, shade(c.torso, -0.15));
+      g.save(); if ((ms.torso) === 'glass') g.globalAlpha = 0.82; g.fillStyle = tg; g.fill(); g.globalAlpha = 1; g.clip();
+      if (ms.torso === 'fur' || ms.torso === 'feather') { srand(33); for (let i = 0; i < 60; i++) { const x = (rr() - 0.5) * shx * 2, y = sY + rr() * (hipY - sY); g.strokeStyle = rr() < 0.5 ? 'rgba(0,0,0,0.25)' : 'rgba(255,240,220,0.15)'; g.lineWidth = 0.7; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (rr() - 0.5) * 2, y + 3); g.stroke(); } }
+      if (Fd.detail) Fd.detail(g, d, G, st);
+      const ao = g.createLinearGradient(0, hipY - 6, 0, hipY + 3); ao.addColorStop(0, 'rgba(0,0,0,0)'); ao.addColorStop(1, 'rgba(0,0,0,0.3)'); g.fillStyle = ao; g.fillRect(-shx * 2, hipY - 6, shx * 4, 9);
+      g.restore();
+      if (Fd.skirt) Fd.skirt(g, d, G, st);
+      seg(g, [0, sY + 2], [0, nY], d.shW * 0.36, d.shW * 0.32, c.neck || c.hand, ms.neck || 'skin', { seed: 5 });
+      if (Fd.collar) Fd.collar(g, d, G, st);
+    }
+    // arms
+    for (const A of [arms.L, arms.R]) {
+      if (Fd.wing) { Fd.wing(g, d, A, st); continue; }
+      seg(g, A.el, A.wr, d.elbowR, d.wristR, c.armL || c.armU, ms.armL || ms.armU || 'skin', { seed: 70 + A.sd, bf: 0.2 });
+      if (c.cuff) seg(g, lerp2(A.el, A.wr, 0.82), A.wr, d.wristR * 1.2, d.wristR * 1.2, c.cuff, 'cloth', { seed: 72 });
+      if (def.sleeve && A.sd > 0) seg(g, lerp2(A.el, A.wr, -0.04), lerp2(A.el, A.wr, 0.93), d.elbowR * 1.1, d.wristR * 1.12, def.sleeve, 'cloth', { seed: 73 });
+      seg(g, A.s0, A.el, d.shR, d.elbowR, c.armU, ms.armU || 'skin', { seed: 74 + A.sd, bf: def.bicep != null ? def.bicep : 0.25 });
+      const hr = (def.paws ? d.fist * 1.15 : d.fist * 1.05);
+      g.fillStyle = litFill(g, A.wr, 0, -1, hr * 2, c.hand, false); g.beginPath(); g.arc(A.wr[0], A.wr[1] + hr * 0.4, hr, 0, PI * 2); g.fill();
+      if (def.claws || def.paws) { for (let i = -1; i <= 1; i++) line(g, A.wr[0] + i * hr * 0.5, A.wr[1] + hr * 1.1, A.wr[0] + i * hr * 0.55, A.wr[1] + hr * 1.6, '#e8e0d0', 0.8); }
+    }
+    if (Fd.front) Fd.front(g, d, G, st);
+    // head
+    g.save(); g.translate(0, nY); g.rotate(fp.head || 0); g.scale(k * (Fd.headScale || 1), k * (Fd.headScale || 1));
+    const hs = Object.assign({}, st, { jaw: fp.jaw || 0 });
+    if (Fd.head) Fd.head(g, hs); else { g.scale(1, 1); def.head(g, hs, def); }
+    g.restore();
+    if (Fd.overHead) Fd.overHead(g, d, G, st);
+    g.restore();
+    const w = p => [f.x + p[0] * sx, f.y + p[1]];
+    return { handL: w(arms.L.wr), handR: w(arms.R.wr), head: w([0, nY - 12 * k]), chest: w([0, sY + d.torso * 0.25]), neck: w([0, nY]), hip: w([0, hipY]) };
+  }
+
   function drawHeadAt(g, f, x, y, rot, sc, st) {
     g.save();
     g.translate(x, y); g.rotate(rot); g.scale(sc * f.d.k, sc * f.d.k);
@@ -516,5 +586,5 @@ const RIG = (() => {
     }
   }
 
-  return { P, track, lerp, resolve, solve, draw, drawHeadAt, jointWorld, digi, seg, segPath, litFill, srand, rr, shade, ball, oval, poly, line, cap, capPath, sphFill, bone, skull, BONE, PI, dir, add, lerp2 };
+  return { P, track, lerp, resolve, solve, draw, drawFront, drawHeadAt, jointWorld, digi, seg, segPath, litFill, srand, rr, shade, ball, oval, poly, line, cap, capPath, sphFill, bone, skull, BONE, PI, dir, add, lerp2 };
 })();
