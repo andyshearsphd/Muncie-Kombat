@@ -132,6 +132,8 @@ const SFX = (() => {
     gulp: () => { tone(180, 0.25, 'sine', 0.4, -140); tone(120, 0.2, 'sine', 0.3, -60, 0.18); },
     fart: () => { tone(70, 0.6, 'sawtooth', 0.35, -25); tone(84, 0.6, 'square', 0.12, -30); noise(0.5, 0.3, 200, 2, 'bandpass'); },
     howl: () => { tone(300, 0.4, 'sawtooth', 0.1, 300); tone(300, 0.4, 'sine', 0.2, 300); tone(600, 1.1, 'sine', 0.22, -260, 0.38); tone(604, 1.1, 'sawtooth', 0.07, -270, 0.38); noise(1.4, 0.06, 900, 3, 'bandpass', 0.05); },
+    hiss: () => { noise(0.55, 0.32, 4200, 0.7, 'highpass', 0, 0.03); noise(0.4, 0.2, 2600, 2, 'bandpass', 0.05); },
+    creak: () => { tone(140, 0.7, 'sawtooth', 0.12, -60); tone(95, 0.9, 'sawtooth', 0.1, -40, 0.25); },
     sniff: () => { noise(0.12, 0.35, 3000, 1.5, 'bandpass'); noise(0.12, 0.35, 3200, 1.5, 'bandpass', 0.16); noise(0.35, 0.4, 2600, 1.2, 'bandpass', 0.32, 0.02, 4200); },
     ding: () => { tone(2100, 0.5, 'sine', 0.25); tone(4200, 0.25, 'sine', 0.08); },
     squish: () => { noise(0.3, 0.4, 400, 3, 'bandpass', 0, 0.01, 150); tone(90, 0.3, 'sine', 0.25, -40); },

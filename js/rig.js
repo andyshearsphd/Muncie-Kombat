@@ -161,7 +161,7 @@ const RIG = (() => {
     gr.addColorStop(0, shade(c, 0.22 + k)); gr.addColorStop(0.22, shade(c, 0.04 + k)); gr.addColorStop(0.55, shade(c, -0.22 + k)); gr.addColorStop(0.85, shade(c, -0.55 + k)); gr.addColorStop(1, shade(c, -0.78));
     return gr;
   }
-  // materials: skin, cloth, denim, suit, fur, glass, feather
+  // materials: skin, cloth, denim, suit, fur, glass, feather, metal
   function seg(g, A, B, ra, rb, c, mat, o = {}) {
     const bf = o.bf || 0, bb = o.bb || 0, seed = o.seed || 1, dark = !!o.dark;
     const fr = segPath(g, A, B, ra, rb, bf, bb, o.bpos || 0.42);
@@ -201,6 +201,13 @@ const RIG = (() => {
       g.fillStyle = 'rgba(255,235,210,0.09)'; g.beginPath(); g.ellipse(h[0], h[1], r * 0.4, fr.L * 0.3, Math.atan2(fr.uy, fr.ux), 0, PI * 2); g.fill();
       const a = P(t - 0.15, -side * r * 0.2), b = P(t + 0.25, -side * r * 0.35);
       g.strokeStyle = 'rgba(60,20,10,0.22)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+    } else if (mat === 'metal') {
+      // duct pipe: a hard specular line, a dark reflection and crimped seams
+      const r = (ra + rb) * 0.5, hs = side => [P(0.04, side * r), P(0.96, side * r)];
+      let [a, b] = hs(0.3); g.strokeStyle = 'rgba(255,255,255,0.8)'; g.lineWidth = Math.max(1, r * 0.3); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+      [a, b] = hs(-0.45); g.strokeStyle = 'rgba(20,24,30,0.3)'; g.lineWidth = Math.max(1, r * 0.35); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+      const n = Math.max(2, Math.round(fr.L / 6.5));
+      for (let i = 1; i < n; i++) { const t = i / n, p0 = P(t, -r * 1.3), p1 = P(t, r * 1.3); g.strokeStyle = 'rgba(40,44,54,0.5)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(p0[0], p0[1]); g.lineTo(p1[0], p1[1]); g.stroke(); g.strokeStyle = 'rgba(255,255,255,0.3)'; g.lineWidth = 0.5; g.beginPath(); g.moveTo(p0[0] + fr.ux, p0[1] + fr.uy); g.lineTo(p1[0] + fr.ux, p1[1] + fr.uy); g.stroke(); }
     } else if (mat === 'glass') {
       const a = P(0.1, (ra + rb) * 0.25), b = P(0.85, (ra + rb) * 0.25);
       g.strokeStyle = 'rgba(255,255,255,0.7)'; g.lineWidth = 1.3; g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
