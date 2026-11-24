@@ -849,12 +849,12 @@ const ROSTER = (() => {
     fatal: { id: 'slumlord', name: 'CONDEMNED' }
   };
 
-  // ---------- OFC TINKLE: six-foot-three, two-fifty, all of it soft ----------
+  // ---------- OFC TINKLE: six-foot-three, two-fifty, thick neck, glass jaw ----------
   const NAVY = '#16161a', VEST = '#0b0b0d', TSK = '#f0c4a4';
   const tinkle = {
-    id: 'tinkle', name: 'OFC TINKLE', short: 'TINKLE', him: 'HIM', k: 1.16, boss: true, noMatrix: true, plainFinish: true, bicep: 0.15, calf: 0.2,
+    id: 'tinkle', name: 'OFC TINKLE', short: 'TINKLE', him: 'HIM', k: 1.16, boss: true, noMatrix: true, plainFinish: true, bicep: 0.45, calf: 0.38,
     bio: 'Six-three, two-fifty, high and tight. He thinks he\'s a badass. He is a wimpy little bitch.',
-    d: dims({ thigh: 26, shin: 25, torso: 36, upper: 21, fore: 20, hipW: 16, shW: 18, chest: 21, belly: 27, back: 15, thighR: 10, kneeR: 5.6, ankleR: 3.8, shR: 7.6, elbowR: 5.4, wristR: 4, fist: 4.6 }),
+    d: dims({ thigh: 26, shin: 25, torso: 36, upper: 21, fore: 20, hipW: 15, shW: 23, chest: 26, belly: 22, back: 17, thighR: 12, kneeR: 6.2, ankleR: 4, shR: 9.8, elbowR: 6.4, wristR: 4.6, fist: 5.2 }),
     col: { torso: NAVY, armU: NAVY, armL: TSK, hand: TSK, legU: NAVY, legL: NAVY, foot: '#0c0c0e', neck: TSK },
     mat: { torso: 'cloth', armU: 'cloth', armL: 'skin', legU: 'cloth', legL: 'cloth' },
     stats: { speed: 0.95, power: 0.85, weight: 1.35, frail: 3.2 },

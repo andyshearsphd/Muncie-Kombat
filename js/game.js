@@ -191,7 +191,7 @@
     f.wallX = f.x - f.face * clamp(behind, 10, 80); f.wallFace = f.face; f.face = -f.face; f.matrix = 1.2; f.wx0 = f.x;
   }
   function doJump(f, dirx) {
-    f.hangUsed = false;
+    f.hangUsed = false; f.jumpAt = game.time;
     f.state = 'jump'; f.vy = -660; f.vx = dirx * 165 * f.def.stats.speed; f.airAtk = null; f.at = 0; SFX.whoosh();
   }
 
@@ -331,7 +331,7 @@
     const rot = STAGES.ROTATION.slice();
     for (let i = rot.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [rot[i], rot[j]] = [rot[j], rot[i]]; }
     ladder.stages = others.map((f, i) => rot[i % rot.length]).concat(['cityhall', 'glassworks', 'rental', 'hell']);
-    ladder.rung = 0;
+    ladder.rung = 0; ladder.scanned = false;
   }
 
   // ---------- input ----------
@@ -353,7 +353,7 @@
   const elBtn = { P: document.getElementById('bPunch'), K: document.getElementById('bKick'), B: document.getElementById('bBlock') };
   const elPause = document.getElementById('pauseBtn');
   const touches = new Map();
-  let stickId = null, stickOrigin = [0, 0], stickVec = [0, 0];
+  let stickId = null, stickOrigin = [0, 0], stickVec = [0, 0], stickPeak = 0;
   const defaultStickPos = () => [Math.max(100, window.innerWidth * 0.13), window.innerHeight - 105];
   const placeStick = (x, y) => { elBase.style.left = x + 'px'; elBase.style.top = y + 'px'; };
   const setKnob = (dx, dy) => { elKnob.style.transform = `translate(${dx}px, ${dy}px)`; };
@@ -369,14 +369,16 @@
     let dx = x - stickOrigin[0], dy = y - stickOrigin[1];
     const L = Math.hypot(dx, dy), max = 40;
     if (L > max) { stickOrigin[0] += dx * (1 - max / L); stickOrigin[1] += dy * (1 - max / L); placeStick(stickOrigin[0], stickOrigin[1]); dx = x - stickOrigin[0]; dy = y - stickOrigin[1]; }
-    const L2 = Math.hypot(dx, dy);
+    let L2 = Math.hypot(dx, dy);
+    if (L2 > stickPeak) stickPeak = L2;
+    else if (stickPeak > 24 && L2 < stickPeak - 13) { stickOrigin = [x, y]; placeStick(x, y); dx = dy = 0; L2 = 0; stickPeak = 0; }
     setKnob(dx, dy);
     stickVec = L2 < 9 ? [0, 0] : [dx / Math.max(L2, 26), dy / Math.max(L2, 26)];
   }
   function pressStart(id, x, y) {
     SFX.unlock();
     if (screen === 'play' && !paused && game.phase !== 'fatality') {
-      if (x < window.innerWidth * 0.5) { if (stickId === null) { stickId = id; stickOrigin = [x, y]; placeStick(x, y); setKnob(0, 0); stickVec = [0, 0]; } return; }
+      if (x < window.innerWidth * 0.5) { if (stickId === null) { stickId = id; stickOrigin = [x, y]; stickPeak = 0; placeStick(x, y); setKnob(0, 0); stickVec = [0, 0]; } return; }
       const hits = btnZone(x, y);
       touches.set(id, { hits });
       for (const h of hits) { if (h === 'P') press.P = true; if (h === 'K') press.K = true; }
@@ -432,6 +434,7 @@
     return (y + (fw > 0 ? 'F' : fw < 0 ? 'B' : '')) || 'N';
   }
   function pushTok(f, tok) {
+    if (tok.includes('D')) f.lastD = game.time;
     if (tok !== f.tok) { f.tok = tok; f.hist.push({ k: tok, t: game.time }); if (f.hist.length > 12) f.hist.shift(); }
   }
   function motion(f, seq, win = 0.75) {
@@ -450,7 +453,8 @@
     // c: { tok, P, K, B }
     const tok = c.tok, D = tok.includes('D'), U = tok.includes('U'), F = tok.includes('F'), B = tok.includes('B');
     if (f.state === 'jump') {
-      if (!f.airAtk && c.P && D && !f.hangUsed && !f.def.noMatrix && f.y < FLOOR - 30 && Math.abs(o.x - f.x) < 160) { f.hangUsed = true; f.hangSide = Math.sign(o.x - f.x) || f.face; f.airAtk = MV.hang; f.at = 0; f.airHit = false; f.hangN = 0; f.matrix = 1.2; game.slow = Math.max(game.slow || 0, 0.5); SFX.whoosh(); SFX.gong(); return; }
+      if (c.B && !f.def.noMatrix && !f.airAtk && game.time - (f.jumpAt || -9) < 0.17) { f.state = 'idle'; f.y = FLOOR; f.vy = 0; f.vx = 0; startMove(f, MV.bdodge); f.dodged = false; f.matrix = 0.9; game.slow = Math.max(game.slow || 0, 0.55); return; }
+      if (!f.airAtk && c.P && (D || game.time - (f.lastD || -9) < 0.25) && !f.hangUsed && !f.def.noMatrix && f.y < FLOOR - 24 && Math.abs(o.x - f.x) < 225) { f.hangUsed = true; f.hangSide = Math.sign(o.x - f.x) || f.face; f.airAtk = MV.hang; f.at = 0; f.airHit = false; f.hangN = 0; f.matrix = 1.2; game.slow = Math.max(game.slow || 0, 0.5); SFX.whoosh(); SFX.gong(); return; }
       if (!f.airAtk && (c.P || c.K)) { f.airAtk = c.K ? MV.jkick : MV.jpunch; f.at = 0; f.airHit = false; SFX.whoosh(); }
       return;
     }
@@ -465,7 +469,7 @@
     }
     if (c.K) {
       if (game.phase === 'finish' && game.winner === f && f.def.alt && motion(f, ['F', 'F'], 0.6)) { f.hist = []; startFatality(f, o, f.def.alt.id); return; }
-      if (!f.def.noMatrix && motion(f, ['B', 'B'], 0.6)) { f.hist = []; startWallrun(f); return; }
+      if (!f.def.noMatrix && motion(f, ['B', 'B'], 0.9)) { f.hist = []; startWallrun(f); return; }
       if (motion(f, ['D', 'F'])) { f.hist = []; startSP2(f); return; }
       if (D) { startMove(f, MV.sweep); return; }
       if (B) { startMove(f, MV.round); return; }
@@ -1107,7 +1111,7 @@
     if (won) {
       ladder.rung++;
       if (ladder.rung >= ladder.opps.length) { screen = 'ending'; game.pt = 0; SFX.music('menu'); return; }
-      screen = 'ladder'; game.pt = 0; SFX.music('menu');
+      screen = 'ladder'; game.pt = 0; ladder.t0 = null; SFX.music('menu');
     } else { screen = 'continue'; game.pt = 0; SFX.music('menu'); }
   }
 
@@ -1252,33 +1256,23 @@
 
   // ---------- screens ----------
   // menu buttons: curved slabs of cracked stone with the lettering cut into them
-  let stonePat = null;
-  function stone() {
-    if (stonePat) return stonePat;
-    const c = document.createElement('canvas'); c.width = c.height = 96; const s = c.getContext('2d');
-    s.fillStyle = '#6a625a'; s.fillRect(0, 0, 96, 96);
-    let sd = 7; const r = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
-    for (let i = 0; i < 900; i++) { s.fillStyle = r() < 0.5 ? `rgba(255,245,230,${r() * 0.12})` : `rgba(0,0,0,${r() * 0.18})`; s.fillRect(r() * 96, r() * 96, 1 + r() * 2, 1 + r() * 2); }
-    for (let i = 0; i < 14; i++) { s.fillStyle = `rgba(${r() < 0.5 ? '90,70,50' : '40,40,44'},0.15)`; s.beginPath(); s.ellipse(r() * 96, r() * 96, 6 + r() * 14, 4 + r() * 8, r() * 3, 0, Math.PI * 2); s.fill(); }
-    return (stonePat = ctx.createPattern(c, 'repeat'));
-  }
+  let uiPress = null;
   function uiButton(label, x, y, w, h, fn, fill = 'gold', size = 16) {
-    const g = ctx, r = Math.min(h * 0.5, 12), bow = Math.min(4, h * 0.14);
-    const slab = (ox, oy) => { g.beginPath(); g.moveTo(x + ox + r, y + oy + bow); g.quadraticCurveTo(x + ox + w / 2, y + oy - bow, x + ox + w - r, y + oy + bow); g.quadraticCurveTo(x + ox + w, y + oy + bow, x + ox + w, y + oy + r + bow); g.lineTo(x + ox + w, y + oy + h - r); g.quadraticCurveTo(x + ox + w, y + oy + h, x + ox + w - r, y + oy + h); g.lineTo(x + ox + r, y + oy + h); g.quadraticCurveTo(x + ox, y + oy + h, x + ox, y + oy + h - r); g.lineTo(x + ox, y + oy + r + bow); g.quadraticCurveTo(x + ox, y + oy + bow, x + ox + r, y + oy + bow); g.closePath(); };
+    // arcade plate: flat black, clipped corners, a thin gold bevel, a red glow when pressed
+    const g = ctx, c = Math.min(6, h * 0.24);
+    const hot = uiPress && Math.abs(uiPress.x - x) < 1 && Math.abs(uiPress.y - y) < 1;
+    const plate = (ox, oy, ins) => { const a = x + ox + ins, b = y + oy + ins, ww = w - ins * 2, hh = h - ins * 2, cc = Math.max(1, c - ins * 0.6); g.beginPath(); g.moveTo(a + cc, b); g.lineTo(a + ww - cc, b); g.lineTo(a + ww, b + cc); g.lineTo(a + ww, b + hh - cc); g.lineTo(a + ww - cc, b + hh); g.lineTo(a + cc, b + hh); g.lineTo(a, b + hh - cc); g.lineTo(a, b + cc); g.closePath(); };
     g.save();
-    slab(2, 3); g.fillStyle = 'rgba(0,0,0,0.6)'; g.fill();
-    slab(0, 0); g.fillStyle = stone(); g.fill();
-    const sh = g.createLinearGradient(0, y, 0, y + h); sh.addColorStop(0, 'rgba(255,240,220,0.22)'); sh.addColorStop(0.45, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(0,0,0,0.45)'); g.fillStyle = sh; g.fill();
-    g.clip();
-    g.strokeStyle = 'rgba(20,14,10,0.55)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(x + w * 0.78, y); g.lineTo(x + w * 0.72, y + h * 0.4); g.lineTo(x + w * 0.8, y + h * 0.65); g.lineTo(x + w * 0.76, y + h); g.stroke();
+    plate(1.5, 2.5, 0); g.fillStyle = 'rgba(0,0,0,0.7)'; g.fill();
+    plate(0, 0, 0); const gb = g.createLinearGradient(0, y, 0, y + h); gb.addColorStop(0, '#f8de8a'); gb.addColorStop(0.5, '#b07a1c'); gb.addColorStop(1, '#5a3608'); g.fillStyle = gb; g.fill();
+    plate(0, 0, 1.6); const bg = g.createLinearGradient(0, y, 0, y + h); bg.addColorStop(0, hot ? '#5a0a08' : '#1c1a1a'); bg.addColorStop(0.5, hot ? '#3a0404' : '#0c0b0b'); bg.addColorStop(1, hot ? '#200202' : '#050505'); g.fillStyle = bg; g.fill();
+    if (hot) { g.save(); g.clip(); const rg = g.createRadialGradient(x + w / 2, y + h / 2, 2, x + w / 2, y + h / 2, w * 0.6); rg.addColorStop(0, 'rgba(255,60,30,0.55)'); rg.addColorStop(1, 'rgba(255,0,0,0)'); g.fillStyle = rg; g.fillRect(x, y, w, h); g.restore(); }
+    plate(0, 0, 2.6); g.strokeStyle = hot ? 'rgba(255,120,80,0.5)' : 'rgba(216,160,48,0.28)'; g.lineWidth = 0.6; g.stroke();
+    g.fillStyle = 'rgba(255,255,255,0.06)'; g.fillRect(x + c, y + 2.2, w - c * 2, h * 0.32);
     g.restore();
-    slab(0, 0); g.strokeStyle = 'rgba(255,235,210,0.35)'; g.lineWidth = 1; g.stroke();
-    // lettering cut in: dark groove, light catching the lower lip, then the color
-    const tx = x + w / 2, ty = y + h / 2 - size * 0.62 + bow * 0.3;
-    TXT.draw(g, label, tx + 0.8, ty + 0.9, { size, align: 'center', fill: 'rgba(255,240,220,0.4)', shadow: false, italic: false, stroke: null });
-    TXT.draw(g, label, tx - 0.6, ty - 0.7, { size, align: 'center', fill: '#140c08', shadow: false, italic: false, stroke: null });
-    TXT.draw(g, label, tx, ty, { size, align: 'center', fill: fill === 'fire' ? 'blood' : fill, shadow: false, italic: false, stroke: null });
-    ui.push({ x, y, w, h, fn });
+    if (hot) { g.save(); g.shadowColor = 'rgba(255,40,20,0.9)'; g.shadowBlur = 10; plate(0, 0, 0); g.strokeStyle = 'rgba(255,80,40,0.8)'; g.lineWidth = 1; g.stroke(); g.restore(); }
+    TXT.draw(g, label, x + w / 2, y + h / 2 - size * 0.62, { size, align: 'center', fill: hot ? 'fire' : fill });
+    ui.push({ x, y, w, h, fn, btn: 1 });
   }
   function bgDark(t) {
     const g = ctx, gr = g.createRadialGradient(W / 2, H * 0.45, 10, W / 2, H * 0.45, W * 0.7);
@@ -1350,7 +1344,7 @@
   function confirmPick() {
     SFX.gong(); ladder.pick = sel.i; say(ROSTER.FIGHTERS[sel.i].name.replace("'", 'g').toLowerCase());
     if (mode === 'single') { screen = 'opp'; return; }
-    newLadder(); screen = 'ladder'; game.pt = 0;
+    newLadder(); screen = 'ladder'; game.pt = 0; ladder.t0 = null;
   }
   // ---------- single match: pick the opponent, then the arena ----------
   const OPPS = () => ROSTER.FIGHTERS.concat(ROSTER.BOSSES.filter(b => b.id !== 'dan'));
@@ -1438,28 +1432,60 @@
   function renderLadder() {
     elControls.classList.remove('on'); elPause.classList.remove('on');
     bgDark(); ui = [];
-    const g = ctx, t = game.time;
-    TXT.draw(g, 'YOUR DESTINY', W / 2 - 50, 6, { size: 20, align: 'center', fill: 'gold' });
-    const n = ladder.opps.length, bh = Math.min(21, Math.floor((H - 14) / n) - 2), bx = W - 64, by = H - 10 - n * (bh + 2);
-    for (let i = n - 1; i >= 0; i--) {
-      const y = by + (n - 1 - i) * (bh + 2), def = ladder.opps[i];
-      const done = i < ladder.rung, cur = i === ladder.rung;
-      g.fillStyle = cur ? '#7a1a1a' : done ? '#1a1a1a' : '#2a0a10'; g.fillRect(bx, y, 54, bh);
-      g.save(); g.beginPath(); g.rect(bx, y, 54, bh); g.clip();
-      R.drawHeadAt(g, { def, d: def.dk }, bx + 16, y + bh + 2, 0, 0.62 * bh / 21 / def.k, { t, dead: done });
-      g.restore();
-      TXT.draw(g, def.short, bx + 30, y + 6, { size: 8, fill: cur ? 'gold' : done ? '#666' : 'white', italic: false, shadow: false });
-      if (cur) { g.strokeStyle = '#ffe060'; g.lineWidth = 1.5; g.strokeRect(bx + 0.5, y + 0.5, 53, bh - 1); }
-      if (done) { R.line(g, bx + 4, y + 4, bx + 50, y + bh - 4, '#b0101a', 2); }
+    if (ladder.t0 == null) ladder.t0 = performance.now();
+    const g = ctx, t = game.time, pt = (performance.now() - ladder.t0) / 1000, n = ladder.opps.length, r = ladder.rung;
+    // the tower: one big step per opponent, Devil Dan on top. The first time it is shown the
+    // camera scans it top to bottom; after each win your marker climbs one step.
+    const SH = 54, TW = 118, tx = W - TW - 8, top = 8, bot = H - 8;
+    const SCAN = 3.6, scanning = !ladder.scanned && r === 0;
+    const topCam = n - (bot - top) / SH + 0.2, rest = Math.min(r - 0.4, topCam);
+    let camI = rest, mk = r;
+    if (scanning) {
+      const u = clamp((pt - 0.5) / (SCAN - 0.9), 0, 1);
+      camI = lerp(topCam, rest, u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2);
+      if (pt > SCAN) ladder.scanned = true;
+    } else if (r > 0) {
+      const u = ease(clamp((pt - 0.3) / 0.9, 0, 1));
+      camI = lerp(Math.min(r - 1.4, topCam), rest, u); mk = lerp(r - 1, r, u);
     }
-    const me = ROSTER.FIGHTERS[ladder.pick], op = ladder.opps[ladder.rung];
-    const f1 = { def: me, d: me.dk, x: 70, y: 196, face: 1, t }, f2 = { def: op, d: op.dk, x: 230, y: 196, face: -1, t: t + 1 };
+    const sy = i => bot - SH - (i - camI) * SH;
+    g.save(); g.beginPath(); g.rect(tx - 22, top, TW + 30, bot - top); g.clip();
+    g.fillStyle = '#0a0406'; g.fillRect(tx - 4, top, TW + 8, bot - top);
+    for (let i = -1; i < n; i++) {
+      const y = sy(i); if (y > bot || y + SH < top) continue;
+      if (i < 0) { g.fillStyle = '#1a1214'; g.fillRect(tx, y + 6, TW, SH - 6); TXT.draw(g, 'START', tx + TW / 2, y + 22, { size: 12, align: 'center', fill: '#665' }); continue; }
+      const def = ladder.opps[i], done = i < r, cur = i === r && (!scanning || pt > SCAN - 0.4);
+      g.fillStyle = cur ? (Math.sin(t * 8) > 0 ? '#ffe070' : '#d02818') : done ? '#3a2a1a' : '#8a6420'; g.fillRect(tx, y + 3, TW, SH - 3);
+      g.fillStyle = cur ? '#3a0606' : done ? '#121010' : '#160c0c'; g.fillRect(tx + 1.4, y + 4.4, TW - 2.8, SH - 5.8);
+      portrait(g, def, tx + 3, y + 6, 50, SH - 9, cur, t + i);
+      if (done) { g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillRect(tx + 3, y + 6, 50, SH - 9); }
+      TXT.draw(g, def.short, tx + 57, y + 14, { size: def.short.length > 7 ? 9 : 11, fill: done ? '#555' : cur ? 'gold' : 'white', italic: false });
+      if (def.boss) TXT.draw(g, 'BOSS', tx + 57, y + 30, { size: 8, fill: 'blood', italic: false, shadow: false });
+      if (done) { R.line(g, tx + 6, y + 8, tx + TW - 6, y + SH - 4, '#b0101a', 3); R.line(g, tx + TW - 6, y + 8, tx + 6, y + SH - 4, '#b0101a', 3); }
+    }
+    // your marker on the left edge of the tower
+    if (!scanning || pt > SCAN - 0.4) {
+      const me = ROSTER.FIGHTERS[ladder.pick], my = sy(mk) + SH / 2 + 2;
+      g.fillStyle = '#ffd040'; g.fillRect(tx - 22, my - 17, 34, 34); portrait(g, me, tx - 20, my - 15, 30, 30, true, t);
+      R.poly(g, [[tx + 13, my - 5], [tx + 19, my], [tx + 13, my + 5]], '#ffd040');
+    }
+    const fade = g.createLinearGradient(0, top, 0, top + 18); fade.addColorStop(0, 'rgba(0,0,0,0.9)'); fade.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = fade; g.fillRect(tx - 22, top, TW + 30, 18);
+    g.restore();
+    const cx = Math.round((tx - 20) / 2);
+    if (scanning && pt < SCAN - 0.4) {
+      TXT.draw(g, 'YOUR DESTINY', cx, 70, { size: 28, align: 'center', fill: 'gold' });
+      TXT.draw(g, n + ' FIGHTS TO CITY HALL', cx, 112, { size: 12, align: 'center', fill: 'white', italic: false });
+      ui.push({ x: 0, y: 0, w: W, h: H, fn: () => { ladder.scanned = true; ladder.t0 = performance.now() - SCAN * 1000; } });
+      grit(); return;
+    }
+    const me = ROSTER.FIGHTERS[ladder.pick], op = ladder.opps[r];
+    const f1 = { def: me, d: me.dk, x: cx - 68, y: 196, face: 1, t }, f2 = { def: op, d: op.dk, x: cx + 68, y: 196, face: -1, t: t + 1 };
     R.digi(g, f1.x, f1.y, gg => R.draw(gg, f1, PS.stance(t))); R.digi(g, f2.x, f2.y, gg => R.draw(gg, f2, PS.stance(t + 1)));
-    TXT.draw(g, 'VS', 150, 110, { size: 30, align: 'center', fill: 'fire' });
-    TXT.draw(g, 'BATTLE ' + (ladder.rung + 1) + ' OF ' + n, 150, 34, { size: 14, align: 'center', fill: 'white' });
-    TXT.draw(g, STAGES.name(ladder.stages[ladder.rung]), 150, 52, { size: 11, align: 'center', fill: 'purple' });
-    if (op.boss) TXT.draw(g, op.bio, 150, 206, { size: 8, align: 'center', fill: 'gold', italic: false });
-    if (Math.sin(t * 5) > -0.3) TXT.draw(g, 'TAP TO FIGHT', 150, 218, { size: 13, align: 'center', fill: 'white' });
+    TXT.draw(g, 'VS', cx, 110, { size: 30, align: 'center', fill: 'fire' });
+    TXT.draw(g, 'BATTLE ' + (r + 1) + ' OF ' + n, cx, 30, { size: 14, align: 'center', fill: 'white' });
+    TXT.draw(g, STAGES.name(ladder.stages[r]), cx, 48, { size: 11, align: 'center', fill: 'purple' });
+    if (op.boss) bio(g, op.bio, cx, 199, tx - 30, 2);
+    if (Math.sin(t * 5) > -0.3) TXT.draw(g, 'TAP TO FIGHT', cx, op.boss ? 222 : 218, { size: 13, align: 'center', fill: 'white' });
     ui.push({ x: 0, y: 0, w: W, h: H, fn: () => { SFX.gong(); startMatch(); } });
     grit();
   }
@@ -1501,7 +1527,10 @@
   }
   function uiTap(x, y) {
     const r = cv.getBoundingClientRect(), cx = (x - r.left) / r.width * W, cy = (y - r.top) / r.height * H;
-    for (let i = ui.length - 1; i >= 0; i--) { const b = ui[i]; if (cx >= b.x && cx <= b.x + b.w && cy >= b.y && cy <= b.y + b.h) { ui = []; b.fn(); return; } }
+    if (uiPress) return;
+    for (let i = ui.length - 1; i >= 0; i--) { const b = ui[i]; if (cx >= b.x && cx <= b.x + b.w && cy >= b.y && cy <= b.y + b.h) {
+      if (b.btn) { uiPress = b; SFX.blip(); setTimeout(() => { const p = uiPress; uiPress = null; if (p) { ui = []; p.fn(); } }, 130); return; }
+      ui = []; b.fn(); return; } }
   }
   function uiKey() { if (ui.length) { const b = ui[ui.length - 1]; ui = []; b.fn(); } }
 
