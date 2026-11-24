@@ -626,18 +626,16 @@ const STAGES = (() => {
     clouds(B, 10, 80, 10, 'rgba(24,20,36,0.6)', 'rgba(140,100,90,0.2)', 1);
     seed = 401;
     glow(B, 700, 150, 260, 'rgba(255,140,60,0.16)', 1);
-    // downtown in the distance: low brick blocks, a couple of towers, a steeple, a water tower
-    const hz = 150;
-    for (let i = 0; i < 36; i++) {
-      const x = 380 + i * 20 + rr(-6, 6), w = rr(14, 26), h = i % 9 === 4 ? rr(60, 78) : rr(12, 40);
+    // downtown in the distance: a low line of two- to five-story blocks, a steeple and the water tower
+    const hz = 152;
+    for (let i = 0; i < 40; i++) {
+      const x = 380 + i * 18 + rr(-5, 5), w = rr(12, 22), h = i === 17 || i === 24 ? rr(22, 26) : rr(5, 14);
       B.fillStyle = shade('#14121a', rr(-0.1, 0.15)); B.fillRect(x, hz - h, w, h);
-      for (let r = hz - h + 4; r < hz - 3; r += 5) for (let c = x + 2; c < x + w - 2; c += 4) if (rand() < 0.18) { B.fillStyle = rand() < 0.7 ? 'rgba(255,200,120,0.8)' : 'rgba(170,200,255,0.7)'; B.fillRect(c, r, 1.6, 2); }
-      if (h > 58) glow(B, x + w / 2, hz - h - 2, 4, 'rgba(255,30,30,1)', 0.9);
+      for (let r = hz - h + 2; r < hz - 2; r += 3.5) for (let c = x + 2; c < x + w - 2; c += 3.5) if (rand() < 0.2) { B.fillStyle = rand() < 0.7 ? 'rgba(255,200,120,0.75)' : 'rgba(170,200,255,0.6)'; B.fillRect(c, r, 1.3, 1.4); }
     }
-    B.fillStyle = '#14121a'; B.beginPath(); B.moveTo(586, hz - 40); B.lineTo(592, hz - 88); B.lineTo(598, hz - 40); B.fill(); B.fillRect(584, hz - 40, 16, 40);
-    B.fillStyle = '#1a181e'; B.fillRect(960, hz - 64, 2, 64); B.fillRect(978, hz - 64, 2, 64); B.beginPath(); B.ellipse(970, hz - 70, 16, 9, 0, 0, PI * 2); B.fill();
-    B.fillStyle = 'rgba(200,190,170,0.35)'; B.font = '5px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('MUNCIE', 970, hz - 68); B.textAlign = 'left';
-    treeline(B, hz, 30, '#05060a', 6, 22, BW);
+    B.fillStyle = '#14121a'; B.beginPath(); B.moveTo(588, hz - 16); B.lineTo(591, hz - 36); B.lineTo(594, hz - 16); B.fill(); B.fillRect(586, hz - 16, 10, 16);
+    B.fillStyle = '#1a181e'; B.fillRect(965, hz - 26, 1.4, 26); B.fillRect(975, hz - 26, 1.4, 26); B.beginPath(); B.ellipse(970, hz - 29, 9, 5, 0, 0, PI * 2); B.fill();
+    treeline(B, hz, 30, '#05060a', 4, 12, BW);
     // the cut below: State Road 32 and the tracks, lit orange
     vg(B, 0, hz, BW, FY - hz, ['#0c0c12', '#16141a', '#0a0a0e']);
     for (const [y, c] of [[hz + 10, '#3a3a40'], [hz + 14, '#3a3a40'], [hz + 22, '#2a2a30']]) { B.fillStyle = c; B.fillRect(0, y, BW, 1.2); }
