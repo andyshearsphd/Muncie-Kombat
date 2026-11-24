@@ -483,7 +483,7 @@ const STAGES = (() => {
     for (let i = 0; i < 4; i++) { const x = 100 + rand() * 900; F.fillStyle = '#0a0a0a'; F.beginPath(); F.ellipse(x, FY + 8, 9, 4, 0, 0, PI * 2); F.fill(); F.fillStyle = '#2a2a2a'; F.beginPath(); F.ellipse(x, FY + 7, 4, 1.6, 0, 0, PI * 2); F.fill(); }
   }
 
-  // ---------- CORNBREAD ROAD: cornfields, the movie-prop Devils Tower, UFOs ----------
+  // ---------- CORNBREAD ROAD: cornfields, a quarry fence, cows, UFOs ----------
   function cornbread(B, F) {
     vg(B, 0, 0, BW, H, ['#06040e', '#1a0e2a', '#4a1e3a', '#a04a3a']);
     stars(B, 90, 70);
@@ -492,26 +492,35 @@ const STAGES = (() => {
     // Yorktown water tower on the horizon
     const yx = 1000; B.fillStyle = '#1a1620'; B.fillRect(yx - 4, 80, 8, FY - 80); B.beginPath(); B.ellipse(yx, 70, 30, 22, 0, 0, PI * 2); B.fill(); B.fillStyle = 'rgba(255,150,120,0.25)'; B.beginPath(); B.ellipse(yx - 8, 64, 14, 8, -0.3, 0, PI * 2); B.fill();
     B.fillStyle = '#3a6a4a'; B.font = '7px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('YORKTOWN', yx, 74); B.textAlign = 'left'; glow(B, yx, 46, 5, 'rgba(255,40,40,1)');
-    // Devils Tower: fluted columns, flat summit, boulder skirt, lit from the UFO
-    const cx = CX, top = 26;
-    B.fillStyle = '#100a08'; B.beginPath(); B.moveTo(cx - 120, FY); B.lineTo(cx - 60, FY - 50); B.lineTo(cx + 60, FY - 50); B.lineTo(cx + 120, FY); B.fill();
-    const N = 16;
-    for (let i = 0; i < N; i++) {
-      const t0 = i / N, t1 = (i + 1) / N, tl0 = cx - 44 + t0 * 88, tl1 = cx - 44 + t1 * 88, bl0 = cx - 84 + t0 * 168, bl1 = cx - 84 + t1 * 168;
-      const gr = B.createLinearGradient(tl0, 0, tl1, 0); const base = i < N * 0.4 ? '#6a5a4c' : i < N * 0.75 ? '#4a3e34' : '#2a221c';
-      gr.addColorStop(0, shade(base, 0.15)); gr.addColorStop(0.6, base); gr.addColorStop(1, shade(base, -0.35));
-      B.fillStyle = gr; B.beginPath(); B.moveTo(tl0, top + (i % 3)); B.lineTo(tl1, top + ((i + 1) % 3)); B.lineTo(bl1, FY - 30); B.lineTo(bl0, FY - 30); B.fill();
-    }
-    grime(B, cx - 84, top, 168, FY - top - 30, 30, 0.3);
-    B.fillStyle = '#2a3a1a'; B.fillRect(cx - 44, top - 4, 88, 5); for (let i = 0; i < 12; i++) B.fillRect(cx - 42 + i * 7, top - 8 - (i % 3) * 2, 5, 5);
-    for (let i = 0; i < 26; i++) { const bx = cx + rr(-110, 110), by = FY - rr(0, 40), r = rr(6, 16); B.fillStyle = shade('#4a3e34', rr(-0.4, 0)); B.beginPath(); B.ellipse(bx, by, r, r * 0.7, 0, 0, PI * 2); B.fill(); B.fillStyle = 'rgba(255,160,120,0.12)'; B.beginPath(); B.ellipse(bx - r * 0.3, by - r * 0.3, r * 0.4, r * 0.25, 0, 0, PI * 2); B.fill(); }
+    const cx = CX;
+    // a farmhouse and barn out in the corn, windows lit
+    B.fillStyle = '#1e1a1c'; B.fillRect(cx + 250, FY - 46, 46, 30); B.beginPath(); B.moveTo(cx + 246, FY - 46); B.lineTo(cx + 273, FY - 66); B.lineTo(cx + 300, FY - 46); B.fill();
+    B.fillStyle = '#ffd890'; B.fillRect(cx + 258, FY - 38, 7, 7); B.fillRect(cx + 280, FY - 38, 7, 7); glow(B, cx + 270, FY - 34, 18, 'rgba(255,200,120,0.25)');
+    B.fillStyle = '#3a1210'; B.fillRect(cx + 380, FY - 52, 60, 36); B.beginPath(); B.moveTo(cx + 374, FY - 52); B.lineTo(cx + 390, FY - 74); B.lineTo(cx + 430, FY - 74); B.lineTo(cx + 446, FY - 52); B.fill();
+    B.strokeStyle = '#6a3a2a'; B.lineWidth = 1; B.strokeRect(cx + 400, FY - 40, 20, 24); B.beginPath(); B.moveTo(cx + 400, FY - 40); B.lineTo(cx + 420, FY - 16); B.moveTo(cx + 420, FY - 40); B.lineTo(cx + 400, FY - 16); B.stroke();
+    // the quarry: a raw limestone rim falling away behind the fence
+    B.fillStyle = '#2a2622'; B.beginPath(); B.moveTo(cx - 360, FY - 24); B.lineTo(cx - 300, FY - 40); B.lineTo(cx - 180, FY - 36); B.lineTo(cx - 60, FY - 44); B.lineTo(cx - 10, FY - 26); B.lineTo(cx - 10, FY); B.lineTo(cx - 360, FY); B.fill();
+    for (let i = 0; i < 18; i++) { B.fillStyle = shade('#5a524a', rr(-0.35, 0.05)); B.fillRect(cx - 350 + i * 19, FY - 34 + (i % 3) * 3, rr(10, 18), rr(3, 6)); }
     // cornfields
     for (let row = 0; row < 3; row++) {
       const y = FY - 4 - row * 8, h = 34 - row * 8;
-      for (let x = 0; x < BW; x += 3 + row) { if (Math.abs(x - cx) < 120 - row * 20) continue; B.strokeStyle = shade(row ? '#2a2a10' : '#3a3214', rr(-0.3, 0.1)); B.lineWidth = 1.2; B.beginPath(); B.moveTo(x, y); B.quadraticCurveTo(x + rr(-3, 3), y - h * 0.6, x + rr(-6, 6), y - h * rr(0.8, 1.1)); B.stroke(); if (rand() < 0.3) { B.fillStyle = '#5a4a1a'; B.fillRect(x - 1, y - h * 0.5, 2, 4); } }
+      for (let x = 0; x < BW; x += 3 + row) { if (x > cx - 360 && x < cx - 10) continue; B.strokeStyle = shade(row ? '#2a2a10' : '#3a3214', rr(-0.3, 0.1)); B.lineWidth = 1.2; B.beginPath(); B.moveTo(x, y); B.quadraticCurveTo(x + rr(-3, 3), y - h * 0.6, x + rr(-6, 6), y - h * rr(0.8, 1.1)); B.stroke(); if (rand() < 0.3) { B.fillStyle = '#5a4a1a'; B.fillRect(x - 1, y - h * 0.5, 2, 4); } }
     }
-    // little houses in the corn, a MOVIE PROP sign
-    B.fillStyle = '#d8d0c0'; B.fillRect(cx - 160, FY - 30, 22, 16); B.fillStyle = '#a01818'; B.font = '5px Anton, Impact, sans-serif'; B.fillText('MOVIE', cx - 157, FY - 23); B.fillText('PROP', cx - 155, FY - 17); B.fillStyle = '#111'; B.fillRect(cx - 150, FY - 14, 2, 14);
+    // a MOVIE PROP sign in the corn
+    B.fillStyle = '#d8d0c0'; B.fillRect(cx + 170, FY - 30, 22, 16); B.fillStyle = '#a01818'; B.font = '5px Anton, Impact, sans-serif'; B.fillText('MOVIE', cx + 173, FY - 23); B.fillText('PROP', cx + 175, FY - 17); B.fillStyle = '#111'; B.fillRect(cx + 180, FY - 14, 2, 14);
+    // chain-link quarry fence with barbed wire and the sign
+    const fx0 = cx - 350, fx1 = cx - 14, ft = FY - 52;
+    B.strokeStyle = 'rgba(150,150,160,0.35)'; B.lineWidth = 0.5;
+    for (let x = fx0; x < fx1; x += 4) { B.beginPath(); B.moveTo(x, ft); B.lineTo(x + 40, FY); B.moveTo(x + 40, ft); B.lineTo(x, FY); B.stroke(); }
+    B.fillStyle = '#5a5a62'; for (let x = fx0; x <= fx1; x += 42) B.fillRect(x - 1.5, ft - 8, 3, FY - ft + 8);
+    B.fillRect(fx0, ft, fx1 - fx0, 2);
+    B.strokeStyle = '#6a6a72'; B.lineWidth = 0.7; for (let r = 0; r < 3; r++) { B.beginPath(); for (let x = fx0; x < fx1; x += 6) { B.lineTo(x, ft - 3 - r * 2.6 + (x % 12 ? 0.8 : -0.8)); } B.stroke(); }
+    const sx = cx - 196, sy = ft + 8;
+    B.fillStyle = '#e8e4dc'; B.fillRect(sx, sy, 64, 30); B.fillStyle = '#b01018'; B.fillRect(sx, sy, 64, 11);
+    B.strokeStyle = '#2a2a2a'; B.lineWidth = 0.8; B.strokeRect(sx, sy, 64, 30);
+    B.fillStyle = '#fff'; B.font = '9px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('QUARRY', sx + 32, sy + 9.5);
+    B.fillStyle = '#1a1a1a'; B.font = '8px Anton, Impact, sans-serif'; B.fillText('DO NOT', sx + 32, sy + 19); B.fillText('ENTER', sx + 32, sy + 28); B.textAlign = 'left';
+
     fog(B, FY - 40, 50, 'rgba(120,60,90,0.35)');
     vignette(B, BW);
     pfloor(F, 'stone', '#4a3a26', '#1a1208', { rows: 6, span: 90, edge: '#2a2210' });
@@ -519,7 +528,7 @@ const STAGES = (() => {
     F.strokeStyle = 'rgba(0,0,0,0.35)'; F.lineWidth = 2; for (const off of [-0.12, 0.12]) { F.beginPath(); F.moveTo(AWX / 2 + off * 200, FY); F.lineTo(AWX / 2 + off * 2600, H); F.stroke(); }
   }
 
-  // ---------- BALL GLASS WORKS (Ball Jar Golem): furnace hall, Goro's Lair style ----------
+  // ---------- GLASS WORKS (Fruit Jar Golem): furnace hall, Goro's Lair style ----------
   function glassworks(B, F) {
     vg(B, 0, 0, BW, H, ['#060202', '#140806', '#2a120a']);
     seed = 127;
@@ -538,7 +547,7 @@ const STAGES = (() => {
       for (let j = 0; j < 10; j++) { const jx = x0 + 6 + j * 13, jy = 52 + s * 34; B.fillStyle = 'rgba(140,190,210,0.4)'; B.fillRect(jx, jy, 9, 17); B.fillStyle = '#7a7a80'; B.fillRect(jx, jy - 2, 9, 3); if (rand() < 0.5) { B.fillStyle = 'rgba(110,150,50,0.6)'; B.fillRect(jx + 1, jy + 7, 7, 9); } if (rand() < 0.15) { B.fillStyle = '#e8dcc8'; B.beginPath(); B.arc(jx + 4.5, jy + 11, 2.5, 0, PI * 2); B.fill(); } B.fillStyle = 'rgba(255,255,255,0.35)'; B.fillRect(jx + 1, jy + 1, 1, 14); }
     }
     B.strokeStyle = '#141414'; B.lineWidth = 2; for (const x of [140, 470, 760, 1170]) { B.beginPath(); B.moveTo(x, 0); B.lineTo(x + rr(-6, 6), rr(60, 110)); B.stroke(); B.fillStyle = '#141414'; B.fillRect(x - 4, 100, 8, 6); }
-    B.fillStyle = '#d8b070'; B.font = '10px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('BALL BROTHERS GLASS WORKS', CX, 30); B.textAlign = 'left';
+    B.fillStyle = '#d8b070'; B.font = '10px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('GLASS WORKS', CX, 30); B.textAlign = 'left';
     fog(B, FY - 40, 50, 'rgba(160,60,10,0.3)');
     vignette(B, BW);
     pfloor(F, 'check', '#3a3430', '#26201c', { rows: 9, span: 40, edge: '#1a1410' });
@@ -560,9 +569,9 @@ const STAGES = (() => {
     B.fillStyle = '#2a1a16'; B.fillRect(x0, top - 6, x1 - x0, 7); B.fillStyle = '#8a7a6a'; B.fillRect(x0, top - 7, x1 - x0, 2);
     const shops = [
       { n: 'MIDNIGHT COOKIES', aw: '#c8402a', neon: '#ffb0d0', fill: (x, w) => { for (let i = 0; i < 6; i++) { R.ball(B, x + 12 + i * (w - 24) / 5, sf + 38, 5, '#c08040'); R.ball(B, x + 11 + i * (w - 24) / 5, sf + 37, 1.2, '#3a1a08'); } B.fillStyle = '#e8e0d0'; B.fillRect(x + 6, sf + 43, w - 12, 3); } },
-      { n: 'BEAN THERE COFFEE', aw: '#2a5a3a', neon: '#a0ffc0', fill: (x, w) => { B.fillStyle = '#3a2416'; B.fillRect(x + 6, sf + 36, w - 12, 12); for (let i = 0; i < 4; i++) { B.fillStyle = '#f0ece0'; B.fillRect(x + 12 + i * 12, sf + 31, 5, 5); } B.fillStyle = '#1a1a1a'; B.fillRect(x + w - 24, sf + 22, 12, 14); } },
-      { n: 'CLOUD 9 VAPE', aw: '#3a2a7a', neon: '#80e8ff', fill: (x, w) => { for (let r = 0; r < 3; r++) for (let i = 0; i < 7; i++) { B.fillStyle = ['#40c0ff', '#ff40c0', '#c0ff40'][(i + r) % 3]; B.fillRect(x + 8 + i * (w - 16) / 7, sf + 22 + r * 9, 3, 6); } } },
-      { n: 'THIRD EYE HEAD SHOP', aw: '#6a2a6a', neon: '#d0a0ff', fill: (x, w) => { B.fillStyle = '#5a1a6a'; B.fillRect(x + 6, sf + 18, w * 0.4, 24); B.fillStyle = '#e0c020'; B.beginPath(); B.arc(x + 6 + w * 0.2, sf + 30, 7, 0, PI * 2); B.fill(); B.fillStyle = '#5a1a6a'; B.beginPath(); B.arc(x + 6 + w * 0.2, sf + 30, 3, 0, PI * 2); B.fill(); for (let i = 0; i < 4; i++) { B.fillStyle = 'rgba(120,220,255,0.6)'; B.fillRect(x + w * 0.55 + i * 9, sf + 30 - i * 3, 4, 16 + i * 3); } } },
+      { n: 'CUP HALF FULL', aw: '#2a5a3a', neon: '#a0ffc0', fill: (x, w) => { B.fillStyle = '#3a2416'; B.fillRect(x + 6, sf + 36, w - 12, 12); for (let i = 0; i < 4; i++) { B.fillStyle = '#f0ece0'; B.fillRect(x + 12 + i * 12, sf + 31, 5, 5); } B.fillStyle = '#1a1a1a'; B.fillRect(x + w - 24, sf + 22, 12, 14); } },
+      { n: 'BE THERE LATER', aw: '#1a1a2a', neon: '#ff6060', fill: (x, w) => { B.fillStyle = '#1a0c10'; B.fillRect(x + 6, sf + 18, w - 12, 30); B.fillStyle = 'rgba(255,60,80,0.35)'; B.beginPath(); B.moveTo(x + w / 2, sf + 18); B.lineTo(x + w / 2 - 16, sf + 48); B.lineTo(x + w / 2 + 16, sf + 48); B.fill(); B.fillStyle = '#0a0a0a'; B.fillRect(x + w / 2 - 0.6, sf + 30, 1.2, 18); B.beginPath(); B.arc(x + w / 2, sf + 29, 2, 0, PI * 2); B.fill(); B.fillRect(x + 12, sf + 36, 8, 12); B.fillRect(x + w - 22, sf + 32, 10, 16); B.fillStyle = '#ff8080'; B.font = '7px Anton, Impact, sans-serif'; B.fillText('LIVE TONIGHT', x + 8, sf + 26); } },
+      { n: 'WE FLY HIGH', aw: '#6a2a6a', neon: '#d0a0ff', fill: (x, w) => { B.fillStyle = '#5a1a6a'; B.fillRect(x + 6, sf + 18, w * 0.4, 24); B.fillStyle = '#e0c020'; B.beginPath(); B.arc(x + 6 + w * 0.2, sf + 30, 7, 0, PI * 2); B.fill(); B.fillStyle = '#5a1a6a'; B.beginPath(); B.arc(x + 6 + w * 0.2, sf + 30, 3, 0, PI * 2); B.fill(); for (let i = 0; i < 4; i++) { B.fillStyle = 'rgba(120,220,255,0.6)'; B.fillRect(x + w * 0.55 + i * 9, sf + 30 - i * 3, 4, 16 + i * 3); } } },
     ];
     let x = 12, i = 0;
     while (x < BW) {
@@ -768,6 +777,60 @@ const STAGES = (() => {
   const BROS2 = (() => { const r = prng(77), a = []; for (let i = 0; i < 18; i++) a.push({ x: 60 + i * 66 + r() * 26, y: FY - 1, h: 42 + r() * 7, ph: r() * 6, speed: 3 + r() * 1.5, stance: 0.8 + r() * 0.6, skin: SKINS[(r() * SKINS.length) | 0], hair: HAIRS[(r() * HAIRS.length) | 0],
     topKind: 'shirt', sleeves: true, top: BRO_COLS[i % 6], logo: r() < 0.5 ? '#e8e0d0' : null, bottom: r() < 0.5 ? '#3a3a42' : '#6a5a3a', bottomLen: 'knee', shoes: '#e8e8e8', style: r() < 0.6 ? 'cheer' : r() < 0.5 ? 'hip' : 'stand', cap: r() < 0.7 ? BRO_COLS[(i + 3) % 6] : null, can: r() < 0.75, rim: 'rgba(255,210,150,0.6)' }); return a; })();
 
+  // ---------- McCULLOCH PARK: the soapbox derby finish line at night ----------
+  const MCC_LAMPS = [150, 470, 810, 1130];
+  function mcculloch(B, F) {
+    vg(B, 0, 0, BW, H, ['#03040a', '#0a0e1c', '#141a26', '#1a1e22']);
+    stars(B, 70, 80);
+    seed = 211;
+    // the far side of the park: a dark wall of trees, then the big elms, lit from below by the streetlights
+    treeline(B, FY - 40, 40, '#0c1410', 40, 70);
+    for (const [x, h] of [[60, 150], [300, 170], [560, 160], [760, 176], [1000, 166], [1230, 150]]) {
+      B.fillStyle = '#0e0a08'; B.beginPath(); B.moveTo(x - 7, FY - 30); B.lineTo(x - 3, FY - h * 0.55); B.lineTo(x + 3, FY - h * 0.55); B.lineTo(x + 7, FY - 30); B.fill();
+      for (const sgn of [-1, 1]) { B.strokeStyle = '#0e0a08'; B.lineWidth = 3; B.beginPath(); B.moveTo(x, FY - h * 0.5); B.quadraticCurveTo(x + sgn * h * 0.2, FY - h * 0.7, x + sgn * h * 0.36, FY - h * 0.86); B.stroke(); }
+      // the vase-shaped crown that makes an elm an elm
+      for (let j = 0; j < 26; j++) { const u = rand(), cxx = x + (u - 0.5) * h * 0.95, cy = FY - h * (0.62 + 0.36 * (1 - Math.abs(u - 0.5) * 1.4) * rr(0.6, 1)), r = h * rr(0.09, 0.16);
+        B.fillStyle = shade('#1a2a16', rr(-0.35, 0)); B.beginPath(); B.arc(cxx, cy, r, 0, PI * 2); B.fill();
+        if (rand() < 0.5) { B.fillStyle = 'rgba(200,190,120,0.16)'; B.beginPath(); B.arc(cxx, cy + r * 0.4, r * 0.6, 0, PI); B.fill(); } }
+    }
+    // basketball goal on the park court
+    const gx = CX - 250;
+    B.fillStyle = '#1a1a1e'; B.fillRect(gx - 2, FY - 110, 4, 80); B.fillRect(gx - 2, FY - 112, 26, 3);
+    B.fillStyle = '#d8d8dc'; B.fillRect(gx + 18, FY - 126, 34, 24); B.strokeStyle = '#b02020'; B.lineWidth = 1; B.strokeRect(gx + 28, FY - 116, 14, 10);
+    B.strokeStyle = '#e06020'; B.lineWidth = 1.4; B.beginPath(); B.ellipse(gx + 35, FY - 104, 7, 1.8, 0, 0, PI * 2); B.stroke();
+    B.strokeStyle = 'rgba(230,230,230,0.6)'; B.lineWidth = 0.5; for (let i = 0; i < 5; i++) { B.beginPath(); B.moveTo(gx + 29 + i * 3, FY - 104); B.lineTo(gx + 31 + i * 2, FY - 94); B.stroke(); }
+    // the track coming down the hill in the distance
+    B.fillStyle = '#2a2a2e'; B.beginPath(); B.moveTo(CX - 40, FY - 30); B.lineTo(CX + 40, FY - 30); B.lineTo(CX + 14, FY - 80); B.lineTo(CX - 10, FY - 80); B.fill();
+    B.strokeStyle = 'rgba(240,240,240,0.4)'; B.lineWidth = 0.8; B.beginPath(); B.moveTo(CX, FY - 30); B.lineTo(CX + 2, FY - 80); B.stroke();
+    B.fillStyle = '#1a2a16'; B.beginPath(); B.moveTo(CX - 120, FY - 30); B.quadraticCurveTo(CX, FY - 96, CX + 120, FY - 30); B.lineTo(CX + 40, FY - 30); B.lineTo(CX + 14, FY - 80); B.lineTo(CX - 10, FY - 80); B.lineTo(CX - 40, FY - 30); B.fill();
+    // grass verge
+    vg(B, 0, FY - 30, BW, 32, ['#141c10', '#0e140c']);
+    for (const x of MCC_LAMPS) lamp(B, x, FY - 2, 128, 'rgba(255,215,140,0.85)');
+    fog(B, FY - 60, 50, 'rgba(40,40,60,0.25)');
+    vignette(B, BW);
+    // the finish straight: dark asphalt, lane lines running at you, a checkered finish line across it
+    vg(F, 0, FY, AWX, H - FY, ['#2a2a2e', '#1c1c20', '#141416']);
+    for (let i = 0; i < 2600; i++) { F.fillStyle = rand() < 0.5 ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.25)'; F.fillRect(rand() * AWX, FY + rand() * (H - FY), 1, 1); }
+    const vx = AWX / 2;
+    F.strokeStyle = 'rgba(235,235,225,0.75)'; F.lineWidth = 1.6; for (const o of [-1, 0, 1]) { F.beginPath(); F.moveTo(vx + o * 110, FY); F.lineTo(vx + o * 520, H); F.stroke(); }
+    const y0 = FY + 9, y1 = FY + 19, n = 64;
+    for (let r = 0; r < 2; r++) for (let i = 0; i < n; i++) { F.fillStyle = (i + r) % 2 ? '#e8e8e0' : '#121214'; F.fillRect(i * AWX / n, r ? (y0 + y1) / 2 : y0, AWX / n + 0.5, (y1 - y0) / 2); }
+    F.fillStyle = 'rgba(0,0,0,0.25)'; for (let i = 0; i < 90; i++) F.fillRect(rand() * AWX, rr(y0, y1), rr(2, 8), 1);
+    F.fillStyle = 'rgba(240,240,230,0.6)'; F.font = '12px Anton, Impact, sans-serif'; F.textAlign = 'center'; F.fillText('FINISH', vx, y1 + 13); F.textAlign = 'left';
+    for (const x of MCC_LAMPS) { const fx = x / BW * AWX; F.save(); F.globalCompositeOperation = 'lighter'; const gr = F.createRadialGradient(fx, FY + 18, 0, fx, FY + 18, 120); gr.addColorStop(0, 'rgba(255,210,140,0.14)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); F.fillStyle = gr; F.fillRect(fx - 120, FY, 240, H - FY); F.restore(); }
+    const dg = F.createLinearGradient(0, FY, 0, FY + 16); dg.addColorStop(0, 'rgba(0,0,0,0.4)'); dg.addColorStop(1, 'rgba(0,0,0,0)'); F.fillStyle = dg; F.fillRect(0, FY, AWX, 16);
+  }
+  const MCC_CROWD = (() => { const r = prng(311), a = [], jack = ['#2a3a5a', '#5a2a2a', '#3a4a2a', '#4a4a50', '#6a5030', '#2a2a30', '#7a6a50'];
+    for (let i = 0; i < 22; i++) { const pants = r() < 0.6 ? '#2a3050' : '#3a3a3a'; a.push({ x: 40 + i * 56 + r() * 22, y: FY - 4, h: 38 + r() * 8, ph: r() * 6, speed: 2.6 + r() * 1.6, stance: 0.8 + r() * 0.6, skin: SKINS[(r() * SKINS.length) | 0], hair: HAIRS[(r() * HAIRS.length) | 0], longHair: r() < 0.35,
+      topKind: 'shirt', sleeves: true, top: jack[i % jack.length], logo: r() < 0.3 ? '#e8e0d0' : null, bottom: pants, legs: pants, bottomLen: 'knee', shoes: '#d8d8d8', style: r() < 0.55 ? 'cheer' : r() < 0.5 ? 'clap' : 'stand', cap: r() < 0.35 ? jack[(i + 2) % jack.length] : null, can: r() < 0.2, rim: 'rgba(255,210,150,0.55)' }); }
+    return a; })();
+  function mccLive(g, t) {
+    g.save(); g.globalAlpha = 0.85; for (const p of MCC_CROWD) person(g, p, t); g.restore();
+    // low red and white racing barrier in front of the crowd
+    for (let x = 0; x < BW; x += 30) { g.fillStyle = (x / 30) % 2 ? '#c81e22' : '#e8e4dc'; g.beginPath(); g.moveTo(x, FY + 2); g.lineTo(x + 3, FY - 13); g.lineTo(x + 27, FY - 13); g.lineTo(x + 30, FY + 2); g.fill(); g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(x, FY - 4, 30, 6); }
+    g.fillStyle = 'rgba(255,255,255,0.18)'; g.fillRect(0, FY - 13, BW, 1.5);
+  }
+
   // ---------- THE RENTAL: Slum Lord's condemned house on the east side ----------
   function rental(B, F) {
     vg(B, 0, 0, BW, H, ['#040806', '#0c1610', '#1a2418', '#2a2a1a']);
@@ -834,9 +897,10 @@ const STAGES = (() => {
     greenway: { name: 'WYSOR STREET DEPOT', draw: greenway },
     shedtown: { name: 'SHEDTOWN DRIVE-IN', draw: shedtown },
     cornbread: { name: 'CORNBREAD ROAD', draw: cornbread },
-    glassworks: { name: 'BALL GLASS WORKS', draw: glassworks },
+    glassworks: { name: 'GLASS WORKS', draw: glassworks },
     village: { name: 'THE VILLAGE', draw: village },
     rental: { name: 'THE RENTAL', draw: rental },
+    mcculloch: { name: 'McCULLOCH PARK', draw: mcculloch, pit: 'mcculloch' },
   };
   const cache = {};
   function get(id) {
@@ -851,6 +915,7 @@ const STAGES = (() => {
   function name(id) { return (DEFS[id] || DEFS.cityhall).name; }
 
   // animated bits drawn each frame on top of the far layer (back-layer coords)
+  const COWS = [{ x0: 20, v: 3, dy: 0, s: 1 }, { x0: 150, v: -2.2, dy: -6, s: 0.8 }, { x0: 260, v: 1.6, dy: -10, s: 0.66 }];
   function live(g, id, t) {
     if (id === 'cityhall' || id === 'hell') {
       for (const x of [CX - 62, CX + 62]) glow(g, x, FY - 12, 24 + Math.sin(t * 7 + x) * 3, id === 'hell' ? 'rgba(255,60,0,0.25)' : 'rgba(255,220,160,0.12)');
@@ -864,6 +929,17 @@ const STAGES = (() => {
       const on = Math.floor(t * 6) % 2; for (let i = 0; i < 7; i++) if ((i + on) % 2) glow(g, CX + 75 + i * 11, FY - 177, 5, 'rgba(255,230,120,1)');
     }
     if (id === 'cornbread') {
+      for (const c of COWS) {
+        const x = CX + 40 + ((c.x0 + t * c.v) % 320 + 320) % 320, y = FY - 4 + c.dy, d = c.v > 0 ? 1 : -1, bob = Math.sin(t * 3 + c.x0) * 0.6, gr = Math.sin(t * 0.7 + c.x0) > 0.4;
+        g.save(); g.translate(x, y); g.scale(d * c.s, c.s);
+        g.fillStyle = '#e8e4dc'; g.beginPath(); g.ellipse(0, -14, 13, 7, 0, 0, PI * 2); g.fill();
+        g.fillStyle = '#141214'; g.beginPath(); g.ellipse(-4, -16, 5, 3.5, 0.3, 0, PI * 2); g.fill(); g.beginPath(); g.ellipse(6, -12, 4, 3, -0.2, 0, PI * 2); g.fill();
+        g.fillStyle = '#e8e4dc'; g.fillRect(-10, -9, 2.4, 9); g.fillRect(-5, -9, 2.4, 9); g.fillRect(5, -9, 2.4, 9); g.fillRect(9, -9, 2.4, 9);
+        const hy = gr ? -8 : -18 + bob; g.fillStyle = '#141214'; g.beginPath(); g.ellipse(15, hy, 4.5, 3.4, gr ? 0.9 : 0.3, 0, PI * 2); g.fill(); g.fillStyle = '#d8a8a0'; g.beginPath(); g.ellipse(18, hy + 2, 2.4, 1.8, 0, 0, PI * 2); g.fill();
+        g.strokeStyle = '#141214'; g.lineWidth = 1; g.beginPath(); g.moveTo(-13, -16); g.quadraticCurveTo(-16, -10 + Math.sin(t * 4 + c.x0) * 2, -15, -5); g.stroke();
+        g.restore();
+        g.strokeStyle = '#2a2a12'; g.lineWidth = 1.2; for (let k = 0; k < 7; k++) { const sx = x - 14 * c.s + k * 4.5 * c.s; g.beginPath(); g.moveTo(sx, FY + 1); g.lineTo(sx + Math.sin(k * 2.1) * 2, FY - 12 - (k % 3) * 3); g.stroke(); }
+      }
       for (let i = 0; i < 3; i++) {
         const x = (300 + i * 360 + Math.sin(t * 0.4 + i) * 60) % BW, y = 40 + i * 14 + Math.sin(t * 1.3 + i) * 5;
         g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, y, 0, FY); gr.addColorStop(0, 'rgba(160,255,200,0.3)'); gr.addColorStop(1, 'rgba(160,255,200,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x - 6, y); g.lineTo(x + 6, y); g.lineTo(x + 26, FY); g.lineTo(x - 26, FY); g.fill(); g.restore();
@@ -889,6 +965,7 @@ const STAGES = (() => {
       const cyc = t % 22;
       if (cyc < 9) { const x = 1400 - cyc * 220; glow(g, x, 160, 14, 'rgba(255,250,200,0.9)', 0.9); g.fillStyle = '#0a0a0c'; g.fillRect(x, 157, 26, 7); for (let c = 0; c < 26; c++) { g.fillStyle = ['#2a1a14', '#1a1a1e', '#2a2018'][c % 3]; g.fillRect(x + 28 + c * 23, 156, 21, 8); } }
     }
+    if (id === 'mcculloch') mccLive(g, t);
     if (id === 'rental') { const fl = Math.sin(t * 13) * Math.sin(t * 7.3) > 0.1 ? 0.22 : 0.08; g.fillStyle = `rgba(120,170,240,${fl})`; g.fillRect(CX - 150 + 170, FY - 150 + 8, 44, 54); for (let i = 0; i < 6; i++) { g.fillStyle = 'rgba(20,20,10,0.8)'; g.fillRect(CX - 60 + Math.sin(t * 3 + i * 2) * 30 + i * 8, FY - 40 + Math.cos(t * 4 + i) * 12, 1, 1); } }
     if (id === 'village') { bros(g, t); for (let i = 0; i < 4; i++) { const on = Math.sin(t * 3 + i * 2) > -0.7; if (on) glow(g, 78 + i * 166, FY - 75, 30, 'rgba(255,120,200,0.1)'); } }
     if (id === 'glassworks') for (const x of [230, 640, 1050]) glow(g, x, 160, 40 + Math.sin(t * 6 + x) * 8, 'rgba(255,140,40,0.3)');
@@ -972,5 +1049,5 @@ const STAGES = (() => {
     }
   }
 
-  return { AW: AWX, H, FLOOR, get, name, live, drawBelow, drawTrain, ROTATION: ['benny', 'bridge', 'minnetrista', 'westend', 'greenway', 'shedtown', 'cornbread', 'cityhall', 'village', 'overpass', 'beach'] };
+  return { AW: AWX, H, FLOOR, get, name, live, drawBelow, drawTrain, ROTATION: ['benny', 'bridge', 'minnetrista', 'westend', 'greenway', 'shedtown', 'cornbread', 'cityhall', 'village', 'overpass', 'beach', 'mcculloch'] };
 })();

@@ -1272,6 +1272,7 @@
     g.restore();
     if (hot) { g.save(); g.shadowColor = 'rgba(255,40,20,0.9)'; g.shadowBlur = 10; plate(0, 0, 0); g.strokeStyle = 'rgba(255,80,40,0.8)'; g.lineWidth = 1; g.stroke(); g.restore(); }
     TXT.draw(g, label, x + w / 2, y + h / 2 - size * 0.62, { size, align: 'center', fill: hot ? 'fire' : fill });
+    if (window.MK_BOXES) { const m = g.getTransform(); window.MK_BOXES.push({ k: 'btn', s: label, x0: m.a * x + m.e, y0: m.d * y + m.f, x1: m.a * (x + w) + m.e, y1: m.d * (y + h) + m.f }); }
     ui.push({ x, y, w, h, fn, btn: 1 });
   }
   function bgDark(t) {
@@ -1301,6 +1302,7 @@
     grit();
   }
   function portrait(g, def, x, y, w, h, on, t) {
+    if (window.MK_BOXES) { const m = g.getTransform(); window.MK_BOXES.push({ k: 'pic', s: def.id, x0: m.a * x + m.e, y0: m.d * y + m.f, x1: m.a * (x + w) + m.e, y1: m.d * (y + h) + m.f }); }
     const gr = g.createLinearGradient(0, y, 0, y + h); gr.addColorStop(0, on ? '#7a1a1a' : '#2a0a10'); gr.addColorStop(1, on ? '#3a0606' : '#100206');
     g.fillStyle = gr; g.fillRect(x, y, w, h);
     g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
@@ -1313,8 +1315,8 @@
     elControls.classList.remove('on'); elPause.classList.remove('on');
     bgDark(); ui = [];
     const t = game.time, g = ctx;
-    TXT.draw(g, 'CHOOSE YOUR FIGHTER', W / 2, 6, { size: 20, align: 'center', fill: 'gold' });
-    const cw = 44, chh = 40, NC = 4, gw = NC * (cw + 4) - 4, gx = Math.round(150 + (W - 150 - gw) / 2), gy = 30, cx = gx + gw / 2;
+    const cw = 44, chh = 40, NC = 4, gw = NC * (cw + 4) - 4, gx = Math.round(150 + (W - 150 - gw) / 2), gy = 32, cx = gx + gw / 2;
+    TXT.draw(g, 'CHOOSE YOUR FIGHTER', cx, 4, { size: 20, align: 'center', fill: 'gold' });
     ROSTER.FIGHTERS.forEach((def, i) => {
       const x = gx + (i % NC) * (cw + 4), y = gy + ((i / NC) | 0) * (chh + 4);
       portrait(g, def, x, y, cw, chh, i === sel.i, t);
@@ -1331,14 +1333,14 @@
     g.fillStyle = 'rgba(0,0,0,0.55)'; g.beginPath(); g.ellipse(70, 206, 28, 4, 0, 0, PI * 2); g.fill();
     R.digi(g, f.x, f.y, gg => R.draw(gg, f, PS.stance(t), {}));
     TXT.draw(g, def.name, cx, gy + 3 * (chh + 4), { size: 15, align: 'center', fill: 'fire' });
-    bio(g, def.bio, cx, gy + 3 * (chh + 4) + 20, Math.min(gw, 2 * (W - 92 - cx) - 6), 3);
+    bio(g, def.bio, cx, gy + 3 * (chh + 4) + 20, Math.min(gw, 2 * (W - 100 - cx)), 3);
     uiButton('FIGHT', W - 86, H - 36, 76, 28, confirmPick, 'fire', 18);
     uiButton('MOVES', W - 86, H - 70, 76, 26, () => { screen = 'moves'; movesBack = 'select'; SFX.blip(); }, 'gold', 14);
     grit();
   }
   function bio(g, str, cx, ly, maxW, maxLines = 9) {
     const words = str.split(' '); let line = '', n = 0;
-    for (const wd of words) { const tr = line ? line + ' ' + wd : wd; if (TXT.width(g, tr, 8) > maxW) { if (n < maxLines) TXT.draw(g, line, cx, ly, { size: 8, align: 'center', fill: 'white', italic: false }); n++; line = wd; ly += 10; } else line = tr; }
+    for (const wd of words) { const tr = line ? line + ' ' + wd : wd; if (TXT.width(g, tr, 8) > maxW) { if (n < maxLines) TXT.draw(g, line, cx, ly, { size: 8, align: "center", fill: "white", italic: false }); n++; line = wd; ly += 11; } else line = tr; }
     if (n < maxLines) TXT.draw(g, line, cx, ly, { size: 8, align: 'center', fill: 'white', italic: false });
   }
   function confirmPick() {
@@ -1353,8 +1355,8 @@
     elControls.classList.remove('on'); elPause.classList.remove('on');
     bgDark(); ui = [];
     const t = game.time, g = ctx, list = OPPS();
-    TXT.draw(g, 'CHOOSE YOUR OPPONENT', W / 2, 6, { size: 20, align: 'center', fill: 'gold' });
-    const cw = 38, chh = 38, NC = 5, gw = NC * (cw + 4) - 4, gx = Math.round(150 + (W - 150 - gw) / 2), gy = 30;
+    const cw = 38, chh = 38, NC = 5, gw = NC * (cw + 4) - 4, gx = Math.round(150 + (W - 150 - gw) / 2), gy = 32;
+    TXT.draw(g, 'CHOOSE YOUR OPPONENT', gx + gw / 2, 4, { size: 20, align: 'center', fill: 'gold' });
     list.forEach((def, i) => {
       const x = gx + (i % NC) * (cw + 4), y = gy + ((i / NC) | 0) * (chh + 4);
       portrait(g, def, x, y, cw, chh, i === sel.o, t);
@@ -1368,7 +1370,7 @@
     R.digi(g, 70, 206, gg => R.draw(gg, { def, d: def.dk, x: 70, y: 206, face: 1, t }, PS.stance(t), {}));
     const cx = gx + gw / 2;
     TXT.draw(g, def.name, cx, gy + 3 * (chh + 4) + 2, { size: 15, align: 'center', fill: 'fire' });
-    bio(g, def.bio, cx, gy + 3 * (chh + 4) + 22, Math.min(gw, 2 * (W - 92 - cx) - 6), 3);
+    bio(g, def.bio, cx, gy + 3 * (chh + 4) + 22, Math.min(gw, 2 * (W - 100 - cx)), 3);
     uiButton('NEXT', W - 86, H - 36, 76, 28, () => { screen = 'arena'; SFX.gong(); }, 'fire', 18);
     uiButton('RANDOM', W - 86, H - 70, 76, 26, () => { sel.o = (Math.random() * list.length) | 0; SFX.select(); }, 'gold', 13);
     uiButton('BACK', 6, H - 26, 56, 20, () => { screen = 'select'; SFX.blip(); }, 'gold', 11);
@@ -1415,15 +1417,15 @@
     elControls.classList.remove('on');
     bgDark(); ui = [];
     const g = ctx, def = screen === 'moves' && movesBack === 'play' ? p1.def : ROSTER.FIGHTERS[sel.i];
-    TXT.draw(g, def.name + ' MOVES', W / 2, 6, { size: 18, align: 'center', fill: 'gold' });
+    TXT.draw(g, def.name + ' MOVES', W / 2, 4, { size: 18, align: 'center', fill: 'gold' });
     const rows = [
       ['PUNCH', 'Jab (tap again for a combo)', 0], ['DOWN + PUNCH', 'Uppercut', 0], ['TOWARD + PUNCH (close)', 'Suplex', 0], ['BACK + PUNCH (close)', 'Wad Toss', 0],
       ['KICK', 'Kick', 0], ['DOWN + KICK', 'Sweep', 0], ['BACK + KICK', 'Spinning back kick', 0], ['UP', 'Jump (punch or kick in the air)', 0], ['BLOCK (hold)', 'Block (hold DOWN too to block low)', 0],
-      ['BLOCK + UP', 'BULLET DODGE (counters if it dodges)', 2], ['BACK, BACK + KICK', 'WALL RUN', 2], ['IN THE AIR: DOWN + PUNCH', 'HANG TIME', 2],
-      ['BACK, FORWARD + PUNCH', def.proj.name, 1], ['DOWN, FORWARD + KICK', def.sp2.name, 1], ['FINISH: DOWN, DOWN + PUNCH', 'FATALITY: ' + def.fatal.name, 1], ['FINISH at RAILROAD BRIDGE or OVERPASS: DOWN + PUNCH', 'Stage fatality', 1],
+      ['BLOCK + UP', 'BULLET DODGE (counters if it dodges)', 2], ['BACK, BACK + KICK', 'WALL RUN FLYING KICK', 2], ['IN THE AIR: DOWN + PUNCH', 'HANG TIME', 2],
+      ['BACK, FORWARD + PUNCH', def.proj.name, 1], ['DOWN, FORWARD + KICK', def.sp2.name, 1], ['FINISH: DOWN, DOWN + PUNCH', 'FATALITY: ' + def.fatal.name, 1], ['FINISH at BRIDGE, OVERPASS or McCULLOCH: DOWN + PUNCH', 'Stage fatality', 1],
     ];
     rows.forEach((r, i) => {
-      const y = 28 + i * 12.4, hl = r[2];
+      const y = 30 + i * 12.5, hl = r[2];
       TXT.draw(g, r[0], W / 2 - 6, y, { size: 9, align: 'right', fill: hl === 1 ? 'fire' : hl === 2 ? 'green' : 'white', italic: false });
       TXT.draw(g, r[1], W / 2 + 6, y, { size: 9, align: 'left', fill: hl === 1 ? 'gold' : hl === 2 ? 'green' : '#c8c8d0', italic: false });
     });

@@ -481,7 +481,7 @@ const FATAL = (() => {
     s.at(1.95, () => { api.sfx('thud'); api.shake(4); });
     s.at(3.3, () => { heart = false; const h = J(A, 'head'); FX.gib('heart', h[0] + A.face * 17 * k, h[1], 0, -330, { s: 1.3, vr: 10 }); api.sfx('whoosh'); });
     s.at(3.75, () => { api.sfx('gulp'); FX.gibs.forEach(g => { if (g.kind === 'heart') g.dead = true; }); });
-    s.at(4.0, () => { api.sfx('chirp'); api.bubble('TWEET TWEET.', A.x, F - 150, { size: 13, fill: 'white', life: 1.8 }); });
+    s.at(4.0, () => { api.sfx('chirp'); api.bubble('CHIRP CHIRP.', A.x, F - 150, { size: 13, fill: 'white', life: 1.8 }); });
     s.at(5.6, () => { s.done = true; });
     s.tick = (t, dt) => {
       if (t < 0.35) { V.scriptPose = PS.dizzy(V.t); A.scriptPose = P({ hyL: 0.5, lean: 0.4, aF: [2.2, 0.4], aB: [2.0, 0.5], fF: [12, 0], fB: [-12, 0] }); return; }
@@ -753,7 +753,7 @@ const FATAL = (() => {
   };
 
 
-  // ---------- BALL JAR GOLEM: Canning Season ----------
+  // ---------- FRUIT JAR GOLEM: Canning Season ----------
   S.golem = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR;
     let lifted = false, slammed = false;
@@ -860,6 +860,70 @@ const FATAL = (() => {
         if (smashed) { smear = Math.min(1, smear + dt * 2); if (Math.random() < 0.9) FX.blood(trainX + rnd(0, 300), 170 + rnd(-30, 20), 3, -1, 1.2); }
       }
       A.scriptPose = PS.win(A.t);
+    };
+  };
+
+  // ---------- McCULLOCH PARK stage fatality: Soapbox Derby ----------
+  // uppercut into a soapbox car, a kick in the back, and the elm at the bottom of the hill wins
+  S.mcculloch = (s, A, V, api) => {
+    const PS = api.PS, F = api.FLOOR, k = A.d.k, d = A.face, cs = 1.75 * V.d.k, SEAT = 12 * cs;
+    const LX = Math.max(api.cam + 90, Math.min(api.cam + api.W - 90, A.x + d * 96 * k));
+    const treeX = d > 0 ? api.cam + api.W - 26 : api.cam + 26, edge = d > 0 ? api.cam + api.W + 60 : api.cam - 60;
+    let vy = -700, landed = false, carX = edge, carV = 0, rolling = false, crashed = false, splat = 0, planks = [];
+    api.sfx('big'); FX.blood(V.x, V.y - 80, 30, d, 1.4);
+    const car = (g, x) => {
+      g.save(); g.translate(x, F); g.scale(d * cs, cs);
+      g.fillStyle = '#b8201c'; g.beginPath(); g.moveTo(-30, -6); g.lineTo(-30, -18); g.lineTo(14, -18); g.lineTo(34, -10); g.lineTo(34, -6); g.fill();
+      g.fillStyle = '#e8e0d0'; g.fillRect(-30, -14, 44, 2.5); g.fillStyle = '#1a1a1a'; g.fillRect(-12, -22, 18, 5);
+      g.fillStyle = '#f0f0e8'; g.beginPath(); g.arc(-2, -11, 4.5, 0, PI * 2); g.fill(); g.fillStyle = '#111'; g.font = '7px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillText('7', -2, -8.5); g.textAlign = 'left';
+      for (const wx of [-22, 26]) { R.ball(g, wx, -5.5, 5.5, '#141414'); R.ball(g, wx, -5.5, 2, '#9a9aa0'); }
+      g.restore();
+    };
+    // the big elm at the bottom of the run
+    prop({ layer: 'back', draw(g) {
+      if (s.t < 0.9) return;
+      g.fillStyle = '#2a1e16'; g.beginPath(); g.moveTo(treeX - 13, F + 2); g.lineTo(treeX - 8, F - 200); g.lineTo(treeX + 8, F - 200); g.lineTo(treeX + 13, F + 2); g.fill();
+      g.fillStyle = 'rgba(0,0,0,0.3)'; for (let i = 0; i < 9; i++) g.fillRect(treeX - 8 + (i * 5) % 16, F - 190 + i * 21, 1.2, 16);
+      if (splat > 0) { g.fillStyle = 'rgba(120,0,8,0.9)'; g.beginPath(); g.ellipse(treeX - d * 10, F - 26, 9 * splat, 22 * splat, 0, 0, PI * 2); g.fill(); g.fillRect(treeX - d * 10 - 2, F - 26, 4, 30 * splat); }
+    } });
+    prop({ layer: 'front', draw(g) {
+      if (!crashed && carX !== edge) car(g, carX);
+      for (const p of planks) { g.save(); g.translate(p.x, p.y); g.rotate(p.a); g.fillStyle = p.c; g.fillRect(-p.w / 2, -2, p.w, 4); g.restore(); }
+    }, update(p, dt) { for (const q of planks) { if (q.y < F - 2) { q.vy += 1300 * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.a += q.va * dt; } else { q.y = F - 2; q.vx *= 0.8; q.va *= 0.7; } } } });
+    s.at(0.25, () => api.sfx('whoosh'));
+    s.at(1.75, () => { rolling = true; carV = d * 380; api.sfx('kick'); api.sfx('whoosh'); });
+    s.at(4.6, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (t > 0.3 && t < 0.95) carX = lerp(edge, LX, ease(Math.min(1, (t - 0.3) / 0.6)));
+      if (!landed) {
+        vy += 1500 * dt; V.y += vy * dt; V.x += (LX - V.x) * Math.min(1, dt * 4);
+        V.scriptPose = PS.air(t * 12); A.scriptPose = t < 0.5 ? (PS.up1 || PS.stance(A.t)) : PS.stance(A.t);
+        if (t > 0.6 && V.y >= F - SEAT) { V.y = F - SEAT; V.x = LX; landed = true; api.sfx('thud'); api.shake(4); }
+        return;
+      }
+      if (!crashed) {
+        V.scriptPose = P({ hyL: 0.55, lean: -0.2 + Math.sin(t * 9) * 0.08, head: -0.3 + Math.sin(t * 7) * 0.2, fF: [24 * cs / V.d.k, 0], fB: [20 * cs / V.d.k, 0], aF: [2.3 + Math.sin(t * 14) * 0.5, 0.5], aB: [2.6 + Math.cos(t * 13) * 0.5, 0.4] });
+        if (!rolling) { walkTo(A, LX - d * (30 * cs + 6 * k), dt, api, 130); A.scriptPose = PS.stance(A.t); if (t > 1.5) A.scriptPose = PS.kick0 || PS.stance(A.t); }
+        else {
+          A.scriptPose = t < 2.0 ? (PS.kick1 || PS.stance(A.t)) : PS.stance(A.t);
+          carV += d * 900 * dt; carX += carV * dt; V.x = carX;
+          if (Math.random() < 0.5) FX.dust(carX - d * 28, F, 1);
+          if ((treeX - carX) * d < 30 + 34 * cs) {
+            crashed = true; V.hidden = true; api.sfx('crunch'); api.sfx('splat'); api.sfx('big'); api.shake(14); api.flash();
+            const hx = treeX - d * 18;
+            FX.burst(hx, F - 30, 40, ['chunk', 'bone', 'guts', 'skullfrag', 'eye', 'chunk', 'heart', 'brain', 'tooth', 'bone'], 1.4);
+            for (const g2 of FX.gibs) g2.vx = -Math.abs(g2.vx) * d * 0.8;
+            skullGib(V, hx, F - 40, -d * 420, -520);
+            for (let i = 0; i < 4; i++) FX.blood(hx, F - 20 - i * 10, 60, -d, 2, 1.4);
+            FX.drops(24);
+            for (let i = 0; i < 9; i++) planks.push({ x: hx, y: F - 12, vx: -d * rnd(80, 420), vy: rnd(-520, -160), a: rnd(0, 6), va: rnd(-14, 14), w: rnd(8, 20), c: i < 3 ? '#141414' : i % 2 ? '#b8201c' : '#e8e0d0' });
+          }
+        }
+        return;
+      }
+      splat = Math.min(1, splat + dt * 3);
+      A.scriptPose = t > 3 ? PS.win(A.t) : PS.stance(A.t);
+      if (t > 3.2 && t < 3.3 && !s.said) { s.said = true; api.bubble('CHECKERED FLAG.', A.x, F - 150, { size: 13, fill: 'gold', life: 1.6 }); }
     };
   };
 

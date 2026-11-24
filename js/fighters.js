@@ -471,7 +471,7 @@ const ROSTER = (() => {
   // ---------- bosses ----------
   const GLASS = '#8cbccc';
   const golem = {
-    id: 'golem', name: 'BALL JAR GOLEM', short: 'GOLEM', him: 'IT', k: 1.32, boss: true, glass: true,
+    id: 'golem', name: 'FRUIT JAR GOLEM', short: 'GOLEM', him: 'IT', k: 1.32, boss: true, glass: true,
     bio: 'Blown in the old glass works. Something pickled lives inside.',
     d: dims({ thigh: 20, shin: 20, torso: 38, neck: 3, upper: 18, fore: 18, hipW: 18, shW: 19, chest: 20, belly: 21, back: 19, thighR: 8, kneeR: 7, ankleR: 6.5, shR: 7.5, elbowR: 6.5, wristR: 6, fist: 6.5, footL: 13, footH: 6 }),
     col: { torso: GLASS, armU: GLASS, armL: GLASS, hand: '#a8ccda', legU: GLASS, legL: GLASS, foot: '#6a98ac', neck: '#8f8f94' },
