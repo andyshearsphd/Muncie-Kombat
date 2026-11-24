@@ -911,7 +911,7 @@ const ROSTER = (() => {
   // ---------- POSSUM: lives under your porch ----------
   const PG = '#bab6ae', PGD = '#2a2626', PWH = '#f0ece4', PK = '#e8a8a8';
   const possum = {
-    id: 'possum', name: 'POSSUM', short: 'POSSUM', him: 'HIM', k: 1.0, paws: true, claws: true, skull: 'raccoon', skullK: 1.05, bicep: 0.25,
+    id: 'possum', name: 'PETEY', short: 'PETEY', him: 'HIM', k: 1.0, paws: true, claws: true, skull: 'raccoon', skullK: 1.05, bicep: 0.25,
     bio: 'Fifty teeth and zero shame. Lives under your porch. Plays dead until you get close.',
     d: dims({ thigh: 20, shin: 19, torso: 32, neck: 2, upper: 17, fore: 16, hipW: 15, shW: 14, chest: 16, belly: 19, back: 15, thighR: 8.4, kneeR: 5.6, ankleR: 4, shR: 6.6, elbowR: 4.8, wristR: 3.8, fist: 4.2, footL: 12, footH: 4.4 }),
     col: { torso: PG, armU: PG, armL: PGD, hand: PK, legU: PG, legL: PGD, foot: PK, neck: PG },
@@ -1046,7 +1046,7 @@ const ROSTER = (() => {
   const NAVY = '#16161a', VEST = '#0b0b0d', TSK = '#f0c4a4';
   const tinkle = {
     id: 'tinkle', name: 'OFC TINKLE', short: 'TINKLE', him: 'HIM', k: 1.16, boss: true, noMatrix: true, plainFinish: true, bicep: 0.45, calf: 0.38,
-    bio: 'Six-three, two-fifty, high and tight. He thinks he\'s a badass. He is a wimpy little bitch.',
+    bio: 'He thinks he\'s a badass. He is a wimpy little bitch.',
     d: dims({ thigh: 26, shin: 25, torso: 36, upper: 21, fore: 20, hipW: 15, shW: 23, chest: 26, belly: 22, back: 17, thighR: 12, kneeR: 6.2, ankleR: 4, shR: 9.8, elbowR: 6.4, wristR: 4.6, fist: 5.2 }),
     col: { torso: NAVY, armU: NAVY, armL: TSK, hand: TSK, legU: NAVY, legL: NAVY, foot: '#0c0c0e', neck: TSK },
     mat: { torso: 'cloth', armU: 'cloth', armL: 'skin', legU: 'cloth', legL: 'cloth' },
