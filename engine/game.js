@@ -1,4 +1,5 @@
-// Muncie Kombat: engine, combat, AI, screens, HUD and touch controls
+// Kombat Engine: combat, AI, screens, HUD and touch controls.
+// The game supplies ROSTER (fighterkit.js), STAGES.define() (stagekit.js), FATAL.add() (fatal.js) and a GAME config object.
 'use strict';
 (() => {
   const cv = document.getElementById('game');
@@ -14,6 +15,8 @@
   const ease = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
   FX.setFloor(FLOOR);
   const AUTO = /auto/.test(location.search);
+  const G = Object.assign({ title: 'KOMBAT', subtitle: '', ladderGoal: '', endingLine: '', mascot: null, toasty: null, winPoses: null }, window.GAME || {});
+  const mascotDef = () => G.mascot && ROSTER.ALL[G.mascot];
 
   // ---------- poses ----------
   const STANCE = P({ hy: 8, lean: 0.12, head: 0.05, aF: [1.0, 1.55], aB: [0.25, 2.45], fF: [17, 0], fB: [-17, 0] });
@@ -146,14 +149,14 @@
   }
   const overlap = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0;
   function bleed(v, x, y, n, dir, power) {
-    if (v.def.id === 'golem') { for (let i = 0; i < n / 2; i++) FX.gib('shard', x, y, rnd(-120, 120) + dir * 80, rnd(-260, -60)); FX.puff(x, y, 'rgba(120,170,60,0.7)', n / 2, 2); return; }
+    if (v.def.glass) { for (let i = 0; i < n / 2; i++) FX.gib('shard', x, y, rnd(-120, 120) + dir * 80, rnd(-260, -60)); FX.puff(x, y, 'rgba(120,170,60,0.7)', n / 2, 2); return; }
     FX.blood(x, y, n, dir, power);
-    if (['gertie', 'chucky', 'turkey'].includes(v.def.id)) { const fc = { gertie: '#8a7a68', chucky: '#b0141c', turkey: '#5a3a22' }[v.def.id]; for (let i = 0; i < 3; i++) FX.gib('feather', x, y, rnd(-60, 60), rnd(-160, -40), { grav: 120, vr: rnd(-4, 4), draw: (g) => { R.oval(g, 0, 0, 4, 1.4, fc, 0, true); R.line(g, -4, 0, 4, 0, '#2a1a14', 0.5); } }); }
+    if (v.def.feathers) { const fc = v.def.feathers; for (let i = 0; i < 3; i++) FX.gib('feather', x, y, rnd(-60, 60), rnd(-160, -40), { grav: 120, vr: rnd(-4, 4), draw: (g) => { R.oval(g, 0, 0, 4, 1.4, fc, 0, true); R.line(g, -4, 0, 4, 0, '#2a1a14', 0.5); } }); }
   }
 
   // extra gore on every connecting hit: wounds that stay on the body, teeth, chunks
   function gore(v, x, y, dir, dmg, mv) {
-    if (v.def.id === 'golem') return;
+    if (v.def.glass) return;
     const hh = hurtH(v), rel = (v.y - y) / hh;
     const j = rel > 0.8 ? 'head' : rel > 0.55 ? 'chest' : rel > 0.35 ? 'belly' : 'leg';
     const w = v.st2.wounds || (v.st2.wounds = []);
@@ -181,8 +184,7 @@
   }
   function startSP2(f) {
     const kind = f.def.sp2.kind, mv = Object.assign({ kind, name: f.def.sp2.name }, SP2[kind]);
-    if (f.def.id === 'golem') { mv.dmg = 14; mv.quake = 1; }
-    if (f.def.id === 'dan') mv.fire = 1;
+    if (f.def.sp2Mod) Object.assign(mv, f.def.sp2Mod);
     startMove(f, mv);
     if (kind === 'cloud') SFX.splat();
     if (kind === 'playdead') SFX.thud();
@@ -221,7 +223,7 @@
     bleed(v, cx, cy, Math.round(dmg * 5), dir, mv.upper ? 1.9 : 1.2);
     gore(v, cx, cy, dir, dmg, mv);
     game.freeze = mv.upper ? 0.11 : dmg >= 10 ? 0.08 : 0.055;
-    if (mv.upper) { game.shake = 5; if (Math.random() < 0.14 && !game.toasty) { game.toasty = 1.4; SFX.squeak(); } }
+    if (mv.upper) { game.shake = 5; if (G.toasty && Math.random() < 0.14 && !game.toasty) { game.toasty = 1.4; SFX.squeak(); } }
     const heavy = v.def.stats.armor && (mv.fx === 'stun') && v.hp > 0;
     let fx = mv.fx;
     if (heavy) { v.flashT = 0.1; return; }
@@ -300,7 +302,7 @@
   function bossDeath(v) {
     game.phase = 'fatality'; game.pt = 0;
     v.state = 'script'; setWin(game.winner);
-    game.script = FATAL.start({ golem: 'golemDie', slumlord: 'slumDie', dan: 'danDie' }[v.def.id] || 'danDie', game.winner, v, fatalAPI);
+    game.script = FATAL.start(v.def.death || 'generic', game.winner, v, fatalAPI);
   }
   function startRound() {
     FX.reset(); projs = []; game.banners = []; game.bubbles = []; game.scene = null; game.script = null;
@@ -319,7 +321,7 @@
     p1 = newFighter(ROSTER.FIGHTERS[ladder.pick], 0);
     p2 = newFighter(oppDef, 1);
     const lv = ladder.rung / Math.max(1, ladder.opps.length - 1);
-    p2.cpu.lvl = oppDef.id === 'tinkle' ? 0.34 : mode === 'single' ? (oppDef.boss ? 0.6 : 0.38) : oppDef.boss ? 0.55 + lv * 0.2 : 0.12 + lv * 0.5;
+    p2.cpu.lvl = oppDef.cpuLvl != null ? oppDef.cpuLvl : mode === 'single' ? (oppDef.boss ? 0.6 : 0.38) : oppDef.boss ? 0.55 + lv * 0.2 : 0.12 + lv * 0.5;
     stage = STAGES.get(ladder.stages[ladder.rung]);
     game.round = 1;
     screen = 'play'; paused = false;
@@ -332,7 +334,7 @@
     ladder.opps = others.concat(ROSTER.BOSSES);
     const rot = STAGES.ROTATION.slice();
     for (let i = rot.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [rot[i], rot[j]] = [rot[j], rot[i]]; }
-    ladder.stages = others.map((f, i) => rot[i % rot.length]).concat(['cityhall', 'glassworks', 'rental', 'hell']);
+    ladder.stages = others.map((f, i) => rot[i % rot.length]).concat(ROSTER.BOSSES.map((b, i) => b.arena || rot[(others.length + i) % rot.length]));
     ladder.rung = 0; ladder.scanned = false;
   }
 
@@ -530,7 +532,8 @@
       if (r < 0.8 && dist < 50) { out.tok = 'F'; out.P = true; return out; }
       c.blockT = 0.35; out.B = true; return out;
     }
-    if (f.def.id === 'tinkle') { c.blockT = 0; if (Math.random() < 0.003) game.bubbles.push({ str: pick(['STOP RESISTING!', 'ON THE GROUND!', 'I AM THE LAW!', 'GET SOME!']), x: f.x, y: f.y - hurtH(f) - 12, t: 0, life: 1.1, size: 10, fill: 'white' }); }
+    const AS = f.def.aiStyle || {};
+    if (AS.noBlock || AS.quips) { if (AS.noBlock) c.blockT = 0; if (AS.quips && Math.random() < 0.003) game.bubbles.push({ str: pick(AS.quips), x: f.x, y: f.y - hurtH(f) - 12, t: 0, life: 1.1, size: 10, fill: 'white' }); }
     c.t -= dt;
     if (c.walk) out.tok = c.walk > 0 ? 'F' : 'B';
     if (c.t > 0) return out;
@@ -538,7 +541,7 @@
     c.walk = 0;
     const r = Math.random();
     const hw = 40 * f.d.k + halfW(o);
-    if (f.def.id === 'slumlord' && dist > 130 && Math.random() < 0.12) { startMove(f, MV.taunt); return out; }
+    if (AS.taunt && dist > 130 && Math.random() < AS.taunt) { startMove(f, MV.taunt); return out; }
     if (o.state === 'down' && !o.stomped && dist < 130 && Math.random() < 0.15 + lv * 0.4) { out.tok = 'U' + (dist > 25 ? fwd : ''); return out; }
     if (['down', 'getup', 'air'].includes(o.state)) { if (r < 0.4) c.walk = -1; else if (r < 0.55 && f.projOut <= 0 && dist > 120) { f.hist = [{ k: 'B', t: game.time }, { k: 'F', t: game.time }]; out.P = true; } return out; }
     if (dist > 170) {
@@ -736,7 +739,7 @@
       if (!m.airborne && f.mt >= su && !f.leapt) { f.leapt = true; m.airborne = true; f.vy = -480; f.vx = clamp((o.x - f.x) / 0.62, -280, 280); }
       if (f.leapt && f.y < FLOOR + 1) {
         f.vy += GRAV * dt; f.x += f.vx * dt; f.y += f.vy * dt;
-        if (f.def.id === 'dan' || f.def.id === 'ballin') FX.fire(f.x, f.y - 40, 1, 0.6);
+        if (f.def.fireTrail) FX.fire(f.x, f.y - 40, 1, 0.6);
         if (f.y >= FLOOR && f.vy > 0) {
           f.y = FLOOR; m.airborne = false; f.leapt = false; f.vx = 0; SFX.land(); FX.dust(f.x, FLOOR, 12);
           if (m.quake) { game.shake = 7; SFX.thud(); if (!f.hitDone && grounded(o) && Math.abs(o.x - f.x) < 110 && !invuln(o) && o.state !== 'block') { f.hitDone = true; applyHit(f, o, { dmg: 8, fx: 'trip', snd: 'thud' }, false, o.x, FLOOR - 10); } }
@@ -887,55 +890,8 @@
   // ---------- victory poses: each winner celebrates in character ----------
   function setWin(f) { if (f.state === 'win') return; f.state = 'win'; f.winAt = f.t; f.wf = {}; f.snapPose = false; }
   const once = (f, key, t, at) => { if (t >= at && !f.wf[key]) { f.wf[key] = 1; return true; } return false; };
-  const WIN = {
-    hippo: { fp: t => ({ jaw: t > 1.6 && t < 2.3 ? 1 : 0.15, aL: t < 1.6 ? [0.5, -2.8 + Math.sin(t * 16) * 0.35] : [1.4, 0.4], aR: t < 1.6 ? [0.5, -2.8 - Math.sin(t * 16) * 0.35] : [1.4, 0.4], squat: t < 1.6 ? 2 : 0 }),
-      fx(f, t) { if (t < 1.6 && Math.sin(t * 16) > 0.97) SFX.thud(); if (once(f, 'burp', t, 1.65)) { SFX.gulp(); SFX.fart(); const h = fj(f, 'head'); FX.puff(h[0], h[1] + 10, 'rgba(160,110,200,0.7)', 14, 4); } } },
-    painter: { fp: t => ({ aR: [2.3 + Math.sin(t * 6) * 0.25, 0.6 + Math.cos(t * 6) * 0.25], aL: [0.7, -1.3] }),
-      fx(f, t) { if (t > 0.2 && t < 2.6 && Math.random() < 0.25) { const h = fj(f, 'handR'); FX.puff(h[0] + 8, h[1] - 8, 'rgba(250,250,255,0.75)', 1, 1); } },
-      draw(g, f) { const h = fj(f, 'handR'), l = fj(f, 'handL'); R.line(g, h[0], h[1], h[0] + 6, h[1] - 9, '#6a4a2a', 1.4); R.ball(g, h[0] + 6.5, h[1] - 9.5, 1.4, '#f8f8ff');
-        g.save(); g.translate(l[0] - 4, l[1] + 2); g.fillStyle = '#a87a48'; g.beginPath(); g.ellipse(0, 0, 9, 6, -0.3, 0, PI * 2); g.fill(); ['#f4f4f4', '#2a5ad0', '#e8c020', '#c02020', '#2a8a3a'].forEach((c, i) => { g.fillStyle = c; g.beginPath(); g.arc(-5 + i * 2.6, -1.5 + (i % 2) * 2.5, 1.3, 0, PI * 2); g.fill(); }); g.restore(); } },
-    garf: { fp: t => t < 1.0 ? ({ jaw: 1, aL: [2.9, 0.1], aR: [2.9, 0.1], hy: -2 }) : ({ jaw: 0.25 + Math.abs(Math.sin(t * 9)) * 0.2, head: 0.18, aR: [0.45, -3.2], aL: [0.3, 0.1], squat: 3 }),
-      fx(f, t) { if (once(f, 'yawn', t, 0.1)) SFX.squeak(); } },
-    host: { fp: t => t < 0.55 ? ({ aR: [2.2, 1.0], aL: [0.6, -1.5] }) : t < 0.9 ? ({ aR: [3.3, 0.3], aL: [0.6, -1.5] }) : ({ aR: [0.6, -1.5], aL: [0.6, -1.5] }),
-      fx(f, t) { if (once(f, 'toss', t, 0.6)) { const h = fj(f, 'handR'); FX.gib('pencil', h[0], h[1] - 8, 260, -300, { vr: 18, draw: g => { g.fillStyle = '#e8c020'; g.fillRect(-6, -0.9, 10, 1.8); g.fillStyle = '#f0c8a0'; g.fillRect(4, -0.9, 2, 1.8); g.fillStyle = '#e88aa0'; g.fillRect(-7.5, -0.9, 1.5, 1.8); } }); }
-        if (once(f, 'glass', t, 1.0)) { SFX.shatter(); game.flash = 0.06; } },
-      draw(g, f, t) { if (t < 0.6) { const h = fj(f, 'handR'); g.fillStyle = '#e8c020'; g.fillRect(h[0] - 1, h[1] - 10, 1.8, 10); } } },
-    ballin: { fp: t => ({ aR: [2.98, 0.04], aL: t > 1.2 ? [0.45, -2.5] : [0.5, -1.4] }),
-      draw(g, f, t) { const h = fj(f, 'handR'); g.save(); g.translate(h[0], h[1] - 13); g.rotate(t * 16); R.ball(g, 0, 0, 11, '#e0701a'); R.line(g, -11, 0, 11, 0, '#2a1004', 1.2); R.line(g, 0, -11, 0, 11, '#2a1004', 1.2); g.strokeStyle = '#2a1004'; g.lineWidth = 1; g.beginPath(); g.arc(-14, 0, 11, -0.8, 0.8); g.stroke(); g.beginPath(); g.arc(14, 0, 11, PI - 0.8, PI + 0.8); g.stroke(); g.restore(); } },
-    gertie: { fp: t => ({ jaw: Math.sin(t * 5) > 0 ? 0.9 : 0.1, aL: [1.9 + Math.sin(t * 14) * 0.4, 0.3], aR: [1.9 + Math.sin(t * 14) * 0.4, 0.3], head: Math.sin(t * 3) * 0.15 }),
-      fx(f, t) { if (once(f, 'h1', t, 0.1) || once(f, 'h2', t, 0.8) || once(f, 'h3', t, 1.6)) SFX.honk(); } },
-    rocky: { fp: t => ({ jaw: 0.4 + Math.abs(Math.sin(t * 7)) * 0.3, aL: [0.35, -1.9 + Math.sin(t * 20) * 0.18], aR: [0.35, -1.9 - Math.sin(t * 20) * 0.18], squat: 4 }),
-      fx(f, t) { if (Math.random() < 0.2) { const h = fj(f, 'head'); FX.puff(h[0], h[1] + 12, 'rgba(245,245,235,0.9)', 1, 1); } if (once(f, 'c', t, 0.3) || once(f, 'c2', t, 1.3)) SFX.squeak(); } },
-    millie: { fp: t => ({ jaw: Math.abs(Math.sin(t * 30)) * 0.6, aL: [2.5, 0.8], aR: [2.5, 0.8], hy: -Math.abs(Math.sin(t * 4)) * 3 }),
-      fx(f, t) { if (once(f, 's1', t, 0.3) || once(f, 's2', t, 1.0) || once(f, 's3', t, 1.7)) { SFX.thud(); FX.dust(f.x, FLOOR, 6); } } },
-    chucky: { fp: t => ({ aL: [1.65, 1.45 + Math.sin(t * 6) * 0.1], aR: [1.65, 1.45 + Math.sin(t * 6) * 0.1], hy: -2, jaw: once2(t) }),
-      fx(f, t) { if (once(f, 'c1', t, 0.1) || once(f, 'c2', t, 0.8) || once(f, 'c3', t, 1.4)) SFX.chirp(); if (Math.random() < 0.05) { const c = fj(f, 'chest'); FX.gib('feather', c[0], c[1], rnd(-60, 60), rnd(-120, -40), { grav: 100, vr: 4, draw: g => R.oval(g, 0, 0, 4, 1.4, '#b0141c', 0, true) }); } } },
-    turkey: { fp: t => ({ aL: [0.45, 0.1], aR: [0.45, 0.1], head: Math.sin(t * 6) * 0.2, squat: Math.abs(Math.sin(t * 5)) * 3, jaw: Math.sin(t * 9) > 0.5 ? 0.6 : 0 }),
-      fx(f, t) { if (once(f, 'g1', t, 0.2) || once(f, 'g2', t, 1.2)) SFX.yelp(); } },
-    wolfe: { fp: t => t < 1.7 ? ({ jaw: 1, aL: [1.0, 0.5], aR: [1.0, 0.5], hy: -2 }) : ({ jaw: 0.1, aR: [0.45, -3.25], aL: [0.6, -1.5] }),
-      fx(f, t) { if (once(f, 'howl', t, 0.05)) SFX.howl(); if (once(f, 'sniff', t, 1.8)) { SFX.sniff(); const h = fj(f, 'head'); FX.puff(h[0], h[1] + 6, 'rgba(250,250,250,0.9)', 10, 2); } } },
-    em: { fp: t => t < 1.0 ? ({ squat: 10, head: 0.1, aL: [0.35, -0.35], aR: [0.35, -0.35], spread: 1 }) : ({ aR: [2.95, 0.15], aL: [0.6, -1.5] }),
-      fx(f, t) { if (once(f, 'ding', t, 1.05)) SFX.ding(); },
-      draw(g, f, t) { if (t < 1.0) return; const h = fj(f, 'handR'); g.save(); g.translate(h[0], h[1] - 8); g.fillStyle = '#6a1420'; g.fillRect(-6, -8, 12, 16); g.fillStyle = '#d8b040'; g.fillRect(-4, -4, 8, 1); g.fillRect(-4, -2, 8, 0.7); g.fillStyle = '#f0e8d0'; g.fillRect(6, -7, 1.4, 14); g.restore(); } },
-    golem: { fp: t => ({ aL: [2.9 + Math.sin(t * 22) * 0.15, 0.3], aR: [2.9 - Math.sin(t * 22) * 0.15, 0.3], sway: Math.sin(t * 20) * 0.03 }),
-      fx(f, t) { if (once(f, 'c', t, 0.2) || once(f, 'c2', t, 0.9)) SFX.clang(); } },
-    slumlord: { fp: t => ({ aL: [1.9, 1.7], aR: [2.6 + Math.sin(t * 7) * 0.15, 1.6], head: -0.12 }),
-      fx(f, t) { if (once(f, 'b', t, 0.4)) game.bubbles.push({ str: 'STILL GORGEOUS.', x: f.x, y: f.y - hurtH(f) - 20, t: 0, life: 1.8, size: 11, fill: 'gold' }); },
-      draw(g, f) { const h = fj(f, 'handL'); g.save(); g.translate(h[0], h[1]); g.fillStyle = '#c89830'; g.fillRect(-1.2, -2, 2.4, 9); g.beginPath(); g.ellipse(0, -8, 5.5, 7, 0, 0, PI * 2); g.fill(); g.fillStyle = '#b8d0e0'; g.beginPath(); g.ellipse(0, -8, 4.2, 5.6, 0, 0, PI * 2); g.fill(); g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(-2, -12, 1.2, 4); g.restore(); } },
-    dan: { fp: t => ({ jaw: Math.abs(Math.sin(t * 18)) * 0.8, aR: [2.98, 0.08], aL: [0.5, -2.0] }),
-      fx(f, t) { if (Math.random() < 0.4) FX.fire(f.x + rnd(-24, 24), FLOOR, 1, 0.9); if (once(f, 'f', t, 0.1)) SFX.fire(); },
-      draw(g, f) { const h = fj(f, 'handR'); R.line(g, h[0], h[1] + 26, h[0], h[1] - 40, '#4a2e12', 2.2); R.line(g, h[0] - 6, h[1] - 40, h[0] + 6, h[1] - 40, '#b8b8c0', 1.8); for (let i = -1; i <= 1; i++) R.line(g, h[0] + i * 5.5, h[1] - 40, h[0] + i * 5.5, h[1] - 49, '#c8c8d0', 1.4); } },
-    tinman: { fp: t => t < 1.5 ? ({ aL: [1.5 + Math.sin(t * 8) * 0.5, 0.05], aR: [1.5 - Math.sin(t * 8) * 0.5, 0.05], sway: Math.sin(t * 8) * 0.04 }) : ({ aR: [0.55, -2.1], aL: [0.6, -1.5], jaw: 0.4 }),
-      fx(f, t) { if (once(f, 'c1', t, 0.15) || once(f, 'c2', t, 0.55) || once(f, 'c3', t, 0.95) || once(f, 'c4', t, 1.6) || once(f, 'c5', t, 2.0)) SFX.clang(); } },
-    bunyon: { fp: t => ({ aR: [0.45, -2.5], aL: [0.45, -2.5], sway: Math.sin(t * 2) * 0.02 }),
-      fx(f, t) { if (once(f, 's', t, 0.25) || once(f, 's2', t, 1.25)) { SFX.thud(); game.shake = 4; FX.dust(f.x, FLOOR, 14); } } },
-    becky: { fp: t => ({ aL: [0.6, -1.5], aR: [0.6, -1.5], head: Math.sin(t * 1.5) * 0.06 }),
-      fx(f, t) { if (Math.random() < 0.25) { const c = fj(f, 'chest'); FX.spark(c[0] + rnd(-12, 12), c[1] + rnd(-6, 10), '#eef2ff', 2); } if (once(f, 'd', t, 0.3)) SFX.ding(); } },
-    possum: { fp: t => t < 1.5 ? ({ jaw: 1, aL: [1.9 + Math.sin(t * 18) * 0.15, 0.3], aR: [1.9 - Math.sin(t * 18) * 0.15, 0.3], squat: 4 }) : ({ jaw: 0.2, aL: [0.4, 0.2], aR: [0.4, 0.2], squat: 3, head: 0.25 }),
-      fx(f, t) { if (once(f, 'h', t, 0.05) || once(f, 'h2', t, 0.9)) SFX.hiss(); } },
-    tinkle: { fp: t => ({ aL: [0.95, 1.25], aR: [0.95, 1.25], jaw: 0.3, head: Math.sin(t * 2) * 0.1 }),
-      fx(f, t) { if (once(f, 'b', t, 0.3)) game.bubbles.push({ str: 'I FEARED FOR MY LIFE.', x: f.x, y: f.y - hurtH(f) - 20, t: 0, life: 2, size: 11, fill: 'white' }); } },
-  };
+  // victory poses come from the game: GAME.winPoses(kit) returns { id: { fp(t), fx(f, t), draw(g, f, t) } }
+  const WIN = G.winPoses ? G.winPoses({ R, P, PI, FX, SFX, FLOOR, game, once, once2, fj, hurtH, rnd, pick, clamp, lerp, ease }) : {};
   function once2(t) { return Math.sin(t * 5) > 0.8 ? 0.6 : 0; }
   // victory poses turn to face the camera: a quick squash out of profile, then the front view
   const TURN = 0.12;
@@ -1157,7 +1113,7 @@
   function drawFighter(g, f) {
     drawGhosts(g, f);
     if (f.hidden) return;
-    if (f.def.id === 'golem' && f.state === 'script' && f.ro.gone) return;
+    if (f.def.vanish && f.state === 'script' && f.ro.gone) return;
     g.save();
     if (f.sink > 0) { g.beginPath(); g.rect(f.x - 80, 0, 160, FLOOR + 1); g.clip(); g.translate(0, f.sink * hurtH(f) * 1.05); }
     if (f.flashT > 0) g.globalAlpha = 0.7;
@@ -1260,8 +1216,8 @@
     if (game.toasty > 0) {
       const u = game.toasty > 1.1 ? (1.4 - game.toasty) / 0.3 : game.toasty < 0.3 ? game.toasty / 0.3 : 1;
       const x = W - 46 * u + 8, y = 26;
-      R.drawHeadAt(ctx, { def: ROSTER.ALL.hippo, d: ROSTER.ALL.hippo.dk }, x, y + 34, -0.2, 1.4, { t: game.time });
-      TXT.draw(ctx, 'SQUARE SLICED!', x - 30, y + 10, { size: 12, align: 'right', fill: 'purple' });
+      const td = ROSTER.ALL[G.toasty.fighter]; if (td) R.drawHeadAt(ctx, { def: td, d: td.dk }, x, y + 34, -0.2, 1.4, { t: game.time });
+      TXT.draw(ctx, G.toasty.text, x - 30, y + 10, { size: 12, align: 'right', fill: 'purple' });
     }
     if (game.phase === 'finish') { const left = Math.max(0, 6 - game.pt); if (left < 3) TXT.draw(ctx, String(Math.ceil(left)), W / 2, 100, { size: 18, align: 'center', fill: 'red' }); }
   }
@@ -1310,7 +1266,7 @@
     R.ball(g, 0, 0, r, '#2a0a3a');
     g.strokeStyle = '#d8a030'; g.lineWidth = 2.5; g.beginPath(); g.arc(0, 0, r - 2, 0, PI * 2); g.stroke();
     g.lineWidth = 1; g.beginPath(); g.arc(0, 0, r - 6, 0, PI * 2); g.stroke();
-    R.drawHeadAt(g, { def: ROSTER.ALL.hippo, d: ROSTER.ALL.hippo.dk }, -r * 0.18, r * 0.5, 0, r / 26, { t, jaw: 0.6 + Math.sin(t * 2) * 0.3 });
+    const md = mascotDef(); if (md) R.drawHeadAt(g, { def: md, d: md.dk }, -r * 0.18, r * 0.5, 0, r / 26, { t, jaw: 0.6 + Math.sin(t * 2) * 0.3 });
     g.fillStyle = '#9a000c'; for (let i = 0; i < 4; i++) g.fillRect(-6 + i * 5, r * 0.55, 2, 4 + ((t * 6 + i * 3) % 8));
     g.restore();
   }
@@ -1319,8 +1275,8 @@
     bgDark(); ui = [];
     const t = game.time;
     emblem(ctx, W / 2, 84, 42, t);
-    TXT.draw(ctx, 'MUNCIE KOMBAT', W / 2, 128, { size: 44, align: 'center', fill: 'fire' });
-    TXT.draw(ctx, 'A PURPLE HIPPO ARCADE GAME', W / 2, 180, { size: 10, align: 'center', fill: 'purple' });
+    TXT.draw(ctx, G.title, W / 2, 128, { size: 44, align: 'center', fill: 'fire' });
+    if (G.subtitle) TXT.draw(ctx, G.subtitle, W / 2, 180, { size: 10, align: 'center', fill: 'purple' });
     const go = m => () => { mode = m; SFX.gong(); SFX.music('menu'); screen = 'select'; say('choose your fighter'); };
     uiButton('SINGLE MATCH', W / 2 - 152, 196, 144, 28, go('single'), 'gold', 15);
     uiButton('ARCADE LADDER', W / 2 + 8, 196, 144, 28, go('ladder'), 'fire', 15);
@@ -1331,7 +1287,7 @@
     const gr = g.createLinearGradient(0, y, 0, y + h); gr.addColorStop(0, on ? '#7a1a1a' : '#2a0a10'); gr.addColorStop(1, on ? '#3a0606' : '#100206');
     g.fillStyle = gr; g.fillRect(x, y, w, h);
     g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
-    const sc = w / 36, adj = { gertie: [0.42, 0.78, 1.5], painter: [0.5, 0.86, 0.85], hippo: [0.3, 0.9, 0.85], garf: [0.4, 0.9, 0.95], turkey: [0.36, 0.94, 1.45], chucky: [0.38, 0.95, 0.85], wolfe: [0.3, 0.92, 0.8], em: [0.42, 0.96, 0.95], slumlord: [0.42, 0.92, 0.85], tinkle: [0.42, 0.96, 0.9], golem: [0.5, 0.7, 1], dan: [0.42, 0.95, 0.85], tinman: [0.4, 1.02, 0.78], bunyon: [0.42, 0.98, 0.82], becky: [0.42, 0.94, 0.95], possum: [0.28, 0.9, 0.85] }[def.id] || [0.4, 0.88, 1];
+    const sc = w / 36, adj = def.portrait || [0.4, 0.88, 1];
     R.drawHeadAt(g, { def, d: def.dk }, x + w * adj[0], y + h * adj[1], 0, sc / def.k * adj[2], { t, hurt: false });
     g.restore();
     g.strokeStyle = on ? '#ffe060' : '#6a4a20'; g.lineWidth = on ? 2 : 1; g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
@@ -1375,8 +1331,8 @@
     newLadder(); screen = 'ladder'; game.pt = 0; ladder.t0 = null;
   }
   // ---------- single match: pick the opponent, then the arena ----------
-  const OPPS = () => ROSTER.FIGHTERS.concat(ROSTER.BOSSES.filter(b => b.id !== 'dan'));
-  const ARENAS = () => STAGES.ROTATION.concat(['glassworks', 'rental']);
+  const OPPS = () => ROSTER.FIGHTERS.concat(ROSTER.BOSSES.filter(b => !b.ladderOnly));
+  const ARENAS = () => STAGES.SINGLE;
   function renderOpp() {
     elControls.classList.remove('on'); elPause.classList.remove('on');
     bgDark(); ui = [];
@@ -1462,7 +1418,7 @@
     bgDark(); ui = [];
     if (ladder.t0 == null) ladder.t0 = performance.now();
     const g = ctx, t = game.time, pt = (performance.now() - ladder.t0) / 1000, n = ladder.opps.length, r = ladder.rung;
-    // the tower: one big step per opponent, Devil Dan on top. The first time it is shown the
+    // the tower: one big step per opponent, the final boss on top. The first time it is shown the
     // camera scans it top to bottom; after each win your marker climbs one step.
     const SH = 54, TW = 118, tx = W - TW - 8, top = 8, bot = H - 8;
     const SCAN = 3.6, scanning = !ladder.scanned && r === 0;
@@ -1502,7 +1458,7 @@
     const cx = Math.round((tx - 20) / 2);
     if (scanning && pt < SCAN - 0.4) {
       TXT.draw(g, 'YOUR DESTINY', cx, 70, { size: 28, align: 'center', fill: 'gold' });
-      TXT.draw(g, n + ' FIGHTS TO CITY HALL', cx, 112, { size: 12, align: 'center', fill: 'white', italic: false });
+      TXT.draw(g, n + ' FIGHTS' + (G.ladderGoal ? ' TO ' + G.ladderGoal : ''), cx, 112, { size: 12, align: 'center', fill: 'white', italic: false });
       ui.push({ x: 0, y: 0, w: W, h: H, fn: () => { ladder.scanned = true; ladder.t0 = performance.now() - SCAN * 1000; } });
       ladderBack(); grit(); return;
     }
@@ -1539,8 +1495,8 @@
     R.digi(g, W / 2, 206, gg => R.drawFront(gg, { def, d: def.dk, x: W / 2, y: 206, t }, frontPose({ def }, t % 3)), { box: [20, 0, 340, 330] });
     TXT.draw(g, def.name, W / 2, 10, { size: 30, align: 'center', fill: 'fire' });
     TXT.draw(g, 'IS THE CHAMPION OF', W / 2, 46, { size: 14, align: 'center', fill: 'white' });
-    TXT.draw(g, 'MUNCIE KOMBAT', W / 2, 62, { size: 24, align: 'center', fill: 'blood' });
-    TXT.draw(g, 'Devil Dan is back in the basement of City Hall. For now.', W / 2, 214, { size: 9, align: 'center', fill: 'gold', italic: false });
+    TXT.draw(g, G.title, W / 2, 62, { size: 24, align: 'center', fill: 'blood' });
+    if (G.endingLine) TXT.draw(g, G.endingLine, W / 2, 214, { size: 9, align: 'center', fill: 'gold', italic: false });
     if (game.pt > 2.5) ui.push({ x: 0, y: 0, w: W, h: H, fn: () => { FX.reset(); screen = 'title'; } });
     game.pt += 1 / 60;
     grit();

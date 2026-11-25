@@ -1,4 +1,4 @@
-// Muncie Kombat: blood, gore, gibs, organs, props and screen effects
+// Kombat Engine: blood, gore, gibs, organs, props and screen effects
 'use strict';
 const FX = (() => {
   const R = RIG, PI = Math.PI;

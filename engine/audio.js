@@ -1,4 +1,4 @@
-// Muncie Kombat: synthesized sound effects and a deep announcer voice (no audio files)
+// Kombat Engine: synthesized sound effects and a deep announcer voice (no audio files)
 'use strict';
 const SFX = (() => {
   let ac = null, master = null, muted = false, voice = null;

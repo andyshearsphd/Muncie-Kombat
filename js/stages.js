@@ -2,158 +2,8 @@
 // moody early-90s Mortal Kombat style: night skies, fog, hard light sources, textured stone and
 // brick, deep perspective floors, then dithered like a digitized backdrop.
 'use strict';
-const STAGES = (() => {
-  const R = RIG, PI = Math.PI;
-  const H = 240, FLOOR = 222, AWX = 1100, BW = 1280, CX = 640, FY = 186, VY = 118;
-  let seed = 7;
-  const rand = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
-  const rr = (a, b) => a + rand() * (b - a);
-  const mk = w => { const c = document.createElement('canvas'); c.width = w; c.height = H; return c; };
-  const shade = R.shade;
-
-  // ---------- painting helpers ----------
-  function vg(g, x, y, w, h, stops) { const gr = g.createLinearGradient(0, y, 0, y + h); stops.forEach((c, i) => gr.addColorStop(i / (stops.length - 1), c)); g.fillStyle = gr; g.fillRect(x, y, w, h); }
-  function hgf(g, x, y, w, h, stops) { const gr = g.createLinearGradient(x, 0, x + w, 0); stops.forEach((c, i) => gr.addColorStop(i / (stops.length - 1), c)); g.fillStyle = gr; g.fillRect(x, y, w, h); }
-  function glow(g, x, y, r, c, a = 1) {
-    g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = a;
-    const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, c); gr.addColorStop(1, 'rgba(0,0,0,0)');
-    g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); g.restore();
-  }
-  function shadowRect(g, x, y, w, h, a = 0.5) { const gr = g.createLinearGradient(x, 0, x + w, 0); gr.addColorStop(0, `rgba(0,0,0,${a})`); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(x, y, w, h); }
-  function speckle(g, x, y, w, h, n, dark = 0.35, light = 0.12) {
-    for (let i = 0; i < n; i++) { g.fillStyle = rand() < 0.6 ? `rgba(0,0,0,${dark * rand()})` : `rgba(255,240,220,${light * rand()})`; g.fillRect(x + rand() * w, y + rand() * h, 1 + (rand() < 0.2), 1); }
-  }
-  function grime(g, x, y, w, h, n = 12, a = 0.25) {
-    for (let i = 0; i < n; i++) { const xx = x + rand() * w, ww = 1 + rand() * 4, hh = h * (0.2 + rand() * 0.8); const gr = g.createLinearGradient(0, y, 0, y + hh); gr.addColorStop(0, `rgba(0,0,0,${a * rand()})`); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(xx, y, ww, hh); }
-  }
-  // lit wall: vertical light falloff from a light at the bottom (street lamps) or top (moon)
-  function wall(g, x, y, w, h, c, o = {}) {
-    const gr = g.createLinearGradient(0, y, 0, y + h);
-    const up = o.uplit;
-    gr.addColorStop(0, shade(c, up ? -0.45 : 0.08)); gr.addColorStop(0.55, c); gr.addColorStop(1, shade(c, up ? 0.12 : -0.4));
-    g.fillStyle = gr; g.fillRect(x, y, w, h);
-    if (o.side) shadowRect(g, x + w - o.side, y, o.side, h, 0.0), (() => { const s = g.createLinearGradient(x + w - o.side, 0, x + w, 0); s.addColorStop(0, 'rgba(0,0,0,0)'); s.addColorStop(1, 'rgba(0,0,0,0.45)'); g.fillStyle = s; g.fillRect(x + w - o.side, y, o.side, h); })();
-  }
-  function bricks(g, x, y, w, h, c, mortar, bw = 7, bh = 3.2) {
-    g.fillStyle = mortar; g.fillRect(x, y, w, h);
-    for (let yy = y, r = 0; yy < y + h; yy += bh, r++) {
-      const off = r % 2 ? bw / 2 : 0;
-      for (let xx = x - off; xx < x + w; xx += bw) {
-        g.fillStyle = shade(c, rr(-0.18, 0.1)); g.fillRect(Math.max(x, xx + 0.6), yy + 0.6, Math.min(bw - 0.9, x + w - xx - 0.6), bh - 0.9);
-      }
-    }
-  }
-  // cheap fake-adobe plaster: flat color, mottled patches, water stains and hairline cracks
-  function stucco(g, x, y, w, h, c) {
-    g.fillStyle = c; g.fillRect(x, y, w, h);
-    for (let i = 0; i < w * h / 90; i++) { g.fillStyle = rand() < 0.5 ? 'rgba(255,250,235,0.07)' : 'rgba(60,40,20,0.08)'; g.beginPath(); g.ellipse(x + rand() * w, y + rand() * h, rr(3, 10), rr(2, 6), 0, 0, PI * 2); g.fill(); }
-    for (let i = 0; i < w / 14; i++) { const sx = x + rand() * w, sy = y + rand() * h * 0.3, sl = rr(10, h * 0.7); const gr = g.createLinearGradient(0, sy, 0, sy + sl); gr.addColorStop(0, 'rgba(70,55,35,0.35)'); gr.addColorStop(1, 'rgba(70,55,35,0)'); g.fillStyle = gr; g.fillRect(sx, sy, rr(2, 6), sl); }
-    g.strokeStyle = 'rgba(40,30,20,0.4)'; g.lineWidth = 0.6;
-    for (let i = 0; i < w / 30; i++) { let px = x + rand() * w, py = y + rand() * h; g.beginPath(); g.moveTo(px, py); for (let j = 0; j < 4; j++) { px += rr(-6, 6); py += rr(3, 9); g.lineTo(px, py); } g.stroke(); }
-    speckle(g, x, y, w, h, w * h / 6, 0.12, 0.08);
-  }
-  function stones(g, x, y, w, h, c, sw = 16, sh = 8) {
-    g.fillStyle = shade(c, -0.45); g.fillRect(x, y, w, h);
-    for (let yy = y, r = 0; yy < y + h; yy += sh, r++) {
-      const off = r % 2 ? sw * 0.5 : 0;
-      for (let xx = x - off; xx < x + w; xx += sw) {
-        const cx = Math.max(x, xx + 0.7), cw = Math.min(sw - 1.2, x + w - cx);
-        if (cw <= 0) continue;
-        const gr = g.createLinearGradient(0, yy, 0, yy + sh); const t = rr(-0.12, 0.06);
-        gr.addColorStop(0, shade(c, t + 0.1)); gr.addColorStop(1, shade(c, t - 0.15));
-        g.fillStyle = gr; g.fillRect(cx, yy + 0.7, cw, sh - 1.2);
-      }
-    }
-  }
-  // a window: dark glass catching a little sky, or lit from inside with a warm bloom
-  function win(g, x, y, w, h, lit, warm = '#ffcc70', frame = '#1a1612') {
-    g.fillStyle = frame; g.fillRect(x - 1, y - 1, w + 2, h + 2);
-    if (lit) { vg(g, x, y, w, h, [shade(warm, 0.25), warm, shade(warm, -0.35)]); glow(g, x + w / 2, y + h / 2, Math.max(w, h) * 1.6, warm, 0.22); }
-    else { vg(g, x, y, w, h, ['#3a4458', '#1a2030', '#0c1018']); g.fillStyle = 'rgba(180,200,230,0.12)'; g.fillRect(x, y, w * 0.35, h); }
-  }
-  function moon(g, x, y, r, c = '#efe8cf') {
-    glow(g, x, y, r * 6, 'rgba(200,210,255,0.35)');
-    glow(g, x, y, r * 2.4, 'rgba(230,230,255,0.45)');
-    const gr = g.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r); gr.addColorStop(0, '#fffdf0'); gr.addColorStop(0.7, c); gr.addColorStop(1, shade(c, -0.25));
-    g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, PI * 2); g.fill();
-    g.fillStyle = 'rgba(120,110,90,0.25)'; for (let i = 0; i < 7; i++) { g.beginPath(); g.arc(x + rr(-r, r) * 0.6, y + rr(-r, r) * 0.6, rr(1, r * 0.25), 0, PI * 2); g.fill(); }
-  }
-  function stars(g, n, h, w = BW) { for (let i = 0; i < n; i++) { g.fillStyle = `rgba(255,255,255,${0.2 + rand() * 0.6})`; g.fillRect(rand() * w, rand() * h, 1, 1); } }
-  // soft painted clouds, lit on one side by the moon or the city glow
-  function clouds(g, y0, y1, n, dark, light, lx = 0) {
-    for (let i = 0; i < n; i++) {
-      const x = rand() * BW, y = rr(y0, y1), w = rr(40, 140), h = w * rr(0.18, 0.35);
-      g.globalAlpha = 0.55;
-      for (let j = 0; j < 12; j++) {
-        const cx = x + rr(-w, w) * 0.55, cy = y + rr(-h, h) * 0.35, r = rr(h * 0.9, h * 1.8);
-        const gr = g.createRadialGradient(cx + lx * r * 0.25, cy - r * 0.3, 0, cx, cy, r);
-        gr.addColorStop(0, light); gr.addColorStop(0.35, dark); gr.addColorStop(1, 'rgba(0,0,0,0)');
-        g.fillStyle = gr; g.fillRect(cx - r, cy - r, r * 2, r * 2);
-      }
-      g.globalAlpha = 1;
-    }
-  }
-  function fog(g, y, h, c, w = BW) { const gr = g.createLinearGradient(0, y, 0, y + h); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(0.5, c); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, y, w, h); }
-  function treeline(g, y, n, c, h0, h1, w = BW, lit) {
-    for (let i = 0; i < n; i++) {
-      const x = rand() * w, h = rr(h0, h1);
-      for (let j = 0; j < 6; j++) { const cx = x + rr(-h, h) * 0.3, cy = y - h * rr(0.45, 0.9), r = h * rr(0.22, 0.38); g.fillStyle = shade(c, rr(-0.15, 0.05)); g.beginPath(); g.arc(cx, cy, r, 0, PI * 2); g.fill(); if (lit) { g.fillStyle = lit; g.beginPath(); g.arc(cx - r * 0.3, cy - r * 0.35, r * 0.45, 0, PI * 2); g.fill(); } }
-      g.fillStyle = shade(c, -0.3); g.fillRect(x - 1.5, y - h * 0.4, 3, h * 0.4);
-    }
-  }
-  function tree(g, x, y, h, c, lit) {
-    g.fillStyle = '#140e0a'; g.beginPath(); g.moveTo(x - 3, y); g.lineTo(x - 1.5, y - h * 0.5); g.lineTo(x + 1.5, y - h * 0.5); g.lineTo(x + 3, y); g.fill();
-    for (let j = 0; j < 14; j++) { const cx = x + rr(-h, h) * 0.32, cy = y - h * rr(0.45, 0.95), r = h * rr(0.14, 0.26); g.fillStyle = shade(c, rr(-0.25, 0.05)); g.beginPath(); g.arc(cx, cy, r, 0, PI * 2); g.fill(); if (lit && rand() < 0.6) { g.fillStyle = lit; g.beginPath(); g.arc(cx + r * 0.25, cy + r * 0.3, r * 0.5, 0, PI * 2); g.fill(); } }
-  }
-  function lamp(g, x, y, h, c = 'rgba(255,220,150,0.9)') {
-    g.fillStyle = '#0c0c0e'; g.fillRect(x - 1.2, y - h, 2.4, h); g.fillRect(x - 3, y - 4, 6, 4);
-    g.fillStyle = '#0c0c0e'; g.beginPath(); g.moveTo(x - 4, y - h); g.lineTo(x + 4, y - h); g.lineTo(x + 2.5, y - h - 7); g.lineTo(x - 2.5, y - h - 7); g.fill();
-    g.fillStyle = '#ffe6b0'; g.fillRect(x - 2, y - h - 6, 4, 5);
-    glow(g, x, y - h - 3, 34, c, 0.55); glow(g, x, y - h - 3, 10, 'rgba(255,250,220,1)', 0.7);
-    // light pool on the ground
-    g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 0, x, y, 40); gr.addColorStop(0, 'rgba(255,200,130,0.18)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, 40, 8, 0, 0, PI * 2); g.fill(); g.restore();
-  }
-  function flag(g, x, top, c) { g.fillStyle = '#6a6a72'; g.fillRect(x - 0.8, top, 1.6, FY - top); g.fillStyle = '#c8b060'; g.fillRect(x - 1.5, top - 2, 3, 2); g.fillStyle = c; g.beginPath(); g.moveTo(x + 1, top + 1); g.quadraticCurveTo(x + 9, top - 1, x + 17, top + 3); g.lineTo(x + 17, top + 12); g.quadraticCurveTo(x + 9, top + 8, x + 1, top + 10); g.fill(); g.fillStyle = 'rgba(0,0,0,0.3)'; g.fillRect(x + 9, top + 1, 8, 10); }
-  function vignette(g, w) { const gr = g.createRadialGradient(w / 2, H * 0.55, H * 0.4, w / 2, H * 0.55, w * 0.62); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,0.55)'); g.fillStyle = gr; g.fillRect(0, 0, w, H); }
-  // MK-style perspective floor, lines converge to a vanishing point above the middle of the arena
-  function pfloor(g, kind, c1, c2, o = {}) {
-    const w = AWX, vx = w / 2, y0 = FY, y1 = H;
-    vg(g, 0, y0, w, y1 - y0, [c1, c2]);
-    const rows = o.rows || 9, span = o.span || 34;
-    const ry = t => y0 + (y1 - y0) * Math.pow(t, 1.7);
-    // tiles
-    for (let r = 0; r < rows; r++) {
-      const ya = ry(r / rows), yb = ry((r + 1) / rows), sa = (ya - VY) / (y1 - VY), sb = (yb - VY) / (y1 - VY);
-      for (let i = -40; i <= 40; i++) {
-        const off = kind === 'brick' && r % 2 ? 0.5 : 0;
-        const xa0 = vx + (i + off) * span * sa, xa1 = vx + (i + 1 + off) * span * sa, xb0 = vx + (i + off) * span * sb, xb1 = vx + (i + 1 + off) * span * sb;
-        if (Math.max(xa1, xb1) < 0 || Math.min(xa0, xb0) > w) continue;
-        const t = rr(-0.12, 0.08);
-        g.fillStyle = shade(r % 2 ^ (i & 1) && kind === 'check' ? c2 : c1, t - (1 - r / rows) * 0.25);
-        g.beginPath(); g.moveTo(xa0 + 0.6, ya + 0.6); g.lineTo(xa1 - 0.6, ya + 0.6); g.lineTo(xb1 - 0.6, yb - 0.6); g.lineTo(xb0 + 0.6, yb - 0.6); g.closePath(); g.fill();
-        if (rand() < 0.15) { g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 0.6; g.beginPath(); g.moveTo(rr(xa0, xa1), ya + 1); g.lineTo(rr(xb0, xb1), yb - 1); g.stroke(); }
-      }
-    }
-    speckle(g, 0, y0, w, y1 - y0, 2200, 0.4, 0.1);
-    // depth darkening toward the back
-    const dg = g.createLinearGradient(0, y0, 0, y0 + 26); dg.addColorStop(0, 'rgba(0,0,0,0.6)'); dg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = dg; g.fillRect(0, y0, w, 26);
-    if (o.wet) { for (let i = 0; i < 16; i++) { const x = rand() * w, y = rr(y0 + 10, y1 - 4); g.fillStyle = 'rgba(160,180,220,0.12)'; g.beginPath(); g.ellipse(x, y, rr(10, 40), rr(1, 3), 0, 0, PI * 2); g.fill(); } }
-    if (o.edge) { g.fillStyle = o.edge; g.fillRect(0, y0 - 2, w, 3); g.fillStyle = 'rgba(255,255,255,0.08)'; g.fillRect(0, y0 - 2, w, 1); }
-  }
-  // dithered color reduction so backdrops match the digitized fighters
-  const BAY = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
-  function digitize(c, step = 14, sat = 0.82, gain = 1) {
-    const g = c.getContext('2d'), img = g.getImageData(0, 0, c.width, c.height), d = img.data, w = c.width;
-    for (let i = 0, p = 0; i < d.length; i += 4, p++) {
-      if (d[i + 3] < 8) continue;
-      const x = p % w, y = (p / w) | 0, n = (BAY[(y & 3) * 4 + (x & 3)] - 7.5) * step / 16 + (rand() - 0.5) * 10;
-      let r = d[i] * gain, gg = d[i + 1] * gain, b = d[i + 2] * gain;
-      const l = 0.3 * r + 0.59 * gg + 0.11 * b;
-      r = l + (r - l) * sat + n; gg = l + (gg - l) * sat + n; b = l + (b - l) * sat + n;
-      d[i] = Math.round(r / step) * step; d[i + 1] = Math.round(gg / step) * step; d[i + 2] = Math.round(b / step) * step;
-    }
-    g.putImageData(img, 0, 0);
-  }
+(() => {
+  const { R, PI, H, AWX, BW, CX, FY, rand, rr, shade, setSeed, vg, hgf, glow, shadowRect, speckle, grime, wall, bricks, stucco, stones, win, moon, stars, clouds, fog, treeline, tree, lamp, flag, vignette, pfloor } = STAGES.kit;
 
   // ---------- CITY HALL, downtown at night in the rain ----------
   function cityhall(B, F, hell) {
@@ -161,7 +11,7 @@ const STAGES = (() => {
     if (!hell) stars(B, 40, 70);
     clouds(B, 10, 90, 22, hell ? 'rgba(90,10,0,0.5)' : 'rgba(40,30,55,0.6)', hell ? 'rgba(255,120,40,0.5)' : 'rgba(150,90,80,0.35)', 0);
     // downtown silhouettes: AT&T tower, Cornerstone's crenellated tower, office blocks
-    seed = 31;
+    setSeed(31);
     for (let i = 0; i < 22; i++) {
       const x = i * 62 + rr(-10, 10), w = rr(40, 60), h = rr(50, 120), top = FY - 30 - h;
       wall(B, x, top, w, h + 30, hell ? '#2a0a08' : '#1a1a26', { uplit: true });
@@ -225,7 +75,7 @@ const STAGES = (() => {
     stars(B, 120, 90); moon(B, 470, 40, 15);
     clouds(B, 20, 80, 14, 'rgba(30,40,60,0.55)', 'rgba(170,180,210,0.35)', -1);
     // campus brick halls and the Shafer bell tower in the fog
-    seed = 41;
+    setSeed(41);
     for (const [x, w, h] of [[150, 170, 80], [330, 120, 70], [820, 150, 86], [990, 170, 74]]) {
       bricks(B, x, FY - h, w, h, '#4a2420', '#1a0c0a', 7, 3.2); B.fillStyle = 'rgba(10,14,30,0.5)'; B.fillRect(x, FY - h, w, h);
       for (let yy = FY - h + 10; yy < FY - 14; yy += 18) for (let xx = x + 8; xx < x + w - 10; xx += 16) win(B, xx, yy, 7, 10, rand() < 0.35, '#ffcc80');
@@ -275,7 +125,7 @@ const STAGES = (() => {
     vg(B, 0, 0, BW, H, ['#010208', '#060c1c', '#101a30', '#1a2236']);
     stars(B, 160, 120); moon(B, 820, 52, 22);
     clouds(B, 30, 110, 16, 'rgba(20,28,48,0.6)', 'rgba(180,190,220,0.3)', 1);
-    seed = 57;
+    setSeed(57);
     treeline(B, 168, 60, '#04080a', 30, 70);
     // river far below, moonlight on the water
     vg(B, 0, 168, BW, 72, ['#0a1424', '#0e1c30', '#08101c']);
@@ -320,7 +170,7 @@ const STAGES = (() => {
     vg(B, 0, 0, BW, H, ['#0a0614', '#2a0e2a', '#6a2a2a', '#c86a3a']);
     clouds(B, 20, 100, 18, 'rgba(60,20,40,0.55)', 'rgba(255,150,90,0.4)', 1);
     glow(B, 900, 150, 140, 'rgba(255,130,60,0.35)');
-    seed = 71;
+    setSeed(71);
     treeline(B, FY - 20, 40, '#0e0a0a', 40, 80, BW, 'rgba(255,120,60,0.12)');
     // Ball mansions: tan brick colonial, sandstone Richardsonian with red tile roof, red brick Georgian
     const mansion = (x, w, h, c, roof, kind) => {
@@ -368,7 +218,7 @@ const STAGES = (() => {
     vg(B, 0, 0, BW, H, ['#020206', '#0a0a18', '#1a1428', '#2a1a24']);
     stars(B, 80, 80); moon(B, 300, 34, 11, '#e8d8c8');
     clouds(B, 10, 90, 14, 'rgba(30,25,40,0.6)', 'rgba(120,100,120,0.3)', -1);
-    seed = 83;
+    setSeed(83);
     // old houses with porches and FOR SALE signs
     const house = (x, w, h, c) => {
       wall(B, x, FY - h, w, h, c, { uplit: true }); for (let r = FY - h + 3; r < FY; r += 4) { B.fillStyle = 'rgba(0,0,0,0.25)'; B.fillRect(x, r, w, 0.8); }
@@ -414,7 +264,7 @@ const STAGES = (() => {
     vg(B, 0, 0, BW, H, ['#100608', '#3a0e10', '#8a2a14', '#e0702a']);
     clouds(B, 20, 110, 16, 'rgba(70,20,20,0.55)', 'rgba(255,140,60,0.45)', 1);
     glow(B, 400, 160, 170, 'rgba(255,140,40,0.4)'); B.fillStyle = '#ffcc70'; B.beginPath(); B.arc(400, 150, 18, 0, PI * 2); B.fill(); glow(B, 400, 150, 40, 'rgba(255,220,120,0.8)');
-    seed = 97;
+    setSeed(97);
     treeline(B, FY, 50, '#0c0604', 40, 90, BW, 'rgba(255,120,40,0.14)');
     fog(B, 120, 70, 'rgba(160,60,30,0.3)');
     // Wysor Street Depot: brick, hip roof, arched windows, chimney, platform
@@ -443,7 +293,7 @@ const STAGES = (() => {
     vg(B, 0, 0, BW, H, ['#020204', '#0a0810', '#18121a', '#2a1e1e']);
     stars(B, 100, 90); moon(B, 1000, 40, 12, '#e8d8b8');
     clouds(B, 10, 80, 12, 'rgba(25,20,25,0.6)', 'rgba(120,100,90,0.3)', 1);
-    seed = 101;
+    setSeed(101);
     // shacks with tin roofs
     const shack = (x, w, h, c) => {
       wall(B, x, FY - h, w, h, c, { uplit: true }); for (let i = 0; i < w; i += 4) { B.fillStyle = 'rgba(0,0,0,0.3)'; B.fillRect(x + i, FY - h, 1, h); }
@@ -488,7 +338,7 @@ const STAGES = (() => {
     vg(B, 0, 0, BW, H, ['#06040e', '#1a0e2a', '#4a1e3a', '#a04a3a']);
     stars(B, 90, 70);
     clouds(B, 20, 90, 14, 'rgba(40,20,50,0.55)', 'rgba(255,120,90,0.3)', 1);
-    seed = 113;
+    setSeed(113);
     // Yorktown water tower on the horizon
     const yx = 1000; B.fillStyle = '#1a1620'; B.fillRect(yx - 4, 80, 8, FY - 80); B.beginPath(); B.ellipse(yx, 70, 30, 22, 0, 0, PI * 2); B.fill(); B.fillStyle = 'rgba(255,150,120,0.25)'; B.beginPath(); B.ellipse(yx - 8, 64, 14, 8, -0.3, 0, PI * 2); B.fill();
     B.fillStyle = '#3a6a4a'; B.font = '7px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('YORKTOWN', yx, 74); B.textAlign = 'left'; glow(B, yx, 46, 5, 'rgba(255,40,40,1)');
@@ -531,7 +381,7 @@ const STAGES = (() => {
   // ---------- GLASS WORKS (Fruit Jar Golem): furnace hall, Goro's Lair style ----------
   function glassworks(B, F) {
     vg(B, 0, 0, BW, H, ['#060202', '#140806', '#2a120a']);
-    seed = 127;
+    setSeed(127);
     stones(B, 0, 10, BW, FY - 10, '#3a2016', 22, 11);
     B.fillStyle = 'rgba(0,0,0,0.45)'; B.fillRect(0, 10, BW, FY - 10);
     grime(B, 0, 10, BW, FY - 10, 80, 0.45);
@@ -558,7 +408,7 @@ const STAGES = (() => {
   function village(B, F) {
     vg(B, 0, 0, BW, H, ['#04030a', '#0c0a1e', '#22142e', '#3a1c2a']);
     stars(B, 40, 60); clouds(B, 6, 60, 10, 'rgba(30,20,40,0.6)', 'rgba(120,80,110,0.25)', -1);
-    seed = 211;
+    setSeed(211);
     // distant campus: dorm towers and a water tower
     for (let i = 0; i < 9; i++) { const x = 40 + i * 140 + rr(-20, 20), w = rr(40, 70), h = rr(50, 90); B.fillStyle = '#0e0c18'; B.fillRect(x, FY - 60 - h, w, h + 60); for (let r = 0; r < 6; r++) for (let c = 0; c < 4; c++) if (rand() < 0.35) { B.fillStyle = rand() < 0.5 ? 'rgba(255,210,140,0.5)' : 'rgba(180,200,255,0.4)'; B.fillRect(x + 5 + c * (w - 10) / 4, FY - 54 - h + r * 12, 4, 5); } }
     fog(B, 70, 60, 'rgba(60,30,60,0.4)');
@@ -683,7 +533,7 @@ const STAGES = (() => {
     vg(B, 0, 0, BW, H, ['#020208', '#080a1a', '#141428', '#2a1e26']);
     stars(B, 70, 70);
     clouds(B, 10, 80, 10, 'rgba(24,20,36,0.6)', 'rgba(140,100,90,0.2)', 1);
-    seed = 401;
+    setSeed(401);
     glow(B, 700, 150, 260, 'rgba(255,140,60,0.16)', 1);
     // downtown in the distance: a low line of two- to five-story blocks, a steeple and the water tower
     const hz = 152;
@@ -734,7 +584,7 @@ const STAGES = (() => {
   function beach(B, F) {
     vg(B, 0, 0, BW, 120, ['#1a1438', '#3e2250', '#8a3a58', '#d8684a', '#f4a858']);
     clouds(B, 20, 80, 10, 'rgba(90,40,70,0.55)', 'rgba(255,170,120,0.35)', 1);
-    seed = 503;
+    setSeed(503);
     const hz = 118, sx = 820;
     glow(B, sx, hz, 120, 'rgba(255,170,80,0.45)', 1); R.ball(B, sx, hz, 15, '#ffd27a'); B.fillStyle = 'rgba(255,240,200,0.6)'; B.beginPath(); B.arc(sx, hz, 11, 0, PI * 2); B.fill();
     // the far shore: flat, solid with trees
@@ -782,7 +632,7 @@ const STAGES = (() => {
   function mcculloch(B, F) {
     vg(B, 0, 0, BW, H, ['#03040a', '#0a0e1c', '#141a26', '#1a1e22']);
     stars(B, 70, 80);
-    seed = 211;
+    setSeed(211);
     // the far side of the park: a dark wall of trees, then the big elms, lit from below by the streetlights
     treeline(B, FY - 40, 40, '#0c1410', 40, 70);
     for (const [x, h] of [[60, 150], [300, 170], [560, 160], [760, 176], [1000, 166], [1230, 150]]) {
@@ -836,7 +686,7 @@ const STAGES = (() => {
     vg(B, 0, 0, BW, H, ['#040806', '#0c1610', '#1a2418', '#2a2a1a']);
     stars(B, 30, 50); moon(B, 980, 30, 10, '#d8e0b8');
     clouds(B, 8, 80, 12, 'rgba(20,30,20,0.6)', 'rgba(110,130,90,0.25)', 1);
-    seed = 307;
+    setSeed(307);
     // neighbors: more rentals, just as bad
     const shack = (x, w, h, c) => {
       wall(B, x, FY - h, w, h, c, { uplit: true }); for (let r = FY - h + 3; r < FY; r += 4) { B.fillStyle = 'rgba(0,0,0,0.28)'; B.fillRect(x, r, w, 0.8); }
@@ -902,17 +752,6 @@ const STAGES = (() => {
     rental: { name: 'THE RENTAL', draw: rental },
     mcculloch: { name: 'McCULLOCH PARK', draw: mcculloch, pit: 'mcculloch' },
   };
-  const cache = {};
-  function get(id) {
-    if (!DEFS[id]) id = 'cityhall';
-    if (cache[id]) return cache[id];
-    seed = 11 + id.length * 97;
-    const back = mk(BW), front = mk(AWX);
-    DEFS[id].draw(back.getContext('2d'), front.getContext('2d'));
-    digitize(back, 14, 0.85); digitize(front, 14, 0.85);
-    return (cache[id] = { id, name: DEFS[id].name, pit: DEFS[id].pit || false, back, front, bxOff: -206 });
-  }
-  function name(id) { return (DEFS[id] || DEFS.cityhall).name; }
 
   // animated bits drawn each frame on top of the far layer (back-layer coords)
   const COWS = [{ x0: 20, v: 3, dy: 0, s: 1 }, { x0: 150, v: -2.2, dy: -6, s: 0.8 }, { x0: 260, v: 1.6, dy: -10, s: 0.66 }];
@@ -987,7 +826,7 @@ const STAGES = (() => {
   }
   function belowRiver(g, W, t) {
     vg(g, 0, 0, W, H, ['#02030a', '#08101e', '#0e1828']);
-    seed = 61; for (let i = 0; i < 60; i++) { g.fillStyle = `rgba(255,255,255,${0.2 + rand() * 0.5})`; g.fillRect(rand() * W, rand() * 110, 1, 1); }
+    setSeed(61); for (let i = 0; i < 60; i++) { g.fillStyle = `rgba(255,255,255,${0.2 + rand() * 0.5})`; g.fillRect(rand() * W, rand() * 110, 1, 1); }
     R.ball(g, W * 0.78, 70, 12, '#ece6cf');
     for (let x = -10; x < W; x += 9) { const h = rr(18, 46); g.fillStyle = '#05080a'; g.beginPath(); g.ellipse(x, 140 - h * 0.4, rr(6, 12), h * 0.6, 0, 0, PI * 2); g.fill(); }
     g.fillStyle = '#05080a'; g.fillRect(0, 128, W, 14);
@@ -1015,7 +854,7 @@ const STAGES = (() => {
     g.strokeStyle = 'rgba(150,150,160,0.18)'; g.lineWidth = 0.6; for (let x = -40; x < W + 40; x += 7) { g.beginPath(); g.moveTo(x, 150); g.lineTo(x + 30, 120); g.moveTo(x, 150); g.lineTo(x - 30, 120); g.stroke(); }
     vg(g, 0, 150, W, 40, ['#14141a', '#1e1c1c']);
     vg(g, 0, 190, W, 50, ['#3a342c', '#26221c']);
-    seed = 83; for (let i = 0; i < 500; i++) { g.fillStyle = rand() < 0.5 ? 'rgba(150,140,130,0.35)' : 'rgba(0,0,0,0.35)'; g.fillRect(rand() * W, 190 + rand() * 50, 1.4, 1); }
+    setSeed(83); for (let i = 0; i < 500; i++) { g.fillStyle = rand() < 0.5 ? 'rgba(150,140,130,0.35)' : 'rgba(0,0,0,0.35)'; g.fillRect(rand() * W, 190 + rand() * 50, 1.4, 1); }
     for (let x = -10; x < W; x += 14) { g.fillStyle = '#3a2a1a'; g.fillRect(x, 203, 9, 14); }
     g.fillStyle = '#8a8a90'; g.fillRect(0, 202, W, 2.5); g.fillRect(0, 214, W, 2.5);
     g.fillStyle = '#c8c8d0'; g.fillRect(0, 202, W, 0.8); g.fillRect(0, 214, W, 0.8);
@@ -1049,5 +888,6 @@ const STAGES = (() => {
     }
   }
 
-  return { AW: AWX, H, FLOOR, get, name, live, drawBelow, drawTrain, ROTATION: ['benny', 'bridge', 'minnetrista', 'westend', 'greenway', 'shedtown', 'cornbread', 'cityhall', 'village', 'overpass', 'beach', 'mcculloch'] };
+  const ROTATION = ['benny', 'bridge', 'minnetrista', 'westend', 'greenway', 'shedtown', 'cornbread', 'cityhall', 'village', 'overpass', 'beach', 'mcculloch'];
+  STAGES.define({ defs: DEFS, fallback: 'cityhall', rotation: ROTATION, single: ROTATION.concat(['glassworks', 'rental']), live, drawBelow, extra: { drawTrain } });
 })();

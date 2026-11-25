@@ -1,4 +1,4 @@
-// Muncie Kombat: arcade text (Metal Mania headlines, Anton small text, italic, gradient fill, heavy outline)
+// Kombat Engine: arcade text (Metal Mania headlines, Anton small text, italic, gradient fill, heavy outline)
 'use strict';
 const TXT = (() => {
   const FAMILY = 'Anton, Impact, "Arial Narrow", sans-serif';

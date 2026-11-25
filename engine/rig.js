@@ -1,4 +1,4 @@
-// Muncie Kombat: skeletal fighter rig, shaded body drawing, skeleton mode
+// Kombat Engine: skeletal fighter rig, shaded body drawing, skeleton mode
 // Local frame: origin between the feet on the floor, +x is the way the fighter faces, y grows downward.
 // Angles: 0 points straight down, positive swings forward (+x), PI points straight up.
 'use strict';

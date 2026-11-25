@@ -130,9 +130,18 @@ The Tillotson Overpass stage fatality:
 
 Plain JavaScript and the HTML canvas, with no build step and no libraries. Every fighter, arena, sound and piece of music is drawn or synthesized in code at runtime. Open `index.html` from any static web server to run it locally.
 
+Muncie Kombat runs on the shared [Kombat Engine](https://github.com/andyshearsphd/kombat-engine). The `engine/` folder is a pinned copy of the engine (its version is in `engine/VERSION`); don't edit it here, change the engine repo and copy the new release in. Muncie Kombat's own content lives in `js/`:
+
+| File | What it is |
+| --- | --- |
+| `js/fighters.js` | The sixteen fighters and four bosses |
+| `js/stages.js` | The arenas |
+| `js/fatalities.js` | Fatalities, stage fatalities and boss deaths |
+| `js/config.js` | Titles, the hippo emblem and every victory pose |
+
 ## Credits
 
-Fonts, all under the SIL Open Font License (license files are in `fonts/`):
+Fonts, all under the SIL Open Font License (license files are in `engine/fonts/`):
 
 - **Metal Mania** by Open Window
 - **Nosifer** by Vernon Adams (Typomondo)
