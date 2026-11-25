@@ -8,6 +8,8 @@ Built for phones in landscape. It also plays in a desktop browser with a keyboar
 
 Warning: it is very violent and very gross.
 
+![Muncie Kombat title screen](screenshots/title.jpg)
+
 ## Put it on your iPhone home screen
 
 1. Open the link in Safari.
@@ -23,9 +25,15 @@ It then opens full screen like an app. On Android, use the browser menu and choo
 
 Matches are best of three rounds. Win the deciding round and you get FINISH HIM.
 
+| Choose your fighter | Climb the ladder |
+| --- | --- |
+| ![Fighter select screen](screenshots/select.jpg) | ![Arcade ladder tower](screenshots/ladder.jpg) |
+
 ## Controls
 
 On a phone, the joystick appears wherever your left thumb touches the left half of the screen. PUNCH, KICK and BLOCK are on the right.
+
+![Becky Hack throws Shimmer at Tin Man at Minnetrista](screenshots/fight.jpg)
 
 On a keyboard:
 
@@ -91,6 +99,10 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 | Becky Hack | Shimmer | Blanket Snare | Lights Out |
 | Petey | Fifty Teeth | Play Dead | Playing Possum |
 
+| Timber | Heartless | Playing Possum |
+| --- | --- | --- |
+| ![Tim Bunyon after Timber](screenshots/fatality-timber.jpg) | ![Tin Man's Heartless](screenshots/fatality-heartless.jpg) | ![Petey's Playing Possum](screenshots/fatality-playing-possum.jpg) |
+
 ### Bosses
 
 | Boss | Projectile | Second special | Fatality |
@@ -103,6 +115,16 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 ## Arenas
 
 Campus, White River Railroad Bridge, Minnetrista, Gillespie Tower, Wysor Street Depot, Shedtown Drive-In, Cornbread Road, City Hall, The Village, Tillotson Overpass, Prairie Creek Beach, McCulloch Park, plus the boss arenas: the Glass Works, The Rental and Devil Dan's City Hall.
+
+| Prairie Creek Beach | Cornbread Road |
+| --- | --- |
+| ![Prairie Creek Beach](screenshots/arena-prairie-creek-beach.jpg) | ![Cornbread Road](screenshots/arena-cornbread-road.jpg) |
+| **The Village** | **White River Railroad Bridge** |
+| ![The Village](screenshots/arena-the-village.jpg) | ![White River Railroad Bridge](screenshots/arena-railroad-bridge.jpg) |
+
+The Tillotson Overpass stage fatality:
+
+![A freight train hits the loser at the Tillotson Overpass](screenshots/stage-fatality-overpass.jpg)
 
 ## How it is built
 
