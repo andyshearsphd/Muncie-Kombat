@@ -12,6 +12,7 @@ const SFX = (() => {
       try { if (window.speechSynthesis) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } } catch (e) {}
     }
     if (ac && ac.state === 'suspended') ac.resume();
+    if (CLIPS && !CLIPS.loading) loadClips();
   }
   function setMuted(m) { muted = m; try { localStorage.setItem(KEY, m ? '1' : '0'); } catch (e) {} if (master) master.gain.value = m ? 0 : 0.55; if (m && window.speechSynthesis) speechSynthesis.cancel(); }
   const now = () => ac.currentTime;
@@ -41,7 +42,30 @@ const SFX = (() => {
     tone(60, dur, 'sine', 0.025); tone(120, dur, 'sine', 0.012);
     for (let i = 0; i < dur * 16; i++) noise(0.012, 0.18 + Math.random() * 0.2, 3000 + Math.random() * 3000, 1, 'highpass', Math.random() * dur);
   }
+  // ---------- 1.2: recorded announcer clips ----------
+  // GAME.voiceClips = 'voice/' : a folder holding manifest.json (a list of phrase slugs) and one .mp3 per slug.
+  // Clips play through the game's own audio, so the announcer is heard wherever the music is.
+  // Lines without a clip still go to the browser's text-to-speech.
+  let CLIPS = null, curClip = null, vgain = null;
+  const CB = {}, slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  function setClips(base) { CLIPS = { base, list: null, loading: false }; if (ac) loadClips(); }
+  function loadClips() {
+    if (!ac || !CLIPS || CLIPS.loading) return;
+    CLIPS.loading = true;
+    fetch(CLIPS.base + 'manifest.json').then(r => r.json()).then(list => {
+      CLIPS.list = new Set(list);
+      for (const k of list) fetch(CLIPS.base + k + '.mp3').then(r => r.arrayBuffer()).then(b => new Promise((res, rej) => ac.decodeAudioData(b, res, rej))).then(buf => { CB[k] = buf; }).catch(() => {});
+    }).catch(() => { CLIPS.list = new Set(); });
+  }
+  function playClip(key) {
+    const b = CB[key]; if (!b || muted || !ac) return;
+    if (!vgain) { vgain = ac.createGain(); vgain.gain.value = 1.5; vgain.connect(master); }
+    try { if (curClip) curClip.stop(); } catch (e) {}
+    const src = ac.createBufferSource(); src.buffer = b; src.connect(vgain); src.start(); curClip = src;
+    if (VO.radio) crackle(b.duration);
+  }
   function say(text, pitch = VO.pitch, rate = VO.rate) {
+    if (CLIPS) { const key = slug(text); if (CB[key]) { playClip(key); return; } if (!CLIPS.list || CLIPS.list.has(key)) return; }
     if (muted || !window.speechSynthesis) return;
     try {
       speechSynthesis.cancel();
@@ -148,7 +172,8 @@ const SFX = (() => {
       if (s === 4 || s === 12) DR.clank(t);
     }
     if (menu || sec !== 'A') {
-      const L = T.steps[i % T.steps.length];
+      // 1.1.2: the melody keeps its own place, so it starts at the top after the drum intro and never skips a phrase
+      const L = T.steps[(MU.mstep++) % T.steps.length];
       if (L) { const f = hz(L[0] + MU.tr), d = sd * L[1] * 0.92; mt(t, f, d, 'square', menu ? 0.035 : 0.05, { lp: 3200, echo: 1, att: 0.01 }); mt(t, f, d, 'sawtooth', menu ? 0.02 : 0.035, { det: 9, lp: 1800, echo: 1, att: 0.02 }); if (!menu) mt(t, f / 2, d, 'sawtooth', 0.03, { lp: 1200, att: 0.02 }); }
     }
   }
@@ -156,7 +181,7 @@ const SFX = (() => {
     if (!ac) return;
     const T = name === 'fight' && TUNES && tune != null ? TUNES[((tune % TUNES.length) + TUNES.length) % TUNES.length] : name === 'menu' ? MENU : null;
     if (MU.track === name && MU.tr === tr && MU.tune === T) return;
-    MU.track = name; MU.tr = tr; MU.tune = T; MU.step = 0; MU.next = ac.currentTime + 0.08;
+    MU.track = name; MU.tr = tr; MU.tune = T; MU.step = 0; MU.mstep = 0; MU.next = ac.currentTime + 0.08;
     if (!MU.timer) MU.timer = setInterval(() => {
       if (!MU.track || !ac || muted) { if (ac) MU.next = ac.currentTime + 0.05; return; }
       const T2 = MU.tune, sd = 60 / (T2 && T2.bpm ? T2.bpm : MU.track === 'fight' ? 132 : 92) / 4;
@@ -169,7 +194,7 @@ const SFX = (() => {
   }
   function stopMusic() { MU.track = null; }
   const S = {
-    unlock, setMuted, isMuted: () => muted, say, music, stopMusic, setKey, voice: voiceCfg, setTunes,
+    unlock, setMuted, isMuted: () => muted, say, setClips, music, stopMusic, setKey, voice: voiceCfg, setTunes,
     whoosh: () => noise(0.12, 0.12, 900, 0.7, 'bandpass', 0, 0.02, 2400),
     punch: () => { noise(0.1, 0.45, 500, 0.8, 'lowpass'); tone(120, 0.1, 'sine', 0.4, -60); },
     kick: () => { noise(0.14, 0.5, 380, 0.8, 'lowpass'); tone(90, 0.14, 'sine', 0.45, -40); },
