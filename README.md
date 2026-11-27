@@ -33,7 +33,7 @@ Matches are best of three rounds. Win the deciding round and you get FINISH HIM.
 
 On a phone, the joystick appears wherever your left thumb touches the left half of the screen. PUNCH, KICK and BLOCK are on the right.
 
-![Becky Hack throws Shimmer at Tin Man at Maxitrista](screenshots/fight.jpg)
+![Becky Hack throws Shimmer at Kilgore Tin Man at Maxitrista](screenshots/fight.jpg)
 
 On a keyboard:
 
@@ -88,24 +88,24 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 | Coke Wolf | Howl | Nose Candy | Full Moon |
 | Councilman Creep | Business Card | Close Talker | Too Long a Hug |
 | East End Em | Hardcover | Paper Cut | First Edition |
-| Fat Cat | Hairball | Pounce | I Hate Mondays |
+| Famous Fat Cat | Hairball | Pounce | I Hate Mondays |
 | Gertie Goose | Wing Gust | Dive-Bomb | Pecking Order |
+| Kilgore Tin Man | Oil Slick | Tin Can Charge | Heartless |
 | Late Night Host | Cue Card | Desk Slide | Top Ten List |
 | Mad Turkey | Leftovers | Turkey Trot | Carved |
 | Millie Muskrat | Tail Wave | Burrow | Bone Yard |
-| Muncie Hippo | Poop Shot | Hippo Ram | Pothole Filler |
 | Petey Possum | Fifty Teeth | Play Dead | Playing Possum |
 | Pres. Never Learns | Diploma Toss | Tuition Hike | Honorary Degree |
+| Purple Hippo | Poop Shot | Hippo Ram | Pothole Filler |
 | Rocky Rococo | Trash Can | Claw Roll | Rabies |
 | The Bearcat | Fight Song | Bearcat Maul | Spirit Week |
 | Tim Bunyon | Log Toss | Log Roll | Timber |
-| Tin Man | Oil Slick | Tin Can Charge | Heartless |
 | TV Painter | Palette Knife | Thinner Splash | Happy Little Accident |
 | Wally World Karen | Expired Coupons | Finger Wag | Manager! |
 
 | Timber | Heartless | Playing Possum |
 | --- | --- | --- |
-| ![Tim Bunyon after Timber](screenshots/fatality-timber.jpg) | ![Tin Man's Heartless](screenshots/fatality-heartless.jpg) | ![Petey's Playing Possum](screenshots/fatality-playing-possum.jpg) |
+| ![Tim Bunyon after Timber](screenshots/fatality-timber.jpg) | ![Kilgore Tin Man's Heartless](screenshots/fatality-heartless.jpg) | ![Petey Possum's Playing Possum](screenshots/fatality-playing-possum.jpg) |
 
 ### Bosses
 

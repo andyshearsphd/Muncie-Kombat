@@ -6,7 +6,7 @@ const ROSTER = (() => {
   // ---------- the fighters ----------
   const HP = '#7d4fa8', HPL = '#a982c8', HPD = '#4a2a68';
   const hippo = {
-    id: 'hippo', name: 'MUNCIE HIPPO', short: 'HIPPO', him: 'HIM', k: 1.0, paws: true, skull: 'hippo',
+    id: 'hippo', name: 'PURPLE HIPPO', short: 'HIPPO', him: 'HIM', k: 1.0, paws: true, skull: 'hippo',
     bio: 'Purple, hungry and done filling potholes for this town.',
     d: dims({ thigh: 21, shin: 18, torso: 37, neck: 7, upper: 19, fore: 17, hipW: 19, shW: 19, chest: 21, belly: 26, back: 19, thighR: 10.5, kneeR: 8, ankleR: 7, shR: 8.5, elbowR: 6.8, wristR: 6, fist: 6, footL: 14, footH: 6.5, shOff: 4 }),
     col: { torso: HP, armU: HP, armL: HP, hand: HPD, legU: HP, legL: HP, foot: HPD, neck: HP },
@@ -111,7 +111,7 @@ const ROSTER = (() => {
 
   const OR = '#c8762e', ORD = '#7a3e14', CRM = '#e8d0a8';
   const garf = {
-    id: 'garf', name: 'FAT CAT', short: 'FAT CAT', him: 'HIM', k: 1.08, paws: true, claws: true, skull: 'cat',
+    id: 'garf', name: 'FAMOUS FAT CAT', short: 'FAT CAT', him: 'HIM', k: 1.08, paws: true, claws: true, skull: 'cat',
     bio: 'Twenty pounds of alley tom. Hates Mondays. Hates you more.',
     d: dims({ thigh: 21, shin: 21, torso: 35, neck: 2, upper: 18, fore: 17, hipW: 17, shW: 15, chest: 17, belly: 21, back: 14, thighR: 9.5, kneeR: 6.5, ankleR: 4.5, shR: 7, elbowR: 5.5, wristR: 4.6, fist: 5, footL: 12, footH: 5 }),
     col: { torso: OR, armU: OR, armL: OR, hand: sh(OR, 0.15), legU: OR, legL: OR, foot: sh(OR, 0.1), neck: OR },
@@ -661,7 +661,7 @@ const ROSTER = (() => {
   // ---------- TIN MAN: the sheet-metal landmark, hollow chest and all ----------
   const TM = '#c2c6ce', TMD = '#7a808a';
   const tinman = {
-    id: 'tinman', name: 'TIN MAN', short: 'TIN MAN', him: 'HIM', k: 1.12, bicep: 0.05, calf: 0.05,
+    id: 'tinman', name: 'KILGORE TIN MAN', short: 'TIN MAN', him: 'HIM', k: 1.12, bicep: 0.05, calf: 0.05,
     bio: 'Duct pipe, rivets and a painted-on smile. His chest is hollow and he wants it filled. With yours.',
     d: dims({ thigh: 26, shin: 25, torso: 38, neck: 3, upper: 20, fore: 19, hipW: 17, shW: 18, chest: 22, belly: 22, back: 20, thighR: 8, kneeR: 7.6, ankleR: 7, shR: 7.6, elbowR: 6.6, wristR: 6, fist: 6.6, footL: 15, footH: 7 }),
     col: { torso: TM, armU: TM, armL: TM, hand: sh(TM, -0.08), legU: TM, legL: TM, foot: sh(TM, -0.12), neck: TMD },

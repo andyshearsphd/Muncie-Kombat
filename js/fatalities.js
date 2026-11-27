@@ -4,7 +4,7 @@ FATAL.add(K => {
   const { R, P, PI, rnd, lerp, pick, ease, walkTo, J, prop, headGib, skullGib } = K;
   const S = {};
 
-  // ---------- MUNCIE HIPPO: Pothole Filler ----------
+  // ---------- PURPLE HIPPO: Pothole Filler ----------
   S.hippo = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR;
     const gap = 26 * k + 10;
@@ -825,7 +825,7 @@ FATAL.add(K => {
     };
   };
 
-  // ---------- TIN MAN: Heartless ----------
+  // ---------- KILGORE TIN MAN: Heartless ----------
   S.tinman = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face;
     let heart = 0, door = 0, closing = false, down = false;
