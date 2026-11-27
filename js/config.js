@@ -11,9 +11,18 @@ function overpassBackdrop(g, W, H, t) {
     g.imageSmoothingEnabled = false;
     g.drawImage(st.back, 730 - W / 2 / S, y0, W / S, H / S, 0, 0, W, H);
     g.imageSmoothingEnabled = true;
+    // a warm glow off the city and a cooler haze above it, added light so the night feels lit up
+    { g.save(); g.globalCompositeOperation = 'lighter';
+      let gl = g.createRadialGradient(W / 2, 150, 10, W / 2, 150, W * 0.6); gl.addColorStop(0, 'rgba(255,140,60,0.22)'); gl.addColorStop(0.5, 'rgba(160,60,60,0.10)'); gl.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = gl; g.fillRect(0, 40, W, 160);
+      gl = g.createLinearGradient(0, 110, 0, 160); gl.addColorStop(0, 'rgba(0,0,0,0)'); gl.addColorStop(0.7, 'rgba(255,170,90,0.16)'); gl.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = gl; g.fillRect(0, 110, W, 50);
+      gl = g.createRadialGradient(W / 2, 60, 10, W / 2, 60, W * 0.7); gl.addColorStop(0, 'rgba(120,80,160,0.12)'); gl.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = gl; g.fillRect(0, 0, W, 150);
+      g.restore(); }
     // a harvest moon, heavy and orange, smeared by haze and cloud
     { const mx = Math.max(30, Math.min(W * 0.2, W / 2 - 148)), my = 50, mr = 23, PI = Math.PI;
-      let m = g.createRadialGradient(mx, my, mr * 0.5, mx, my, mr * 3.2); m.addColorStop(0, 'rgba(255,140,40,0.28)'); m.addColorStop(0.4, 'rgba(200,80,30,0.12)'); m.addColorStop(1, 'rgba(120,40,30,0)');
+      let m = g.createRadialGradient(mx, my, mr * 0.5, mx, my, mr * 3.2); m.addColorStop(0, 'rgba(255,150,50,0.42)'); m.addColorStop(0.4, 'rgba(220,90,30,0.18)'); m.addColorStop(1, 'rgba(120,40,30,0)');
       g.fillStyle = m; g.fillRect(mx - mr * 3.2, my - mr * 3.2, mr * 6.4, mr * 6.4);
       for (let i = 4; i >= 0; i--) { g.fillStyle = `rgba(232,${128 + i * 6},${46 + i * 4},${0.16 + (4 - i) * 0.17})`; g.beginPath(); g.arc(mx, my, mr + i * 1.6, 0, PI * 2); g.fill(); }
       g.fillStyle = 'rgba(150,64,24,0.32)'; for (const [dx, dy, r] of [[-7, -6, 7], [6, 5, 6], [2, -11, 3.5], [-9, 9, 4.5], [10, -4, 2.5]]) { g.beginPath(); g.arc(mx + dx, my + dy, r, 0, PI * 2); g.fill(); }
@@ -74,8 +83,7 @@ window.GAME = {
     TXT.draw(g, 'YOU WIN THE GAME!', W / 2, 10 + big, { size: 18, align: 'center', fill: 'gold' });
     const band = g.createLinearGradient(0, 192, 0, H); band.addColorStop(0, 'rgba(0,0,0,0)'); band.addColorStop(0.35, 'rgba(0,0,0,0.7)'); band.addColorStop(1, 'rgba(0,0,0,0.85)');
     g.fillStyle = band; g.fillRect(0, 192, W, H - 192);
-    TXT.draw(g, "BUT YOU DIDN'T SAVE MUNCIE FROM ITSELF. NO ONE CAN DO THAT.", W / 2, 211, { size: 9, align: 'center', fill: 'white', italic: false });
-    TXT.draw(g, 'LET THAT WISDOM CARRY YOU.', W / 2, 224, { size: 9, align: 'center', fill: 'white', italic: false });
+    TXT.draw(g, 'BUT MUNCIE WILL ALWAYS BE MUNCIE.', W / 2, 214, { size: 11, align: 'center', fill: 'white', italic: false });
   },
 
   // ---------- the announcer: the same recorded robot as POTUS Kombat, crackling over the radio ----------
