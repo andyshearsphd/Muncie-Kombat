@@ -202,25 +202,6 @@
     setSeed(71);
     treeline(B, FY - 20, 40, '#0e0a0a', 40, 80, BW, 'rgba(255,120,60,0.12)');
     const DUSK = 'rgba(30,10,30,0.42)';
-    // Maplewood: red brick Georgian Revival, giant white Ionic portico and pediment, red tile hip roof, dormer, chimney
-    { const x = 208, w = 116, h = 70, top = FY - h, cx = x + w / 2;
-      B.fillStyle = '#6a2a1a'; B.beginPath(); B.moveTo(x - 4, top); B.lineTo(x + 14, top - 20); B.lineTo(x + w - 14, top - 20); B.lineTo(x + w + 4, top); B.fill();
-      B.fillStyle = 'rgba(255,150,90,0.25)'; B.fillRect(x + 14, top - 20, w - 28, 1.4);
-      bricks(B, x + 14, top - 34, 7, 16, '#7a2e1c', '#2a0e08', 4, 2.4);
-      B.fillStyle = '#e4dccc'; B.fillRect(x + 24, top - 13, 14, 10); B.beginPath(); B.moveTo(x + 22, top - 13); B.lineTo(x + 31, top - 20); B.lineTo(x + 40, top - 13); B.fill(); win(B, x + 27, top - 11, 8, 7, true, '#ffc070', '#e4dccc');
-      bricks(B, x, top, w, h, '#8a3420', '#2a0e08', 6, 2.8);
-      B.fillStyle = '#e8e0cc'; B.fillRect(x - 2, top, w + 4, 3); B.fillRect(x - 2, top + 30, w + 4, 2);
-      for (const wx of [x + 6, x + 20, x + w - 30, x + w - 16]) { win(B, wx, top + 8, 9, 14, rand() < 0.5, '#ffc070', '#efe8d8'); win(B, wx, top + 38, 9, 16, rand() < 0.6, '#ffc070', '#efe8d8'); }
-      // the portico
-      const pw = 48, px = cx - pw / 2, pt = top - 6;
-      B.fillStyle = '#efe8d8'; B.beginPath(); B.moveTo(px - 4, pt); B.lineTo(cx, pt - 18); B.lineTo(px + pw + 4, pt); B.fill();
-      B.fillStyle = '#c8c0ae'; B.beginPath(); B.ellipse(cx, pt - 6, 4, 2, 0, 0, PI * 2); B.fill();
-      B.fillStyle = '#e8e0cc'; B.fillRect(px - 4, pt, pw + 8, 5);
-      B.fillStyle = '#1a0c08'; B.fillRect(px + 2, pt + 5, pw - 4, FY - pt - 5);
-      win(B, cx - 9, pt + 10, 18, 14, true, '#ffc878', '#efe8d8'); B.fillStyle = '#efe8d8'; B.fillRect(px + 6, pt + 28, pw - 12, 3); for (let i = 0; i < 9; i++) B.fillRect(px + 7 + i * 4, pt + 31, 1.2, 5);
-      B.fillStyle = '#f4eee0'; B.fillRect(cx - 5, FY - 18, 10, 18); win(B, cx - 4, FY - 17, 8, 16, true, '#ffd890', '#f4eee0');
-      for (const c of [px, px + 12, px + pw - 18, px + pw - 6]) { vg(B, c, pt + 5, 6, FY - pt - 7, ['#fffaf0', '#d8d0c0', '#a8a090']); B.fillStyle = '#fffaf0'; B.fillRect(c - 1.5, pt + 4, 9, 2.4); B.fillRect(c - 1, FY - 3, 8, 3); }
-      B.fillStyle = DUSK; B.fillRect(x - 6, top - 36, w + 12, h + 36); }
     // the E.B. Ball Center: grey limestone, two steep gables with red tile roofs, a centre dormer, a deep arched loggia and a terrace balustrade
     { const x = 330, w = 118, h = 66, top = FY - h, cx = x + w / 2;
       B.fillStyle = '#8a2a16'; B.beginPath(); B.moveTo(x + 18, top); B.lineTo(x + 28, top - 18); B.lineTo(x + w - 28, top - 18); B.lineTo(x + w - 18, top); B.fill();
