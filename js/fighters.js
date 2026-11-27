@@ -450,7 +450,7 @@ const ROSTER = (() => {
   // ---------- CHUCKY: an original anthropomorphic red cardinal ----------
   const CR = '#b0141c', CRD = '#6a0a10', CRL = '#d83a34';
   const chucky = {
-    id: 'chucky', name: 'CHUCKY CARD-CARD', short: 'CHUCKY', him: 'HIM', k: 1.1, talons: true, paws: true, skull: 'cardinal', skullK: 1.0,
+    id: 'chucky', name: 'CHUCKY REDBIRD', short: 'CHUCKY', him: 'HIM', k: 1.1, talons: true, paws: true, skull: 'cardinal', skullK: 1.0,
     bio: 'A cardinal with a chip on his shoulder and a beak like a pickaxe. Cardinal red runs in his veins. Yours too, soon.',
     bicep: 0.45, calf: 0.1,
     d: dims({ thigh: 25, shin: 24, torso: 36, neck: 3, upper: 21, fore: 20, hipW: 15, shW: 20, chest: 22, belly: 19, back: 17, thighR: 10.5, kneeR: 3.8, ankleR: 3.2, shR: 8.4, elbowR: 6.4, wristR: 4.8, fist: 5.6, footL: 14, footH: 3.8 }),
@@ -745,7 +745,7 @@ const ROSTER = (() => {
     fatal: { id: 'bunyon', name: 'TIMBER' }
   };
 
-  // ---------- BECKY HACK: Pimihsaahkwa, Myaamia, owner of the Hackley Reserve ----------
+  // ---------- BECKY HACK-HACK: Pimihsaahkwa, Myaamia, owner of the Hackley Reserve ----------
   // dress after documented Myaamia clothing of the 1820s: ribbonworked wool wrap skirt to below
   // the knee, matching leggings and flapped moccasins, a cloth blouse set with silver brooches
   const BKS = '#a86e4c', BKB = '#7a2a24', BKSK = '#1c1f3a', BKL = '#6a1414', BKM = '#a88458', RIB = ['#c8202a', '#e8c030', '#f0ece0', '#2a6a3a'];
@@ -759,7 +759,7 @@ const ROSTER = (() => {
   }
   function brooches(g, pts) { for (const [x, y] of pts) { g.fillStyle = '#d8dce6'; g.beginPath(); g.arc(x, y, 1.7, 0, PI * 2); g.fill(); g.fillStyle = '#7a808a'; g.beginPath(); g.arc(x, y, 0.7, 0, PI * 2); g.fill(); g.fillStyle = 'rgba(255,255,255,0.9)'; g.fillRect(x - 1, y - 1.2, 0.8, 0.8); } }
   const becky = {
-    id: 'becky', name: 'BECKY HACK', short: 'BECKY', him: 'HER', k: 1.0, bicep: 0.15, calf: 0.25,
+    id: 'becky', name: 'BECKY HACK-HACK', short: 'BECKY', him: 'HER', k: 1.0, bicep: 0.15, calf: 0.25,
     bio: 'Pimihsaahkwa. Myaamia. In 1818 she owned the 672 acres that became Muncie. Get off her land.',
     d: dims({ thigh: 27, shin: 26, torso: 33, upper: 19, fore: 18, hipW: 12, shW: 13.5, chest: 13.5, belly: 10.5, back: 10.5, thighR: 7, kneeR: 4.4, ankleR: 3.4, shR: 5.2, elbowR: 3.6, wristR: 3, fist: 3.6, footL: 11.5 }),
     col: { torso: BKB, armU: BKB, armL: BKB, cuff: BKB, hand: BKS, legU: BKL, legL: BKL, foot: BKM, neck: BKS },
