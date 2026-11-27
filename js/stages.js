@@ -547,24 +547,26 @@
     }
     B.fillStyle = '#14121a'; B.beginPath(); B.moveTo(588, hz - 16); B.lineTo(591, hz - 36); B.lineTo(594, hz - 16); B.fill(); B.fillRect(586, hz - 16, 10, 16);
     B.fillStyle = '#1a181e'; B.fillRect(965, hz - 26, 1.4, 26); B.fillRect(975, hz - 26, 1.4, 26); B.beginPath(); B.ellipse(970, hz - 29, 9, 5, 0, 0, PI * 2); B.fill();
-    // far off to the left, Ball State's Teachers College: brick piers framing a tall limestone-and-glass face
-    { const x = 614, w = 22, h = 50, t0 = hz - h;
-      B.fillStyle = '#4a4238'; B.fillRect(x - 1, t0 - 2, w + 2, h + 2);
-      B.fillStyle = '#3a1612'; B.fillRect(x, t0, 4, h); B.fillRect(x + w - 4, t0, 4, h);
-      B.fillStyle = '#10141e'; B.fillRect(x + 4.5, t0, w - 9, h);
-      B.fillStyle = 'rgba(120,112,96,0.55)'; for (let c = 0; c < 5; c++) B.fillRect(x + 5.5 + c * 2.6, t0, 0.7, h);
-      for (let r = t0 + 2; r < hz - 2; r += 3) for (let c = 0; c < 5; c++) if (rand() < 0.22) { B.fillStyle = 'rgba(255,214,140,0.8)'; B.fillRect(x + 4.6 + c * 2.6, r, 1.2, 1.4); }
-      B.fillStyle = 'rgba(170,40,40,0.9)'; B.fillRect(x + w / 2 - 0.6, t0 - 5, 1.2, 3); glow(B, x + w / 2, t0 - 5, 4, 'rgba(255,40,40,0.8)', 0.6); }
-    // off to the right, the AT&T building: a tall windowless beige tower with its blue globe glowing at night
-    { const x = 846, w = 18, h = 58, t0 = hz - h;
-      B.fillStyle = '#4e463c'; B.fillRect(x, t0, w, h);
-      B.fillStyle = '#5e5648'; for (let c = 0; c < 5; c++) B.fillRect(x + 1.5 + c * 3.4, t0 + 5, 1, h - 5);
-      B.fillStyle = '#16141a'; B.fillRect(x - 1.5, t0 - 1.5, w + 3, 5); B.fillStyle = '#6a6254'; B.fillRect(x - 1.5, t0 - 2.5, w + 3, 1);
-      const gx = x + w / 2, gy = t0 + h * 0.22;
-      glow(B, gx, gy, 14, 'rgba(60,160,255,0.55)', 0.9);
-      B.fillStyle = '#2aa0e8'; B.beginPath(); B.arc(gx, gy, 4.2, 0, PI * 2); B.fill();
-      B.strokeStyle = '#0a3a70'; B.lineWidth = 0.6; B.beginPath(); for (let i = -3; i <= 3; i += 1.5) { const ww = Math.sqrt(Math.max(0, 17.6 - i * i)); B.moveTo(gx - ww, gy + i); B.lineTo(gx + ww, gy + i); } B.stroke();
-      B.fillStyle = 'rgba(255,60,60,0.9)'; B.fillRect(gx - 0.6, t0 - 7, 1.2, 4); }
+    // far off to the left, Ball State's Teachers College: a broad block, brick piers at each end framing a limestone-and-glass face
+    { const x = 600, w = 34, h = 30, t0 = hz - h;
+      B.fillStyle = '#3e3830'; B.fillRect(x - 1, t0 - 1.5, w + 2, h + 1.5);
+      B.fillStyle = '#33160f'; B.fillRect(x, t0, 4, h); B.fillRect(x + w - 4, t0, 4, h);
+      B.fillStyle = '#121620'; B.fillRect(x + 4.5, t0 + 1, w - 9, h - 1);
+      B.fillStyle = 'rgba(110,104,90,0.5)'; for (let c = 0; c < 10; c++) B.fillRect(x + 5.4 + c * 2.5, t0 + 1, 0.6, h - 1);
+      for (let r = t0 + 2; r < hz - 2; r += 2.6) for (let c = 0; c < 10; c++) if (rand() < 0.16) { B.fillStyle = 'rgba(255,214,140,0.65)'; B.fillRect(x + 4.8 + c * 2.5, r, 1, 1); }
+      B.fillStyle = 'rgba(200,50,50,0.85)'; B.fillRect(x + w / 2 - 0.5, t0 - 3.5, 1, 2); }
+    // off to the right, the AT&T building: a tall windowless beige tower, its blue globe glowing at night
+    { const x = 826, w = 10, h = 38, t0 = hz - h;
+      B.fillStyle = '#463f36'; B.fillRect(x, t0, w, h);
+      B.fillStyle = '#524a3f'; for (let c = 0; c < 3; c++) B.fillRect(x + 1.5 + c * 3.2, t0 + 3, 0.7, h - 3);
+      B.fillStyle = '#16141a'; B.fillRect(x - 1, t0 - 1, w + 2, 3);
+      const gx = x + w / 2, gy = t0 + h * 0.2;
+      glow(B, gx, gy, 8, 'rgba(60,160,255,0.45)', 0.8);
+      B.fillStyle = '#2a90d8'; B.beginPath(); B.arc(gx, gy, 2.4, 0, PI * 2); B.fill();
+      B.strokeStyle = '#0a3a70'; B.lineWidth = 0.4; B.beginPath(); for (let i = -1.6; i <= 1.6; i += 0.8) { const ww = Math.sqrt(Math.max(0, 5.76 - i * i)); B.moveTo(gx - ww, gy + i); B.lineTo(gx + ww, gy + i); } B.stroke();
+      B.fillStyle = 'rgba(255,60,60,0.85)'; B.fillRect(gx - 0.5, t0 - 4, 1, 2.5); }
+    // distance haze over both
+    B.fillStyle = 'rgba(34,30,44,0.32)'; B.fillRect(598, hz - 36, 40, 36); B.fillRect(824, hz - 44, 14, 44);
     treeline(B, hz, 30, '#05060a', 4, 12, BW);
     // the cut below: State Road 32 and the tracks, lit orange
     vg(B, 0, hz, BW, FY - hz, ['#0c0c12', '#16141a', '#0a0a0e']);
