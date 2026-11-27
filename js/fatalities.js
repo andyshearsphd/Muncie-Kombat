@@ -1136,11 +1136,17 @@ FATAL.add(K => {
     const DOWN = P({ hy: 6, lean: 0.65, head: 0.4, aF: [1.35, 0.1], aB: [1.4, 0.05], fF: [18, 0], fB: [-14, 0] });
     let blows = 0, capped = false, tasselL = false, capT = 0;
     A.st2.noMace = true;
-    const maceTip = () => { const w = J(A, 'handF'), e = J(A, 'elbowF'), dx = w[0] - e[0], dy = w[1] - e[1], L = Math.hypot(dx, dy) || 1; return { w, u: [dx / L, dy / L] }; };
+    s.at(0.55, () => { api.sfx('whoosh'); api.sfx('ding'); });
     prop({ layer: 'front', draw(g) {
       if (A.state === 'script') {
         // the mace held like a club, out along the forearm
-        const { w, u } = maceTip(), kk = k, b = [w[0] + u[0] * 44 * kk, w[1] + u[1] * 44 * kk], a = [w[0] - u[0] * 8 * kk, w[1] - u[1] * 8 * kk];
+        if (s.t < 0.55) return;
+        // raised: the mace stands up over his shoulder. coming down: the head of it lands square on the skull
+        const w = J(A, 'handF'), kk = k, tgt = J(V, blows >= 4 ? 'neck' : 'head');
+        let u = A.scriptPose === DOWN ? [tgt[0] - w[0], tgt[1] - w[1]] : [-d * 0.35, -1];
+        const ul = Math.hypot(u[0], u[1]) || 1; u = [u[0] / ul, u[1] / ul];
+        const reach = A.scriptPose === DOWN ? Math.max(18, Math.min(60, ul)) : 44 * kk;
+        const b = [w[0] + u[0] * reach, w[1] + u[1] * reach], a = [w[0] - u[0] * 8 * kk, w[1] - u[1] * 8 * kk];
         R.line(g, a[0], a[1], b[0], b[1], '#6a4a10', 3.6 * kk); R.line(g, a[0], a[1], b[0], b[1], '#d8b040', 2.4 * kk);
         g.fillStyle = '#d8b040'; g.beginPath(); g.arc(b[0], b[1], 6 * kk, 0, PI * 2); g.fill(); g.fillStyle = '#a8141c'; g.beginPath(); g.arc(b[0], b[1], 2 * kk, 0, PI * 2); g.fill();
         if (blows > 0) { g.fillStyle = 'rgba(120,0,10,0.85)'; g.beginPath(); g.arc(b[0] + 1, b[1] + 1, 4 * kk, 0, PI * 2); g.fill(); }
@@ -1165,7 +1171,7 @@ FATAL.add(K => {
     s.at(6.8, () => { s.done = true; });
     s.tick = (t, dt) => {
       if (capped) capT += dt;
-      if (t < 0.9) { walkTo(A, V.x - d * 46 * k, dt, api, 110); A.scriptPose = PS.stance(A.t); V.scriptPose = PS.dizzy(V.t); return; }
+      if (t < 0.9) { walkTo(A, V.x - d * 40 * k, dt, api, 110); A.scriptPose = t > 0.55 ? UP : PS.stance(A.t); V.scriptPose = PS.dizzy(V.t); return; }
       if (t < 3.45) {
         const ph = ((t - 0.9) % 0.55) / 0.55; A.scriptPose = ph < 0.62 ? UP : DOWN;
         V.scriptPose = blows < 4 ? P({ hyL: Math.min(0.7, 0.4 + blows * 0.1), lean: 0.1, head: 0.3 + blows * 0.12, aF: [1.0, 0.6], aB: [0.8, 0.7], fF: [12, 0], fB: [-10, 0] }) : PS.down(V);
@@ -1176,6 +1182,43 @@ FATAL.add(K => {
       if (t < 4.4) { A.scriptPose = P({ hy: 6, lean: 0.7, head: 0.5, aF: [1.0, 0.6], aB: [1.3, 0.2], fF: [16, 0], fB: [-12, 0] }); return; }
       if (t < 4.8) { A.scriptPose = P({ hy: 6, lean: 0.6, head: 0.5, aF: [1.6, 0.4], aB: [1.3, 0.2], fF: [16, 0], fB: [-12, 0] }); return; }
       A.scriptPose = PS.win(A.t);
+    };
+  };
+
+  // ---------- WALMART KAREN: Manager! ----------
+  // she demands the manager so loudly the victim's head swells up and bursts
+  S.karen = (s, A, V, api) => {
+    const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face;
+    const WAG = t => P({ hy: 2, lean: 0.15, head: 0.2, aF: [1.7 + Math.sin(t * 22) * 0.12, 0.05], aB: [0.6, -1.5], fF: [12, 0], fB: [-12, 0] });
+    const YELL = t => P({ hy: 4, lean: 0.4, head: 0.35 + Math.sin(t * 40) * 0.04, jaw: 1, aF: [0.5, 0.6], aB: [0.4, 0.7], fF: [16, 0], fB: [-14, 0] });
+    let yelling = false, swell = 1, rings = [];
+    prop({ layer: 'front', draw(g) {
+      for (const r of rings) { g.strokeStyle = `rgba(255,240,200,${Math.max(0, 0.7 - r.t)})`; g.lineWidth = 3; g.beginPath(); g.arc(r.x, r.y, 10 + r.t * 140, -0.7, 0.7); if (d < 0) { g.stroke(); g.beginPath(); g.arc(r.x, r.y, 10 + r.t * 140, PI - 0.7, PI + 0.7); } g.stroke(); }
+    }, update(p, dt) { for (const r of rings) r.t += dt * 1.4; rings = rings.filter(r => r.t < 0.8); } });
+    s.at(1.0, () => api.bubble('I WANT TO SPEAK TO YOUR MANAGER.', A.x, F - 160, { size: 11, fill: 'white', life: 1.4 }));
+    s.at(2.3, () => { yelling = true; api.sfx('scream'); api.sfx('horn'); api.shake(6); api.bubble('MANAGER!!!', A.x + d * 40, F - 150, { size: 22, fill: 'blood', life: 2.0 }); });
+    s.at(4.1, () => {
+      yelling = false; V.ro.headScale = 1; V.ro.noHead = true; api.sfx('splat'); api.sfx('big'); api.shake(12); api.flash();
+      const h = J(V, 'head'); FX.burst(h[0], h[1], 26, ['brain', 'skullfrag', 'eye', 'eye', 'chunk', 'tooth', 'skullfrag'], 1.4); FX.blood(h[0], h[1], 80, 0, 2.2, 1.6); FX.drops(14);
+    });
+    s.at(5.1, () => api.bubble("AND I'M LEAVING A ONE-STAR REVIEW.", A.x, F - 160, { size: 11, fill: 'white', life: 2 }));
+    s.at(7.0, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (t < 0.8) { walkTo(A, V.x - d * 34 * k, dt, api, 110); V.scriptPose = PS.dizzy(V.t); return; }
+      if (t < 2.3) { A.scriptPose = WAG(t); V.scriptPose = PS.dizzy(V.t); return; }
+      if (yelling) {
+        A.scriptPose = YELL(t);
+        const m = J(A, 'head'); if (Math.random() < 0.5) rings.push({ x: m[0] + d * 10, y: m[1] + 4, t: 0 });
+        swell = 1 + Math.pow((t - 2.3) / 1.8, 2) * 1.7;
+        V.ro.headScale = swell * (1 + Math.sin(t * 50) * 0.03);
+        V.scriptPose = P({ hy: 4, lean: -0.35 - (t - 2.3) * 0.08, head: -0.6, jaw: 1, aF: [2.5 + Math.sin(t * 30) * 0.3, 0.4], aB: [2.7 + Math.cos(t * 27) * 0.3, 0.3], fF: [6, 0], fB: [-14, 0] });
+        V.x += d * 18 * dt;
+        if (t > 3.3 && Math.random() < 0.3) { const h = J(V, 'head'); FX.blood(h[0], h[1] + 6, 2, 0, 0.6); }
+        return;
+      }
+      if (t < 4.7) { V.scriptPose = P({ hy: 6, lean: 0.2, aF: [0.4, 0.2], aB: [0.3, 0.2], fF: [8, 0], fB: [-8, 0] }); const n = J(V, 'neck'); FX.blood(n[0], n[1], 4, 0, 1.6, 1.6); A.scriptPose = P({ hy: 2, lean: -0.15, head: -0.1, aF: [1.5, 1.8], aB: [1.5, 1.8], fF: [12, 0], fB: [-12, 0] }); return; }
+      V.scriptPose = PS.down(V);
+      A.scriptPose = t < 5.0 ? P({ hy: 2, lean: -0.15, aF: [1.5, 1.8], aB: [1.5, 1.8], fF: [12, 0], fB: [-12, 0] }) : WAG(t);
     };
   };
 

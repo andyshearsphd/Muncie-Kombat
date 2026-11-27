@@ -901,9 +901,9 @@ const ROSTER = (() => {
   // ---------- CREEPY COUNCILMAN: handsome, connected, and standing way too close ----------
   const CCS = '#22283a', CCH = '#b8441c', CCK = '#e8b898';
   const councilman = {
-    id: 'councilman', name: 'CREEPY COUNCILMAN', short: 'COUNCILMAN', him: 'HIM', k: 1.08, bicep: 0.12, calf: 0.1,
+    id: 'councilman', name: 'CREEPY COUNCILMAN', short: 'COUNCILMAN', him: 'HIM', k: 1.08, bicep: 0.28, calf: 0.18,
     bio: 'Handsome, well connected and always standing way too close. HR has a whole drawer just for him.',
-    d: dims({ thigh: 30, shin: 29, torso: 36, upper: 21, fore: 20, hipW: 10, shW: 15.5, chest: 14, belly: 10.5, back: 10.5, thighR: 6.6, kneeR: 4.5, ankleR: 3.4 }),
+    d: dims({ thigh: 30, shin: 29, torso: 36, upper: 21, fore: 20, hipW: 12.5, shW: 18.5, chest: 17.5, belly: 14, back: 13.5, thighR: 8.6, kneeR: 5.6, ankleR: 4, shR: 7.4, elbowR: 5.6, wristR: 4.2, fist: 5 }),
     col: { torso: CCS, armU: CCS, armL: CCS, cuff: '#f0f0ec', hand: CCK, legU: CCS, legL: CCS, foot: '#4a2a18', neck: CCK },
     mat: { torso: 'suit', armU: 'suit', armL: 'suit', legU: 'suit', legL: 'suit' },
     stats: { speed: 1.06, power: 0.97, weight: 0.95 },
@@ -945,7 +945,7 @@ const ROSTER = (() => {
     fatal: { id: 'councilman', name: 'TOO LONG A HUG' }
   };
 
-  // ---------- PRES. CUCKOLD NE'ER-LEARNS: robes, medallion, mace, no clue ----------
+  // ---------- PRES. CUCKOLD NE'ER-LEARNS: the university president, robes, tam and medallion ----------
   const PRG = '#141418', PRS = '#e4c0a2', PRR = '#a8141c', GOLD = '#d8b040';
   function mace(g, k, x, y, ang) {
     // the ceremonial mace: a long gilded staff with a crowned head
@@ -966,7 +966,7 @@ const ROSTER = (() => {
   }
   const prez = {
     id: 'prez', name: "PRES. CUCKOLD NE'ER-LEARNS", short: "NE'ER-LEARNS", him: 'HIM', k: 0.9, bicep: 0, calf: 0,
-    bio: 'A bookish little man in full regalia, a medallion the size of a pie plate and a mace he has never learned to use.',
+    bio: 'The university president. Raised tuition, cut your program and gave himself a bonus. Office hours: never.',
     d: dims({ thigh: 26, shin: 25, torso: 33, upper: 19, fore: 18, hipW: 11, shW: 13, chest: 12.5, belly: 11, back: 10, thighR: 6, kneeR: 4.2, ankleR: 3.2, shR: 5.4, elbowR: 4.6, wristR: 3, fist: 3.6 }),
     col: { torso: PRG, armU: PRG, armL: PRG, cuff: PRG, hand: PRS, legU: '#2a2a30', legL: '#2a2a30', foot: '#0c0c0e', neck: PRS },
     mat: { torso: 'cloth', armU: 'cloth', armL: 'cloth', legU: 'cloth', legL: 'cloth' },
@@ -995,10 +995,6 @@ const ROSTER = (() => {
       g.strokeStyle = 'rgba(255,255,255,0.08)'; g.lineWidth = 0.8; for (let i = 1; i < 4; i++) { const a = R.lerp2(wB, wF, i / 4), b = R.lerp2(hB, hA, i / 4); g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.stroke(); }
       g.fillStyle = '#26262c'; g.beginPath(); g.moveTo(...R.lerp2(wF, wB, 0.08)); g.lineTo(...wF); g.lineTo(...hA); g.lineTo(...R.lerp2(hA, hB, 0.12)); g.fill();
     },
-    frontHand(g, d, J, st) {
-      if (st.noMace) return;
-      const w = J.AF.wr; mace(g, d.k, w[0], w[1] + 4 * d.k, 0.12);
-    },
     head(g, st) {
       humanHead(g, st, {
         skin: PRS, chin: 0.6, nose: 0.7, eyeC: '#4a3a2a', browC: 'rgba(90,80,70,0.95)', cleanJaw: 1,
@@ -1010,12 +1006,13 @@ const ROSTER = (() => {
           g.beginPath(); g.arc(9, -12.4, 2.6, 0, PI * 2); g.stroke(); g.beginPath(); g.arc(4.2, -12.5, 2.2, 0, PI * 2); g.stroke();
           R.line(g, 6.4, -12.6, 6.8, -12.6, '#b8a060', 0.8); R.line(g, 2, -12.5, -2, -11.6, '#b8a060', 0.7);
           g.fillStyle = 'rgba(200,220,255,0.2)'; g.beginPath(); g.arc(9, -12.4, 2.4, 0, PI * 2); g.fill();
-          // the mortarboard: a skull cap and a flat square board, tassel hanging off the side
-          g.beginPath(); g.moveTo(-7, -19); g.quadraticCurveTo(-7, -26.5, 2.5, -26.5); g.quadraticCurveTo(11.5, -26.5, 11.5, -19); g.quadraticCurveTo(2.5, -21, -7, -19); g.closePath(); fillLit(g, '#18181c', 2, -23, 8, 0.25, -0.5);
-          g.fillStyle = '#0c0c0e'; R.poly(g, [[-10, -27], [14, -28.6], [15.5, -26.6], [-8.5, -25]], '#0c0c0e');
-          g.fillStyle = 'rgba(255,255,255,0.15)'; g.fillRect(-9, -27.4, 22, 0.8);
+          // the doctoral tam: a soft, puffy velvet cap with a band, flopping out past the skull
+          g.fillStyle = '#0c0c0e'; g.beginPath(); g.moveTo(-7.4, -18.4); g.quadraticCurveTo(2.5, -21.6, 11.6, -18.4); g.lineTo(11.4, -21); g.quadraticCurveTo(2.5, -23.6, -7.2, -21); g.closePath(); g.fill();
+          g.beginPath(); g.moveTo(-9.6, -21.4); g.bezierCurveTo(-13, -31, 6, -34, 15.6, -26.4); g.quadraticCurveTo(14, -22.6, 11, -21.2); g.quadraticCurveTo(1, -23.4, -9.6, -21.4); g.closePath(); fillLit(g, '#1c1a22', 3, -27, 11, 0.3, -0.5);
+          g.strokeStyle = 'rgba(0,0,0,0.5)'; g.lineWidth = 0.6; for (const x of [-4, 3, 9]) { g.beginPath(); g.moveTo(x, -21.6); g.quadraticCurveTo(x + 1, -27, x + 2, -30.4); g.stroke(); }
           const sw = Math.sin((st.t || 0) * 3) * 0.6;
-          R.line(g, 2.5, -27.4, -8, -26.4, GOLD, 0.7); R.line(g, -8, -26.4, -8.6 + sw, -18, GOLD, 1.1); g.fillStyle = GOLD; g.fillRect(-9.6 + sw, -18.6, 2, 3);
+          g.fillStyle = GOLD; g.beginPath(); g.arc(2.5, -31, 1.2, 0, PI * 2); g.fill();
+          R.line(g, 2.5, -31, -9, -27.6, GOLD, 0.7); R.line(g, -9, -27.6, -9.6 + sw, -19, GOLD, 1.1); g.fillStyle = GOLD; g.fillRect(-10.6 + sw, -19.6, 2, 3.2);
         },
         mouth(g) {
           if (st.dead) { g.fillStyle = '#2a0404'; g.beginPath(); g.ellipse(10.2, -4.4, 1.3, 1.1, 0, 0, PI * 2); g.fill(); g.fillStyle = '#8a0010'; g.fillRect(9.7, -3.6, 1.1, 5); return; }
@@ -1023,8 +1020,55 @@ const ROSTER = (() => {
         }
       });
     },
-    proj: { kind: 'diploma', name: 'DIPLOMA TOSS' }, sp2: { kind: 'swing', name: 'MACE OF OFFICE' },
+    proj: { kind: 'diploma', name: 'DIPLOMA TOSS' }, sp2: { kind: 'rise', name: 'TUITION HIKE' },
     fatal: { id: 'prez', name: 'HONORARY DEGREE' }
+  };
+
+  // ---------- WALMART KAREN: she would like to speak to your manager ----------
+  const KB = '#cfe0f2', KS = '#ecc0a0', KJ = '#4e6c9c', KH = '#b88a4a', KHL = '#ecd08e', KHD = '#5a3a1c';
+  const karen = {
+    id: 'karen', name: 'WALMART KAREN', short: 'KAREN', him: 'HER', k: 1.0, bicep: 0.3, calf: 0.35, sock: KS,
+    bio: 'Capris, flip-flops and a coupon that expired in 2019. She will be speaking to your manager.',
+    d: dims({ thigh: 26, shin: 24, torso: 34, upper: 19, fore: 18, hipW: 15, shW: 15, chest: 17.5, belly: 18, back: 15, thighR: 9.4, kneeR: 5.6, ankleR: 3.8, shR: 6.6, elbowR: 4.6, wristR: 3.4, fist: 4, footL: 12, footH: 3.2 }),
+    col: { torso: KB, armU: KB, armL: KS, hand: KS, legU: KJ, legL: KJ, foot: KS, neck: KS },
+    mat: { torso: 'cloth', armU: 'cloth', armL: 'skin', legU: 'denim', legL: 'denim' },
+    stats: { speed: 0.96, power: 1.02, weight: 1.12 },
+    torsoDetail(g, d, st, L) {
+      // collared button-up blouse, a placket of little buttons, a tucked-in belt line
+      R.poly(g, [[d.shW * 0.1, -L * 1.03], [d.shW * 0.72, -L * 1.03], [d.shW * 0.46, -L * 0.9]], KS);
+      R.poly(g, [[d.shW * 0.1, -L * 1.04], [d.shW * 0.46, -L * 0.9], [d.shW * 0.22, -L * 0.86]], '#e8f0fa');
+      R.line(g, d.belly * 0.78, -L * 0.9, d.belly * 0.9, -L * 0.1, 'rgba(80,100,140,0.45)', 0.7);
+      g.fillStyle = '#f8f8f8'; for (let i = 0; i < 5; i++) g.fillRect(d.belly * (0.8 + i * 0.025), -L * (0.82 - i * 0.16), 1.3, 1.3);
+      g.fillStyle = '#3a2a1a'; g.fillRect(-d.back * 1.2, -3.4, d.back * 1.2 + d.belly * 1.25, 2.6); g.fillStyle = '#c8b070'; g.fillRect(d.belly * 0.5, -3.6, 2.2, 3);
+    },
+    head(g, st) {
+      humanHead(g, st, {
+        skin: KS, chin: 0.9, nose: 0.4, eyeC: '#5a7a9a', browC: 'rgba(90,60,30,0.95)', cleanJaw: 1,
+        back(g) {
+          // the stacked, spiky back: short and teased up high at the crown
+          g.beginPath(); g.moveTo(-1, -26); g.bezierCurveTo(-15, -27, -14, -14, -9, -8); g.lineTo(-4, -9); g.quadraticCurveTo(-3, -18, -1, -22); g.closePath(); fillLit(g, KH, -7, -18, 10, 0.2, -0.6);
+          g.fillStyle = KHD; for (let i = 0; i < 5; i++) R.poly(g, [[-12 + i * 1.6, -24 + i * 2.6], [-15.5 + i * 0.6, -21 + i * 2.6], [-11 + i * 1.5, -21.6 + i * 2.6]], i % 2 ? KHD : KHL);
+        },
+        front(g) {
+          // a big blonde-streaked swoop over the forehead, longer angled piece toward the chin
+          g.beginPath(); g.moveTo(-6, -9); g.bezierCurveTo(-11, -24, -2, -32, 6, -31); g.bezierCurveTo(13, -30, 15.4, -25, 13.6, -19.6);
+          g.quadraticCurveTo(10.6, -22.8, 7, -21.6); g.quadraticCurveTo(3, -19.6, 1.6, -14); g.quadraticCurveTo(0.6, -8, 1.8, -2.6); g.lineTo(-1.4, -3); g.quadraticCurveTo(-2.4, -6, -3.2, -9); g.closePath();
+          fillLit(g, KH, 4, -22, 12, 0.25, -0.5);
+          g.save(); g.clip(); g.strokeStyle = KHL; g.lineWidth = 1.4; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(-6 + i * 3, -30 + i * 0.4); g.quadraticCurveTo(-2 + i * 3, -24, -1 + i * 2.4, -12 + i); g.stroke(); } g.strokeStyle = KHD; g.lineWidth = 0.8; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(-3 + i * 4, -29); g.quadraticCurveTo(i * 3, -22, i * 2, -14); g.stroke(); } g.restore();
+          // sunglasses parked up on the head, a hoop earring
+          g.fillStyle = '#141414'; g.beginPath(); g.ellipse(6, -29.4, 4, 1.6, -0.2, 0, PI * 2); g.fill(); g.fillStyle = 'rgba(255,255,255,0.3)'; g.fillRect(4, -30.4, 2, 0.6);
+          g.strokeStyle = '#d8c070'; g.lineWidth = 0.7; g.beginPath(); g.arc(-1.4, -4.6, 1.6, 0, PI * 2); g.stroke();
+        },
+        mouth(g) {
+          if (st.dead) { g.fillStyle = '#2a0404'; g.beginPath(); g.ellipse(10.2, -4.4, 1.4, 1.1, 0, 0, PI * 2); g.fill(); g.fillStyle = '#8a0010'; g.fillRect(9.7, -3.6, 1.1, 5); return; }
+          // the permanent frown, lipstick and all
+          g.strokeStyle = '#b02848'; g.lineWidth = 1.1; g.beginPath(); g.moveTo(7.8, -4.2); g.quadraticCurveTo(9.8, -5.8, 11.6, -4.6); g.stroke();
+          R.line(g, 7.4, -15.6, 11.6, -14.2, 'rgba(90,60,30,0.95)', 1);
+        }
+      });
+    },
+    proj: { kind: 'coupons', name: 'EXPIRED COUPONS' }, sp2: { kind: 'flurry', name: 'FINGER WAG' },
+    fatal: { id: 'karen', name: 'MANAGER!' }
   };
 
   // ---------- SLUM LORD: the landlord the black mold got into ----------
@@ -1160,6 +1204,20 @@ const ROSTER = (() => {
   };
 
   const FRONT = {
+    karen: {
+      detail: (g, d, G) => { vNeck(g, G, KS, 0.3); for (const sd of [-1, 1]) R.poly(g, [[sd * 0.5, G.sY - 1.5], [sd * G.shx * 0.5, G.sY - 1.5], [sd * G.shx * 0.2, G.sY + 6]], '#e8f0fa'); R.line(g, 0, G.sY + 6, 0, G.hipY - 4, 'rgba(80,100,140,0.45)', 0.7); g.fillStyle = '#f8f8f8'; for (let i = 0; i < 5; i++) g.fillRect(-0.6, G.sY + 8 + i * 6, 1.3, 1.3); belt(g, G, '#3a2a1a', '#c8b070'); },
+      head(g, st) {
+        humanFront(g, st, { skin: KS, w: 8.6, chin: 1.2, eyeC: '#5a7a9a', browC: 'rgba(90,60,30,0.95)',
+          back(g) { g.beginPath(); g.moveTo(-11.6, -6); g.bezierCurveTo(-15, -20, -10, -31, 0, -31.6); g.bezierCurveTo(10, -31, 15, -20, 11.6, -6); g.quadraticCurveTo(0, -12, -11.6, -6); g.closePath(); fillLit(g, KH, 0, -20, 14, 0.2, -0.6); },
+          front(g) {
+            g.beginPath(); g.moveTo(-9, -12); g.bezierCurveTo(-11, -27, 2, -32, 9, -29); g.bezierCurveTo(13, -27, 13, -20, 11.4, -2); g.lineTo(9, -3); g.quadraticCurveTo(9, -14, 6, -20); g.quadraticCurveTo(-2, -24, -9, -12); g.closePath(); fillLit(g, KH, 2, -22, 12, 0.25, -0.5);
+            g.save(); g.clip(); g.strokeStyle = KHL; g.lineWidth = 1.4; for (let i = 0; i < 7; i++) { g.beginPath(); g.moveTo(-9 + i * 3, -30); g.quadraticCurveTo(-4 + i * 3, -22, -1 + i * 2.4, -10 + i); g.stroke(); } g.restore();
+            g.fillStyle = '#141414'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(sd * 4, -29.6, 3.6, 1.5, 0, 0, PI * 2); g.fill(); }
+            g.strokeStyle = '#d8c070'; g.lineWidth = 0.7; g.beginPath(); g.arc(-9.2, -5.4, 1.6, 0, PI * 2); g.stroke();
+          },
+          mouth(g, jaw) { if (st.dead) { g.fillStyle = '#2a0404'; g.beginPath(); g.ellipse(0, -3.4, 1.6, 1.3, 0, 0, PI * 2); g.fill(); return; } if (jaw > 0.2) { g.fillStyle = '#3a0808'; g.beginPath(); g.ellipse(0, -3.4, 2.6, 0.6 + jaw * 2, 0, 0, PI * 2); g.fill(); return; } g.strokeStyle = '#b02848'; g.lineWidth = 1.1; g.beginPath(); g.moveTo(-2.8, -3.4); g.quadraticCurveTo(0, -5.2, 2.8, -3.4); g.stroke(); } });
+      }
+    },
     catbear: {
       behind: (g, d, G, st) => frontTail(g, d, G, st, [CBP, CBD], 9, 7, 5, false),
       detail: (g, d, G) => { bellyPatch(g, G, 'rgba(225,210,240,0.5)', 0.55); },
@@ -1199,9 +1257,10 @@ const ROSTER = (() => {
         humanFront(g, st, { skin: PRS, w: 7.6, chin: 0.8, eyeC: '#4a3a2a', browC: 'rgba(90,80,70,0.95)',
           front(g) {
             g.strokeStyle = '#b8a060'; g.lineWidth = 0.8; for (const sd of [-1, 1]) { g.beginPath(); g.arc(sd * 3.4, -12.6, 2.5, 0, PI * 2); g.stroke(); } R.line(g, -0.9, -12.8, 0.9, -12.8, '#b8a060', 0.7);
-            g.beginPath(); g.moveTo(-8.4, -18); g.quadraticCurveTo(-8.4, -25.6, 0, -25.6); g.quadraticCurveTo(8.4, -25.6, 8.4, -18); g.quadraticCurveTo(0, -20, -8.4, -18); g.closePath(); fillLit(g, '#18181c', 0, -22, 8, 0.25, -0.5);
-            R.poly(g, [[-15, -26.6], [15, -26.6], [12, -24], [-12, -24]], '#0c0c0e');
-            const sw = Math.sin((st.t || 0) * 3) * 0.6; R.line(g, 0, -26, 13, -25.4, GOLD, 0.7); R.line(g, 13, -25.4, 13.4 + sw, -17, GOLD, 1.1); g.fillStyle = GOLD; g.fillRect(12.4 + sw, -17.6, 2, 3);
+            g.fillStyle = '#0c0c0e'; g.beginPath(); g.moveTo(-8.6, -18); g.quadraticCurveTo(0, -21, 8.6, -18); g.lineTo(8.4, -21); g.quadraticCurveTo(0, -23.6, -8.4, -21); g.closePath(); g.fill();
+            g.beginPath(); g.moveTo(-11, -21.4); g.bezierCurveTo(-13, -32, 13, -32, 11, -21.4); g.quadraticCurveTo(0, -23.6, -11, -21.4); g.closePath(); fillLit(g, '#1c1a22', 0, -27, 11, 0.3, -0.5);
+            g.strokeStyle = 'rgba(0,0,0,0.5)'; g.lineWidth = 0.6; for (const x of [-6, 0, 6]) { g.beginPath(); g.moveTo(x, -22); g.quadraticCurveTo(x * 0.8, -27, x * 0.4, -30.4); g.stroke(); }
+            const sw = Math.sin((st.t || 0) * 3) * 0.6; g.fillStyle = GOLD; g.beginPath(); g.arc(0, -30.6, 1.2, 0, PI * 2); g.fill(); R.line(g, 0, -30.6, 10.6, -24.4, GOLD, 0.7); R.line(g, 10.6, -24.4, 11 + sw, -16.4, GOLD, 1.1); g.fillStyle = GOLD; g.fillRect(10 + sw, -17, 2, 3.2);
           },
           mouth(g, jaw) { if (st.dead) { g.fillStyle = '#2a0404'; g.beginPath(); g.ellipse(0, -3.4, 1.6, 1.3, 0, 0, PI * 2); g.fill(); return; } g.fillStyle = jaw > 0.2 ? '#2a0606' : 'rgba(110,50,40,0.9)'; g.beginPath(); g.ellipse(0, -3.9, 1.8, 0.4 + jaw * 1.4, 0, 0, PI * 2); g.fill(); } });
       }
@@ -1534,7 +1593,7 @@ const ROSTER = (() => {
     },
   };
 
-  const FIGHTERS = [hippo, painter, garf, host, ballin, gertie, rocky, millie, chucky, turkey, wolfe, em, tinman, bunyon, becky, possum, catbear, councilman, prez];
+  const FIGHTERS = [hippo, painter, garf, host, ballin, gertie, rocky, millie, chucky, turkey, wolfe, em, tinman, bunyon, becky, possum, catbear, councilman, prez, karen];
   const BOSSES = [tinkle, golem, slumlord, dan];
   // ---------- engine hooks: per-fighter behavior the Kombat Engine reads from the roster ----------
   // feathers: color of feathers that fly off on hits. glass: bleeds glass and green brine, no wounds.
@@ -1550,6 +1609,6 @@ const ROSTER = (() => {
   Object.assign(slumlord, { arena: 'rental', death: 'slumDie', aiStyle: { taunt: 0.12 } });
   Object.assign(dan, { arena: 'hell', death: 'danDie', sp2Mod: { fire: 1 }, fireTrail: true, ladderOnly: true });
 
-  const PORTRAIT = { catbear: [0.36, 0.92, 0.85], councilman: [0.42, 0.98, 0.9], prez: [0.42, 0.98, 1.0], gertie: [0.42, 0.78, 1.5], painter: [0.5, 0.86, 0.85], hippo: [0.3, 0.9, 0.85], garf: [0.4, 0.9, 0.95], turkey: [0.36, 0.94, 1.45], chucky: [0.38, 0.95, 0.85], wolfe: [0.3, 0.92, 0.8], em: [0.42, 0.96, 0.95], slumlord: [0.42, 0.92, 0.85], tinkle: [0.42, 0.96, 0.9], golem: [0.5, 0.7, 1], dan: [0.42, 0.95, 0.85], tinman: [0.4, 1.02, 0.78], bunyon: [0.42, 0.98, 0.82], becky: [0.42, 0.94, 0.95], possum: [0.28, 0.9, 0.85] };
+  const PORTRAIT = { karen: [0.42, 0.98, 0.9], catbear: [0.36, 0.92, 0.85], councilman: [0.42, 0.98, 0.9], prez: [0.42, 0.98, 1.0], gertie: [0.42, 0.78, 1.5], painter: [0.5, 0.86, 0.85], hippo: [0.3, 0.9, 0.85], garf: [0.4, 0.9, 0.95], turkey: [0.36, 0.94, 1.45], chucky: [0.38, 0.95, 0.85], wolfe: [0.3, 0.92, 0.8], em: [0.42, 0.96, 0.95], slumlord: [0.42, 0.92, 0.85], tinkle: [0.42, 0.96, 0.9], golem: [0.5, 0.7, 1], dan: [0.42, 0.95, 0.85], tinman: [0.4, 1.02, 0.78], bunyon: [0.42, 0.98, 0.82], becky: [0.42, 0.94, 0.95], possum: [0.28, 0.9, 0.85] };
   return KIT.roster(FIGHTERS, BOSSES, { front: FRONT, portrait: PORTRAIT });
 })();

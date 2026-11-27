@@ -794,6 +794,66 @@
     for (const x of [CX - 98, CX + 208, CX - 370, CX + 330]) glow(g, x, FY - 64, 20 + Math.sin(t * 9 + x) * 1.5, 'rgba(255,210,150,0.12)');
   }
 
+  // ---------- SOUTHSIDE WALMART: the fight in the action alley, aisles behind, a crowd of rednecks ----------
+  const WM_DEPTS = [['GROCERY', 110], ['HOUSEWARES', 420], ['SPORTING GOODS', 760], ['AUTOMOTIVE', 1120]];
+  function walmart(B, F) {
+    setSeed(613);
+    // high ceiling: exposed steel joists, ductwork, fluorescent tubes
+    vg(B, 0, 0, BW, 60, ['#2a2c30', '#3a3c42']);
+    for (let x = 0; x < BW; x += 22) { B.strokeStyle = 'rgba(10,10,14,0.6)'; B.lineWidth = 1; B.beginPath(); B.moveTo(x, 0); B.lineTo(x + 11, 18); B.lineTo(x + 22, 0); B.stroke(); }
+    B.fillStyle = '#1a1c20'; B.fillRect(0, 18, BW, 2); B.fillStyle = '#5a5e66'; B.fillRect(0, 26, BW, 7); B.fillStyle = 'rgba(255,255,255,0.12)'; B.fillRect(0, 26, BW, 1.5);
+    for (let x = 20; x < BW; x += 80) { B.fillStyle = '#f4fbff'; B.fillRect(x, 38, 46, 3); glow(B, x + 23, 40, 34, 'rgba(220,240,255,0.55)'); }
+    // the back wall: pale blue with big white department letters
+    vg(B, 0, 44, BW, 62, ['#5c86b8', '#4a74a6']);
+    B.fillStyle = 'rgba(255,255,255,0.08)'; B.fillRect(0, 44, BW, 2);
+    B.fillStyle = '#f4f6fa'; B.font = '13px Anton, Impact, sans-serif'; B.textAlign = 'center'; for (const [t, x] of WM_DEPTS) B.fillText(t, x, 60); B.textAlign = 'left';
+    // gondola shelving: endcaps facing the action alley, with aisles running back between them
+    const top = FY - 92;
+    for (let x = -30, n = 1; x < BW; x += 112, n++) {
+      // the aisle gap: a lit corridor of shelves receding to the back wall
+      const gx = x + 92;
+      vg(B, gx, top, 20, FY - top, ['#7a8290', '#a8b0bc', '#c8ccd2']);
+      B.fillStyle = 'rgba(0,0,0,0.25)'; B.fillRect(gx, top, 3, FY - top); B.fillRect(gx + 17, top, 3, FY - top);
+      for (let r = 0; r < 6; r++) { B.fillStyle = ['#c8301e', '#2a5ab0', '#e8c020', '#30903a', '#e86a20', '#8a3ab0'][(n + r) % 6]; B.fillRect(gx + 3, top + 8 + r * 13, 14, 6); }
+      // the endcap itself
+      B.fillStyle = '#8a9098'; B.fillRect(x, top, 92, FY - top); B.fillStyle = '#6a7078'; B.fillRect(x, top, 3, FY - top); B.fillRect(x + 89, top, 3, FY - top);
+      for (let r = 0; r < 5; r++) {
+        const sy = top + 6 + r * 17; B.fillStyle = '#d8dce0'; B.fillRect(x + 2, sy + 12, 88, 2.5);
+        for (let i = 0; i < 9; i++) { const c = shade(['#c8301e', '#2a5ab0', '#e8c020', '#f0f0f0', '#30903a', '#e86a20', '#5a2a1a', '#b02a6a'][(i * 3 + r + n) % 8], rr(-0.15, 0.1)); const w = rr(6, 9), h = rr(7, 11); B.fillStyle = c; B.fillRect(x + 4 + i * 9.6, sy + 12 - h, w, h); B.fillStyle = 'rgba(255,255,255,0.25)'; B.fillRect(x + 4 + i * 9.6, sy + 12 - h, 1, h); }
+        B.fillStyle = '#f8e030'; if (rand() < 0.6) { B.fillRect(x + 10 + (r * 23) % 60, sy + 12, 10, 4); B.fillStyle = '#1a1a1a'; B.font = '3px Anton, Impact, sans-serif'; B.fillText('$' + ((rand() * 9) | 0) + '.97', x + 11 + (r * 23) % 60, sy + 15.4); }
+      }
+      // yellow LOW PRICE topper and the hanging aisle number over the gap
+      B.fillStyle = '#f8e030'; B.fillRect(x + 20, top - 12, 52, 10); B.fillStyle = '#1a2a5a'; B.font = '7px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('LOW PRICE', x + 46, top - 4.6);
+      B.fillStyle = '#20202a'; B.fillRect(gx + 9, 33, 1, top - 55); B.fillStyle = '#2a5ab0'; B.fillRect(gx - 6, top - 22, 32, 12); B.fillStyle = '#fff'; B.font = '9px Anton, Impact, sans-serif'; B.fillText(String(n), gx + 10, top - 12.6); B.textAlign = 'left';
+    }
+    // pallets, shopping carts and a stack of soda in front of the shelving
+    for (const x of [230, 700, 1010]) { B.fillStyle = '#8a6a3a'; B.fillRect(x, FY - 6, 50, 6); for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { B.fillStyle = r % 2 ? '#c81818' : '#1a4aa0'; B.fillRect(x + 1 + c * 12, FY - 18 - r * 12, 11, 11); B.fillStyle = 'rgba(255,255,255,0.3)'; B.fillRect(x + 2 + c * 12, FY - 16 - r * 12, 9, 2); } }
+    const cart = (x, s2) => { B.strokeStyle = '#a8acb4'; B.lineWidth = 1; B.strokeRect(x, FY - 26 * s2, 30 * s2, 15 * s2); for (let i = 1; i < 6; i++) { B.beginPath(); B.moveTo(x + i * 5 * s2, FY - 26 * s2); B.lineTo(x + i * 5 * s2, FY - 11 * s2); B.stroke(); } B.beginPath(); B.moveTo(x + 30 * s2, FY - 26 * s2); B.lineTo(x + 36 * s2, FY - 32 * s2); B.stroke(); B.fillStyle = '#c81818'; B.fillRect(x + 33 * s2, FY - 34 * s2, 6 * s2, 2.5); for (const wx of [x + 3, x + 26 * s2]) R.ball(B, wx, FY - 2, 2, '#1a1a1a'); B.beginPath(); B.moveTo(x + 4, FY - 11 * s2); B.lineTo(x + 4, FY - 3); B.moveTo(x + 26 * s2, FY - 11 * s2); B.lineTo(x + 26 * s2, FY - 3); B.stroke(); };
+    cart(120, 1); cart(150, 1); cart(880, 1.1);
+    vignette(B, BW);
+    // the floor: polished vinyl tile, scuffed, with the lights reflected in it
+    vg(F, 0, FY, AWX, H - FY, ['#c8ccd0', '#aeb2b8', '#8e9298']);
+    const vx = AWX / 2;
+    F.strokeStyle = 'rgba(80,84,92,0.35)'; F.lineWidth = 0.8;
+    for (let i = -14; i <= 14; i++) { F.beginPath(); F.moveTo(vx + i * 40, FY); F.lineTo(vx + i * 40 * 3.2, H); F.stroke(); }
+    for (let y = FY + 4, st = 4; y < H; st *= 1.32, y += st) { F.beginPath(); F.moveTo(0, y); F.lineTo(AWX, y); F.stroke(); }
+    for (let x = 30; x < AWX; x += 70) { const gr = F.createLinearGradient(0, FY, 0, H); gr.addColorStop(0, 'rgba(255,255,255,0.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); F.fillStyle = gr; F.fillRect(x, FY, 30, H - FY); }
+    for (let i = 0; i < 40; i++) { F.fillStyle = 'rgba(40,40,40,0.25)'; F.fillRect(rand() * AWX, FY + rand() * (H - FY), rr(3, 14), 1); }
+    F.fillStyle = 'rgba(240,200,40,0.85)'; F.fillRect(0, FY + 1, AWX, 2.5);
+    const dg = F.createLinearGradient(0, FY, 0, FY + 12); dg.addColorStop(0, 'rgba(0,0,0,0.35)'); dg.addColorStop(1, 'rgba(0,0,0,0)'); F.fillStyle = dg; F.fillRect(0, FY, AWX, 12);
+  }
+  const WM_CROWD = (() => { const r = prng(733), a = [], camo = ['#4a5232', '#5a4a2e', '#3a4228'], flannel = ['#a8201c', '#2a4a8a', '#3a6a3a'], tees = ['#e8e4dc', '#1a1a1a', '#6a6a6a', '#c8a050'];
+    for (let i = 0; i < 22; i++) { const kind = r(), fem = r() < 0.3, top = kind < 0.35 ? camo[(r() * 3) | 0] : kind < 0.65 ? flannel[(r() * 3) | 0] : tees[(r() * 4) | 0];
+      a.push({ x: 30 + i * 58 + r() * 24, y: FY + 2, h: (fem ? 38 : 42) + r() * 7, fem, ph: r() * 6, speed: 3 + r() * 1.6, stance: 0.9 + r() * 0.6, skin: ['#f0c8a8', '#e8b898', '#d8a888', '#f4d0b8'][(r() * 4) | 0], hair: ['#6a4a2a', '#2a1a10', '#c8a060', '#8a6a3a'][(r() * 4) | 0],
+        longHair: r() < 0.55, topKind: 'shirt', sleeves: !(kind > 0.65 && r() < 0.6), top, logo: r() < 0.25 ? '#f8f8f8' : null, bottom: r() < 0.7 ? '#3a4a6a' : '#5a5232', legs: r() < 0.7 ? '#3a4a6a' : '#5a5232', bottomLen: r() < 0.5 ? 'knee' : 'long',
+        shoes: '#3a2a1a', style: r() < 0.65 ? 'cheer' : r() < 0.5 ? 'clap' : 'stand', cap: !fem && r() < 0.75 ? ['#e86a20', '#2a2a2a', '#4a5232', '#c81818', '#f0f0f0'][(r() * 5) | 0] : null, can: r() < 0.55, canC: ['#c8c8d0', '#2a4aa0', '#d8d8d8'][(r() * 3) | 0], shades: r() < 0.15, rim: 'rgba(240,250,255,0.5)' }); }
+    return a; })();
+  function wmLive(g, t) {
+    g.save(); g.globalAlpha = 0.92; for (const p of WM_CROWD) person(g, p, t); g.restore();
+    // a fluorescent tube on its last legs
+    if (Math.sin(t * 23) * Math.sin(t * 7.1) > 0.3) { g.fillStyle = 'rgba(20,24,30,0.85)'; g.fillRect(500, 38, 46, 3); }
+  }
+
   // ---------- THE RENTAL: Slum Lord's condemned house on the east side ----------
   function rental(B, F) {
     vg(B, 0, 0, BW, H, ['#040806', '#0c1610', '#1a2418', '#2a2a1a']);
@@ -865,6 +925,7 @@
     rental: { name: 'THE RENTAL', draw: rental },
     mcculloch: { name: 'McCULLOCH PARK', draw: mcculloch, pit: 'mcculloch' },
     cornerstone: { name: 'CORNERSTONE PARKING LOT', draw: cornerstone, pit: 'cornerstone' },
+    walmart: { name: 'SOUTHSIDE WALMART', draw: walmart },
   };
 
   // animated bits drawn each frame on top of the far layer (back-layer coords)
@@ -920,6 +981,7 @@
     }
     if (id === 'mcculloch') mccLive(g, t);
     if (id === 'cornerstone') csLive(g, t);
+    if (id === 'walmart') wmLive(g, t);
     if (id === 'rental') { const fl = Math.sin(t * 13) * Math.sin(t * 7.3) > 0.1 ? 0.22 : 0.08; g.fillStyle = `rgba(120,170,240,${fl})`; g.fillRect(CX - 150 + 170, FY - 150 + 8, 44, 54); for (let i = 0; i < 6; i++) { g.fillStyle = 'rgba(20,20,10,0.8)'; g.fillRect(CX - 60 + Math.sin(t * 3 + i * 2) * 30 + i * 8, FY - 40 + Math.cos(t * 4 + i) * 12, 1, 1); } }
     if (id === 'village') { bros(g, t); for (let i = 0; i < 4; i++) { const on = Math.sin(t * 3 + i * 2) > -0.7; if (on) glow(g, 78 + i * 166, FY - 75, 30, 'rgba(255,120,200,0.1)'); } }
     if (id === 'glassworks') for (const x of [230, 640, 1050]) glow(g, x, 160, 40 + Math.sin(t * 6 + x) * 8, 'rgba(255,140,40,0.3)');
@@ -1003,6 +1065,6 @@
     }
   }
 
-  const ROTATION = ['benny', 'bridge', 'minnetrista', 'westend', 'greenway', 'shedtown', 'cornbread', 'cityhall', 'village', 'overpass', 'beach', 'mcculloch', 'cornerstone'];
+  const ROTATION = ['benny', 'bridge', 'minnetrista', 'westend', 'greenway', 'shedtown', 'cornbread', 'cityhall', 'village', 'overpass', 'beach', 'mcculloch', 'cornerstone', 'walmart'];
   STAGES.define({ defs: DEFS, fallback: 'cityhall', rotation: ROTATION, single: ROTATION.concat(['glassworks', 'rental']), live, drawBelow, extra: { drawTrain } });
 })();
