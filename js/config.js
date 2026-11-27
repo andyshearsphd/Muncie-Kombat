@@ -6,6 +6,7 @@ window.GAME = {
   title: 'MUNCIE KOMBAT',
   kicker: "PURPLE HIPPO ARCADE'S",                     // small line stacked above MUNCIE KOMBAT on the title screen
   titleStack: true,                                      // MUNCIE over KOMBAT
+  titleSize: 62,
   subtitle: '',
   ladderGoal: 'CITY HALL',
   endingLine: 'Devil Dan is back in the basement of City Hall. For now.',
@@ -21,17 +22,29 @@ window.GAME = {
     g.imageSmoothingEnabled = false;
     g.drawImage(st.back, 730 - W / 2 / S, y0, W / S, H / S, 0, 0, W, H);
     g.imageSmoothingEnabled = true;
+    // a harvest moon, heavy and orange, smeared by haze and cloud
+    { const mx = Math.min(W * 0.2, W / 2 - 148), my = 50, mr = 23, PI = Math.PI;
+      let m = g.createRadialGradient(mx, my, mr * 0.5, mx, my, mr * 3.2); m.addColorStop(0, 'rgba(255,140,40,0.28)'); m.addColorStop(0.4, 'rgba(200,80,30,0.12)'); m.addColorStop(1, 'rgba(120,40,30,0)');
+      g.fillStyle = m; g.fillRect(mx - mr * 3.2, my - mr * 3.2, mr * 6.4, mr * 6.4);
+      for (let i = 4; i >= 0; i--) { g.fillStyle = `rgba(232,${128 + i * 6},${46 + i * 4},${0.16 + (4 - i) * 0.17})`; g.beginPath(); g.arc(mx, my, mr + i * 1.6, 0, PI * 2); g.fill(); }
+      g.fillStyle = 'rgba(150,64,24,0.32)'; for (const [dx, dy, r] of [[-7, -6, 7], [6, 5, 6], [2, -11, 3.5], [-9, 9, 4.5], [10, -4, 2.5]]) { g.beginPath(); g.arc(mx + dx, my + dy, r, 0, PI * 2); g.fill(); }
+      m = g.createLinearGradient(0, my - mr, 0, my + mr); m.addColorStop(0, 'rgba(255,210,150,0.18)'); m.addColorStop(1, 'rgba(90,20,20,0.3)');
+      g.fillStyle = m; g.beginPath(); g.arc(mx, my, mr, 0, PI * 2); g.fill();
+      for (let i = 0; i < 5; i++) { const cy = my - 14 + i * 7.5 + Math.sin(t * 0.4 + i) * 1.2, cx = mx + Math.sin(t * 0.13 + i * 2) * 10; g.fillStyle = `rgba(22,14,26,${0.28 + (i % 2) * 0.16})`; g.beginPath(); g.ellipse(cx, cy, 40 + i * 6, 1.6 + (i % 3) * 0.7, 0, 0, PI * 2); g.fill(); }
+      g.fillStyle = 'rgba(0,0,0,0.18)'; for (let y = my - mr - 4; y < my + mr + 4; y += 2) g.fillRect(mx - mr - 6, y, mr * 2 + 12, 0.7); }
     g.drawImage(st.front, Math.round(560 - W / 2), 0, W, H, 0, 0, W, H);
     // a dark band so the title reads
-    let gr = g.createLinearGradient(0, 0, 0, 105); gr.addColorStop(0, 'rgba(0,0,0,0.75)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, 105);
+    let gr = g.createLinearGradient(0, 0, 0, 120); gr.addColorStop(0, 'rgba(0,0,0,0.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, 120);
     // both fighters in their fighting stance, facing each other
     const stance = ph => R.P({ hy: 8 + Math.sin(t * 4.5 + ph) * 1.6, lean: 0.12 + Math.sin(t * 4.5 + ph) * 0.02, head: 0.05, aF: [1.0 + Math.sin(t * 4.5 + ph) * 0.05, 1.55], aB: [0.25, 2.45], fF: [17, 0], fB: [-17, 0] });
     const hip = ROSTER.FIGHTERS.find(f => f.id === 'hippo'), dan = ROSTER.BOSSES.find(f => f.id === 'dan');
-    for (const [def, x, face, ph] of [[hip, W * 0.15, 1, 0], [dan, W * 0.85, -1, 1.7]]) {
+    for (const [def, x, face, ph] of [[hip, W * 0.14, 1, 0], [dan, W * 0.86, -1, 1.7]]) {
       if (!def) continue;
       const f = { def, d: def.dk, x, y: FL, face, t: t + ph };
-      g.fillStyle = 'rgba(0,0,0,0.5)'; g.beginPath(); g.ellipse(x, FL + 1, 30, 4.5, 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = 'rgba(0,0,0,0.5)'; g.beginPath(); g.ellipse(x, FL + 1, 36, 5, 0, 0, Math.PI * 2); g.fill();
+      g.save(); g.translate(x, FL); g.scale(1.18, 1.18); g.translate(-x, -FL);
       R.digi(g, x, FL, gg => R.draw(gg, f, stance(ph), {}), { phase: ph > 0 ? 1 : 0 });
+      g.restore();
     }
     gr = g.createRadialGradient(W / 2, H / 2, H * 0.45, W / 2, H / 2, W * 0.75); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,0.5)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
   },

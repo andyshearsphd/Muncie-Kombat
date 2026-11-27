@@ -556,7 +556,7 @@
       for (let r = t0 + 2; r < hz - 2; r += 2.6) for (let c = 0; c < 10; c++) if (rand() < 0.16) { B.fillStyle = 'rgba(255,214,140,0.65)'; B.fillRect(x + 4.8 + c * 2.5, r, 1, 1); }
       B.fillStyle = 'rgba(200,50,50,0.85)'; B.fillRect(x + w / 2 - 0.5, t0 - 3.5, 1, 2); }
     // off to the right, the AT&T building: a tall windowless beige tower, its blue globe glowing at night
-    { const x = 826, w = 10, h = 38, t0 = hz - h;
+    { const x = 848, w = 10, h = 38, t0 = hz - h;
       B.fillStyle = '#463f36'; B.fillRect(x, t0, w, h);
       B.fillStyle = '#524a3f'; for (let c = 0; c < 3; c++) B.fillRect(x + 1.5 + c * 3.2, t0 + 3, 0.7, h - 3);
       B.fillStyle = '#16141a'; B.fillRect(x - 1, t0 - 1, w + 2, 3);
@@ -566,7 +566,7 @@
       B.strokeStyle = '#0a3a70'; B.lineWidth = 0.4; B.beginPath(); for (let i = -1.6; i <= 1.6; i += 0.8) { const ww = Math.sqrt(Math.max(0, 5.76 - i * i)); B.moveTo(gx - ww, gy + i); B.lineTo(gx + ww, gy + i); } B.stroke();
       B.fillStyle = 'rgba(255,60,60,0.85)'; B.fillRect(gx - 0.5, t0 - 4, 1, 2.5); }
     // distance haze over both
-    B.fillStyle = 'rgba(34,30,44,0.32)'; B.fillRect(598, hz - 36, 40, 36); B.fillRect(824, hz - 44, 14, 44);
+    B.fillStyle = 'rgba(34,30,44,0.16)'; B.fillRect(598, hz - 36, 40, 36); B.fillRect(846, hz - 44, 14, 44);
     treeline(B, hz, 30, '#05060a', 4, 12, BW);
     // the cut below: State Road 32 and the tracks, lit orange
     vg(B, 0, hz, BW, FY - hz, ['#0c0c12', '#16141a', '#0a0a0e']);
