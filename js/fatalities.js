@@ -1040,7 +1040,7 @@ FATAL.add(K => {
     };
   };
 
-  // ---------- MUNCIE CATBEAR: Spirit Week ----------
+  // ---------- THE BEARCAT: Spirit Week ----------
   // a claw mauling, the head comes off, and it becomes a pom-pom for the cheer
   S.catbear = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face;
@@ -1152,7 +1152,7 @@ FATAL.add(K => {
     };
   };
 
-  // ---------- PRES. CUCKOLD NE'ER-LEARNS: Honorary Degree ----------
+  // ---------- PRES. NEVER LEARNS: Honorary Degree ----------
   // he caves the skull in with the ceremonial mace, caps the stump and moves the tassel
   S.prez = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face;

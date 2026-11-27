@@ -851,10 +851,10 @@ const ROSTER = (() => {
     fatal: { id: 'possum', name: 'PLAYING POSSUM' }
   };
 
-  // ---------- MUNCIE CATBEAR: the purple bearcat from the high school sideline ----------
+  // ---------- THE BEARCAT: the purple bearcat from the high school sideline ----------
   const CBP = '#5e3290', CBD = '#381a5c', CBL = '#cdb6e6';
   const catbear = {
-    id: 'catbear', name: 'MUNCIE CATBEAR', short: 'CATBEAR', him: 'HIM', k: 1.08, paws: true, claws: true, skull: 'cat', bicep: 0.35, calf: 0.3,
+    id: 'catbear', name: 'THE BEARCAT', short: 'BEARCAT', him: 'HIM', k: 1.08, paws: true, claws: true, skull: 'cat', bicep: 0.35, calf: 0.3,
     bio: 'Half bear, half cat, all purple. Leads the cheers on Friday night and the mauling every other night.',
     d: dims({ thigh: 22, shin: 21, torso: 36, neck: 3, upper: 19, fore: 18, hipW: 17, shW: 18, chest: 20, belly: 21, back: 16, thighR: 10, kneeR: 7, ankleR: 5.2, shR: 8.2, elbowR: 6.2, wristR: 5.2, fist: 5.8, footL: 13, footH: 5.4 }),
     col: { torso: CBP, armU: CBP, armL: CBP, hand: CBD, legU: CBP, legL: CBP, foot: CBD, neck: CBP },
@@ -945,7 +945,7 @@ const ROSTER = (() => {
     fatal: { id: 'councilman', name: 'TOO LONG A HUG' }
   };
 
-  // ---------- PRES. CUCKOLD NE'ER-LEARNS: the university president, robes, tam and medallion ----------
+  // ---------- PRES. NEVER LEARNS: the university president, robes, tam and medallion ----------
   const PRG = '#141418', PRS = '#e4c0a2', PRR = '#a8141c', GOLD = '#d8b040';
   function mace(g, k, x, y, ang) {
     // the ceremonial mace: a long gilded staff with a crowned head
@@ -965,7 +965,7 @@ const ROSTER = (() => {
     g.fillStyle = 'rgba(255,250,210,0.7)'; g.fillRect(x - r * 0.5, y - r * 0.6, r * 0.4, r * 0.3);
   }
   const prez = {
-    id: 'prez', name: "PRES. CUCKOLD NE'ER-LEARNS", short: "NE'ER-LEARNS", him: 'HIM', k: 0.9, bicep: 0, calf: 0,
+    id: 'prez', name: 'PRES. NEVER LEARNS', short: 'NEVER LEARNS', him: 'HIM', k: 0.9, bicep: 0, calf: 0,
     bio: 'The university president. Raised tuition, cut your program and gave himself a bonus. Office hours: never.',
     d: dims({ thigh: 26, shin: 25, torso: 33, upper: 19, fore: 18, hipW: 11, shW: 13, chest: 12.5, belly: 11, back: 10, thighR: 6, kneeR: 4.2, ankleR: 3.2, shR: 5.4, elbowR: 4.6, wristR: 3, fist: 3.6 }),
     col: { torso: PRG, armU: PRG, armL: PRG, cuff: PRG, hand: PRS, legU: '#2a2a30', legL: '#2a2a30', foot: '#0c0c0e', neck: PRS },

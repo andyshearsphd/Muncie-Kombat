@@ -98,9 +98,9 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 | Tim Bunyon | Log Toss | Log Roll | Timber |
 | Becky Hack | Shimmer | Blanket Snare | Lights Out |
 | Petey | Fifty Teeth | Play Dead | Playing Possum |
-| Muncie Catbear | Fight Song | Bearcat Maul | Spirit Week |
+| The Bearcat | Fight Song | Bearcat Maul | Spirit Week |
 | Creepy Councilman | Business Card | Close Talker | Too Long a Hug |
-| Pres. Cuckold Ne'er-Learns | Diploma Toss | Tuition Hike | Honorary Degree |
+| Pres. Never Learns | Diploma Toss | Tuition Hike | Honorary Degree |
 | Walmart Karen | Expired Coupons | Finger Wag | Manager! |
 
 | Timber | Heartless | Playing Possum |

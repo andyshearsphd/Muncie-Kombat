@@ -1,6 +1,6 @@
 // Muncie Kombat: game settings for the Kombat Engine (titles, mascot, victory poses)
 'use strict';
-if (window.SFX && SFX.say) { const say0 = SFX.say; SFX.say = (str, ...rest) => say0(String(str).replace(/\bpres\.?\s/gi, 'president ').replace(/ne[g']er-learns/gi, 'nair learns'), ...rest); }
+if (window.SFX && SFX.say) { const say0 = SFX.say; SFX.say = (str, ...rest) => say0(String(str).replace(/\bpres\.?\s/gi, 'president '), ...rest); }
 window.GAME = {
   title: 'MUNCIE KOMBAT',
   subtitle: 'A PURPLE HIPPO ARCADE GAME',
@@ -13,7 +13,7 @@ window.GAME = {
   projectiles: {
     // Walmart Karen's expired coupons: three at once, fanned out
     coupons: { speed: 300, dmg: 4, w: 10, h: 7, spread: [-50, 0, 50], sfx: 'whoosh', draw(g, p, s, t) { g.rotate(Math.sin(t * 20) * 0.4); g.fillStyle = '#fff6c8'; g.fillRect(-7, -4, 14, 8); g.strokeStyle = '#2a2a2a'; g.setLineDash([1, 1]); g.lineWidth = 0.5; g.strokeRect(-7, -4, 14, 8); g.setLineDash([]); g.fillStyle = '#c81818'; g.font = '4px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillText('50¢ OFF', 0, 1.6); g.textAlign = 'left'; } },
-    // Catbear's fight song: a stack of purple sound waves that stuns
+    // Bearcat's fight song: a stack of purple sound waves that stuns
     fightsong: { speed: 260, dmg: 7, w: 14, h: 24, fx: 'stun', sfx: 'howl', draw(g, p, s, t) { g.scale(s * 1.6, 1.6); for (let i = 0; i < 3; i++) { g.strokeStyle = `rgba(${210 - i * 30},150,255,${0.95 - i * 0.22})`; g.lineWidth = 3; g.beginPath(); g.arc(-i * 6, 0, 7 + i * 4 + Math.sin(t * 30) * 1.5, -1.0, 1.0); g.stroke(); } g.scale(s / 1.6, 1 / 1.6); g.fillStyle = '#f0e8ff'; g.font = '8px Anton, Impact, sans-serif'; g.fillText('♪', -3, -10 + Math.sin(t * 12) * 2); } },
     // Creepy Councilman's business card: CALL ME scrawled on the back
     bizcard: { speed: 320, dmg: 7, w: 12, h: 8, sfx: 'whoosh', draw(g, p, s, t) { g.rotate(t * 16 * s); g.fillStyle = '#f4f0e8'; g.fillRect(-8, -5, 16, 10); g.fillStyle = '#22283a'; g.fillRect(-8, -5, 16, 2.4); g.fillStyle = '#b01848'; g.font = '4px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillText('CALL ME', 0, 3); g.textAlign = 'left'; } },
