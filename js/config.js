@@ -42,6 +42,7 @@ window.GAME = {
   kicker: "PURPLE HIPPO ARCADE'S",                     // small line stacked above MUNCIE KOMBAT on the title screen
   titleStack: true,                                      // MUNCIE over KOMBAT
   titleSize: 62,
+  selectStart: 'hippo',                                  // the fighter screen always opens on the Purple Hippo
   subtitle: '',
   ladderGoal: 'CITY HALL',
   endingLine: 'Devil Dan is back in the basement of City Hall. For now.',

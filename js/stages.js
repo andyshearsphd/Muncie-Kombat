@@ -203,7 +203,7 @@
     treeline(B, FY - 20, 40, '#0e0a0a', 40, 80, BW, 'rgba(255,120,60,0.12)');
     const DUSK = 'rgba(30,10,30,0.42)';
     // the E.B. Ball Center: grey limestone, two steep gables with red tile roofs, a centre dormer, a deep arched loggia and a terrace balustrade
-    { const x = 330, w = 118, h = 66, top = FY - h, cx = x + w / 2;
+    { const x = 296, w = 118, h = 66, top = FY - h, cx = x + w / 2;
       B.fillStyle = '#8a2a16'; B.beginPath(); B.moveTo(x + 18, top); B.lineTo(x + 28, top - 18); B.lineTo(x + w - 28, top - 18); B.lineTo(x + w - 18, top); B.fill();
       B.fillStyle = 'rgba(255,150,90,0.22)'; B.fillRect(x + 28, top - 18, w - 56, 1.2);
       stones(B, x, top, w, h, '#a8a294', 10, 5);
