@@ -76,11 +76,40 @@
     clouds(B, 20, 80, 14, 'rgba(30,40,60,0.55)', 'rgba(170,180,210,0.35)', -1);
     // campus brick halls and the Shafer bell tower in the fog
     setSeed(41);
-    for (const [x, w, h] of [[150, 170, 80], [330, 120, 70], [820, 150, 86], [990, 170, 74]]) {
+    for (const [x, w, h] of [[150, 170, 80], [990, 170, 74]]) {
       bricks(B, x, FY - h, w, h, '#4a2420', '#1a0c0a', 7, 3.2); B.fillStyle = 'rgba(10,14,30,0.5)'; B.fillRect(x, FY - h, w, h);
       for (let yy = FY - h + 10; yy < FY - 14; yy += 18) for (let xx = x + 8; xx < x + w - 10; xx += 16) win(B, xx, yy, 7, 10, rand() < 0.35, '#ffcc80');
       B.fillStyle = '#121014'; B.beginPath(); B.moveTo(x - 4, FY - h); B.lineTo(x + w / 2, FY - h - 16); B.lineTo(x + w + 4, FY - h); B.fill();
     }
+    // left of Benny: Lucina Hall, dull red brick collegiate gothic, stone-trimmed gables and a projecting centre bay with a tall oriel
+    { const x = 330, w = 170, h = 96, top = FY - h, cx = x + w / 2;
+      B.fillStyle = '#1e1a1e'; B.beginPath(); B.moveTo(x, top); B.lineTo(x + 10, top - 14); B.lineTo(x + w - 10, top - 14); B.lineTo(x + w, top); B.fill();
+      bricks(B, x, top, w, h, '#6a3a32', '#1e0e0c', 7, 3.2);
+      for (const gx of [x + 4, x + w - 34, cx - 18]) { B.save(); B.beginPath(); B.moveTo(gx, top + 1); B.lineTo(gx + (gx === cx - 18 ? 18 : 15), top - (gx === cx - 18 ? 32 : 24)); B.lineTo(gx + (gx === cx - 18 ? 36 : 30), top + 1); B.closePath(); B.clip(); bricks(B, gx, top - 34, 36, 36, '#6a3a32', '#1e0e0c', 6, 3); B.restore();
+        B.strokeStyle = '#b8ae98'; B.lineWidth = 1.6; const ww = gx === cx - 18 ? 36 : 30, hh = gx === cx - 18 ? 32 : 24; B.beginPath(); B.moveTo(gx - 1, top + 1); B.lineTo(gx + ww / 2, top - hh); B.lineTo(gx + ww + 1, top + 1); B.stroke(); }
+      B.fillStyle = '#b8ae98'; for (const y of [top + 2, top + 30, top + 58]) B.fillRect(x, y, w, 2);
+      for (let r = 0; r < 4; r++) for (let c = 0; c < 10; c++) { const wx = x + 8 + c * 16; if (Math.abs(wx + 4 - cx) < 22) continue; win(B, wx, top + 8 + r * 22, 6, 13, rand() < 0.4, '#ffcc80', '#c8bea8'); win(B, wx + 6.5, top + 8 + r * 22, 6, 13, rand() < 0.35, '#ffcc80', '#c8bea8'); }
+      B.fillStyle = '#c8bea8'; B.fillRect(cx - 16, top - 10, 32, h + 10); B.fillStyle = 'rgba(0,0,0,0.25)'; B.fillRect(cx + 8, top - 10, 8, h + 10);
+      for (let r = 0; r < 5; r++) for (let c = 0; c < 3; c++) win(B, cx - 12 + c * 8.4, top - 4 + r * 18, 7, 14, rand() < 0.55, '#ffd890', '#c8bea8');
+      B.fillStyle = '#100c0c'; B.beginPath(); B.moveTo(cx - 8, FY); B.lineTo(cx - 8, FY - 12); B.arc(cx, FY - 12, 8, PI, 0); B.lineTo(cx + 8, FY); B.fill(); glow(B, cx, FY - 8, 18, 'rgba(255,200,130,0.5)');
+      for (const fx of [cx - 22, cx + 22]) { B.fillStyle = '#2a2a2e'; B.fillRect(fx, top - 6, 1, 30); B.fillStyle = fx < cx ? '#a01a24' : '#e8e8e8'; B.fillRect(fx + 1, top - 6, 8, 5); }
+      B.fillStyle = 'rgba(10,14,30,0.45)'; B.fillRect(x, top - 34, w, h + 34); }
+    // right of Benny: the Administration Building, pale yellow brick, a temple front of tall columns under a pediment, arched windows below
+    { const x = 790, w = 176, h = 92, top = FY - h, cx = x + w / 2;
+      bricks(B, x, top, w, h, '#b8a46a', '#4a3e22', 7, 3.2);
+      B.fillStyle = '#d8ccaa'; B.fillRect(x - 3, top - 5, w + 6, 6); B.fillRect(x, top + 32, w, 2); B.fillRect(x, FY - 30, w, 2);
+      for (let c = 0; c < 9; c++) { const wx = x + 8 + c * 18.5; if (Math.abs(wx + 5 - cx) < 30) continue; win(B, wx, top + 8, 10, 18, rand() < 0.4, '#ffcc80', '#e0d6b8'); win(B, wx, top + 38, 10, 18, rand() < 0.45, '#ffcc80', '#e0d6b8');
+        B.fillStyle = '#e0d6b8'; B.beginPath(); B.moveTo(wx - 1, FY - 4); B.lineTo(wx - 1, FY - 18); B.arc(wx + 5, FY - 18, 6, PI, 0); B.lineTo(wx + 11, FY - 4); B.fill(); B.fillStyle = '#2a5a6a'; B.beginPath(); B.moveTo(wx + 1, FY - 4); B.lineTo(wx + 1, FY - 18); B.arc(wx + 5, FY - 18, 4, PI, 0); B.lineTo(wx + 9, FY - 4); B.fill(); }
+      const pw = 62, px = cx - pw / 2;
+      B.fillStyle = '#cfc2a0'; B.fillRect(px, top - 2, pw, FY - top + 2);
+      B.fillStyle = '#e4dabc'; B.beginPath(); B.moveTo(px - 4, top - 4); B.lineTo(cx, top - 22); B.lineTo(px + pw + 4, top - 4); B.fill(); B.fillStyle = '#c8bc98'; B.beginPath(); B.moveTo(px + 4, top - 6); B.lineTo(cx, top - 18); B.lineTo(px + pw - 4, top - 6); B.fill();
+      B.fillStyle = '#1a1c22'; B.fillRect(px + 4, top + 4, pw - 8, 52);
+      for (let c = 0; c < 3; c++) { win(B, px + 10 + c * 16, top + 8, 10, 18, true, '#ffd890', '#e0d6b8'); win(B, px + 10 + c * 16, top + 34, 10, 18, rand() < 0.7, '#ffd890', '#e0d6b8'); }
+      for (let i = 0; i < 4; i++) vg(B, px + 2 + i * 18.6, top + 2, 4.5, 56, ['#f4ecd4', '#c8bc98']);
+      B.fillStyle = '#e4dabc'; B.fillRect(px - 2, top + 56, pw + 4, 4);
+      for (const ax of [cx - 18, cx, cx + 18]) { B.fillStyle = '#e0d6b8'; B.beginPath(); B.moveTo(ax - 7, FY); B.lineTo(ax - 7, FY - 16); B.arc(ax, FY - 16, 7, PI, 0); B.lineTo(ax + 7, FY); B.fill(); B.fillStyle = '#2a6a7a'; B.beginPath(); B.moveTo(ax - 5, FY); B.lineTo(ax - 5, FY - 16); B.arc(ax, FY - 16, 5, PI, 0); B.lineTo(ax + 5, FY); B.fill(); }
+      glow(B, cx, FY - 10, 34, 'rgba(255,210,140,0.4)');
+      B.fillStyle = 'rgba(10,14,30,0.45)'; B.fillRect(x - 4, top - 22, w + 8, h + 22); }
     bricks(B, 1010, 40, 22, 80, '#4a2420', '#1a0c0a', 5, 3); B.fillStyle = 'rgba(10,14,30,0.4)'; B.fillRect(1010, 40, 22, 80);
     B.fillStyle = '#0e0c10'; B.beginPath(); B.moveTo(1006, 40); B.lineTo(1021, 14); B.lineTo(1036, 40); B.fill(); win(B, 1016, 52, 10, 14, true, '#ffe0a0');
     fog(B, 90, 100, 'rgba(90,110,140,0.4)');
@@ -172,16 +201,47 @@
     glow(B, 900, 150, 140, 'rgba(255,130,60,0.35)');
     setSeed(71);
     treeline(B, FY - 20, 40, '#0e0a0a', 40, 80, BW, 'rgba(255,120,60,0.12)');
-    // Ball mansions: tan brick colonial, sandstone Richardsonian with red tile roof, red brick Georgian
-    const mansion = (x, w, h, c, roof, kind) => {
-      bricks(B, x, FY - h, w, h, c, shade(c, -0.6), 7, 3.2); B.fillStyle = 'rgba(30,10,30,0.45)'; B.fillRect(x, FY - h, w, h);
-      B.fillStyle = roof; B.beginPath(); B.moveTo(x - 6, FY - h); B.lineTo(x + w * 0.18, FY - h - 24); B.lineTo(x + w * 0.82, FY - h - 24); B.lineTo(x + w + 6, FY - h); B.fill();
-      B.fillStyle = 'rgba(255,140,80,0.2)'; B.fillRect(x + w * 0.18, FY - h - 24, w * 0.64, 2);
-      for (let yy = FY - h + 10; yy < FY - 16; yy += 24) for (let xx = x + 8; xx < x + w - 10; xx += 20) win(B, xx, yy, 8, 14, rand() < 0.45, '#ffc070', '#d8cbb0');
-      if (kind === 'cols') { B.fillStyle = '#d8d0bc'; for (let c2 = 0; c2 < 4; c2++) B.fillRect(x + w * 0.3 + c2 * w * 0.12, FY - h, 4, h); }
-      if (kind === 'arch') { B.fillStyle = '#0c0808'; B.beginPath(); B.moveTo(x + w * 0.6, FY); B.lineTo(x + w * 0.6, FY - 26); B.arc(x + w * 0.7, FY - 26, w * 0.1, PI, 0); B.lineTo(x + w * 0.8, FY); B.fill(); }
-    };
-    mansion(120, 150, 90, '#8a6a48', '#2a2a26', 'dorm'); mansion(300, 130, 100, '#8a7a62', '#6a1a10', 'arch'); mansion(840, 150, 92, '#7a2a1a', '#3a1a10', 'cols'); mansion(1020, 140, 84, '#8a6a48', '#2a2a26');
+    const DUSK = 'rgba(30,10,30,0.42)';
+    // Maplewood: red brick Georgian Revival, giant white Ionic portico and pediment, red tile hip roof, dormer, chimney
+    { const x = 208, w = 116, h = 70, top = FY - h, cx = x + w / 2;
+      B.fillStyle = '#6a2a1a'; B.beginPath(); B.moveTo(x - 4, top); B.lineTo(x + 14, top - 20); B.lineTo(x + w - 14, top - 20); B.lineTo(x + w + 4, top); B.fill();
+      B.fillStyle = 'rgba(255,150,90,0.25)'; B.fillRect(x + 14, top - 20, w - 28, 1.4);
+      bricks(B, x + 14, top - 34, 7, 16, '#7a2e1c', '#2a0e08', 4, 2.4);
+      B.fillStyle = '#e4dccc'; B.fillRect(x + 24, top - 13, 14, 10); B.beginPath(); B.moveTo(x + 22, top - 13); B.lineTo(x + 31, top - 20); B.lineTo(x + 40, top - 13); B.fill(); win(B, x + 27, top - 11, 8, 7, true, '#ffc070', '#e4dccc');
+      bricks(B, x, top, w, h, '#8a3420', '#2a0e08', 6, 2.8);
+      B.fillStyle = '#e8e0cc'; B.fillRect(x - 2, top, w + 4, 3); B.fillRect(x - 2, top + 30, w + 4, 2);
+      for (const wx of [x + 6, x + 20, x + w - 30, x + w - 16]) { win(B, wx, top + 8, 9, 14, rand() < 0.5, '#ffc070', '#efe8d8'); win(B, wx, top + 38, 9, 16, rand() < 0.6, '#ffc070', '#efe8d8'); }
+      // the portico
+      const pw = 48, px = cx - pw / 2, pt = top - 6;
+      B.fillStyle = '#efe8d8'; B.beginPath(); B.moveTo(px - 4, pt); B.lineTo(cx, pt - 18); B.lineTo(px + pw + 4, pt); B.fill();
+      B.fillStyle = '#c8c0ae'; B.beginPath(); B.ellipse(cx, pt - 6, 4, 2, 0, 0, PI * 2); B.fill();
+      B.fillStyle = '#e8e0cc'; B.fillRect(px - 4, pt, pw + 8, 5);
+      B.fillStyle = '#1a0c08'; B.fillRect(px + 2, pt + 5, pw - 4, FY - pt - 5);
+      win(B, cx - 9, pt + 10, 18, 14, true, '#ffc878', '#efe8d8'); B.fillStyle = '#efe8d8'; B.fillRect(px + 6, pt + 28, pw - 12, 3); for (let i = 0; i < 9; i++) B.fillRect(px + 7 + i * 4, pt + 31, 1.2, 5);
+      B.fillStyle = '#f4eee0'; B.fillRect(cx - 5, FY - 18, 10, 18); win(B, cx - 4, FY - 17, 8, 16, true, '#ffd890', '#f4eee0');
+      for (const c of [px, px + 12, px + pw - 18, px + pw - 6]) { vg(B, c, pt + 5, 6, FY - pt - 7, ['#fffaf0', '#d8d0c0', '#a8a090']); B.fillStyle = '#fffaf0'; B.fillRect(c - 1.5, pt + 4, 9, 2.4); B.fillRect(c - 1, FY - 3, 8, 3); }
+      B.fillStyle = DUSK; B.fillRect(x - 6, top - 36, w + 12, h + 36); }
+    // the E.B. Ball Center: grey limestone, two steep gables with red tile roofs, a centre dormer, a deep arched loggia and a terrace balustrade
+    { const x = 330, w = 118, h = 66, top = FY - h, cx = x + w / 2;
+      B.fillStyle = '#8a2a16'; B.beginPath(); B.moveTo(x + 18, top); B.lineTo(x + 28, top - 18); B.lineTo(x + w - 28, top - 18); B.lineTo(x + w - 18, top); B.fill();
+      B.fillStyle = 'rgba(255,150,90,0.22)'; B.fillRect(x + 28, top - 18, w - 56, 1.2);
+      stones(B, x, top, w, h, '#a8a294', 10, 5);
+      for (const gx of [x, x + w - 30]) {
+        B.save(); B.beginPath(); B.moveTo(gx, top + 2); B.lineTo(gx + 15, top - 30); B.lineTo(gx + 30, top + 2); B.closePath(); B.clip(); stones(B, gx, top - 30, 30, 34, '#aaa496', 8, 4); B.restore();
+        B.strokeStyle = '#8a2a16'; B.lineWidth = 2.2; B.beginPath(); B.moveTo(gx - 2, top + 3); B.lineTo(gx + 15, top - 32); B.lineTo(gx + 32, top + 3); B.stroke();
+        win(B, gx + 11, top - 14, 8, 10, rand() < 0.5, '#ffc070', '#c8c2b2');
+        for (let i = 0; i < 3; i++) { win(B, gx + 4 + i * 8, top + 8, 6, 12, rand() < 0.5, '#ffc070', '#c8c2b2'); win(B, gx + 4 + i * 8, top + 32, 6, 14, rand() < 0.55, '#ffc070', '#c8c2b2'); }
+        B.fillStyle = '#bab4a4'; B.fillRect(gx - 1, top + 25, 32, 3);
+      }
+      B.save(); B.beginPath(); B.moveTo(cx - 12, top + 2); B.lineTo(cx, top - 22); B.lineTo(cx + 12, top + 2); B.closePath(); B.clip(); stones(B, cx - 12, top - 22, 24, 26, '#aaa496', 7, 4); B.restore();
+      win(B, cx - 7, top - 8, 6, 9, true, '#ffc070', '#c8c2b2'); win(B, cx + 1, top - 8, 6, 9, true, '#ffc070', '#c8c2b2');
+      for (let i = 0; i < 4; i++) win(B, x + 36 + i * 12, top + 8, 8, 10, rand() < 0.5, '#ffc070', '#c8c2b2');
+      B.fillStyle = '#bab4a4'; B.fillRect(x + 32, top + 21, w - 64, 4);
+      B.fillStyle = '#c4beae'; B.beginPath(); B.moveTo(cx - 24, FY); B.lineTo(cx - 24, top + 40); B.arc(cx, top + 40, 24, PI, 0); B.lineTo(cx + 24, FY); B.fill();
+      B.fillStyle = '#1a120c'; B.beginPath(); B.moveTo(cx - 19, FY); B.lineTo(cx - 19, top + 41); B.arc(cx, top + 41, 19, PI, 0); B.lineTo(cx + 19, FY); B.fill();
+      glow(B, cx, FY - 12, 24, 'rgba(255,190,110,0.5)'); B.fillStyle = '#3a2214'; B.fillRect(cx - 4, FY - 16, 8, 16);
+      B.fillStyle = '#c8c2b2'; B.fillRect(x - 8, FY - 12, w + 16, 3); for (let i = 0; i < 34; i++) { const bx = x - 6 + i * ((w + 12) / 34); if (Math.abs(bx - cx) > 14) B.fillRect(bx, FY - 9, 1.5, 9); }
+      B.fillStyle = DUSK; B.fillRect(x - 10, top - 34, w + 20, h + 34); }
     fog(B, 110, 80, 'rgba(120,50,50,0.35)');
     // Minnetrista: cream pavilion, dark clerestory, lit gallery, gold doors, colonnade arms, the steel ring sculpture
     const m = CX;
@@ -199,14 +259,34 @@
     
     B.strokeStyle = '#1a1a1e'; B.lineWidth = 6; B.beginPath(); B.ellipse(m - 92, FY - 60, 26, 38, 0.5, 0, PI * 2); B.stroke(); B.strokeStyle = 'rgba(255,160,100,0.5)'; B.lineWidth = 1.5; B.beginPath(); B.ellipse(m - 92, FY - 60, 26, 38, 0.5, -2.4, -0.6); B.stroke();
     B.strokeStyle = '#141418'; B.lineWidth = 4; B.beginPath(); B.ellipse(m - 92, FY - 60, 14, 33, -0.4, 0, PI * 2); B.stroke();
-    // Appeal to the Great Spirit silhouette on its plinth
-    const sx = m + 200;
-    B.fillStyle = '#100c0a'; B.fillRect(sx - 22, FY - 38, 44, 38);
-    B.beginPath(); B.moveTo(sx - 22, FY - 40); B.quadraticCurveTo(sx - 4, FY - 56, sx + 20, FY - 46); B.lineTo(sx + 26, FY - 40); B.fill();
-    B.beginPath(); B.moveTo(sx + 14, FY - 48); B.lineTo(sx + 22, FY - 66); B.lineTo(sx + 30, FY - 70); B.lineTo(sx + 32, FY - 62); B.lineTo(sx + 22, FY - 48); B.fill();
-    B.beginPath(); B.moveTo(sx - 4, FY - 52); B.lineTo(sx - 2, FY - 86); B.lineTo(sx + 4, FY - 88); B.lineTo(sx + 6, FY - 52); B.fill(); B.beginPath(); B.arc(sx + 1, FY - 92, 4, 0, PI * 2); B.fill();
-    B.lineWidth = 3; B.strokeStyle = '#100c0a'; B.beginPath(); B.moveTo(sx, FY - 84); B.lineTo(sx - 18, FY - 98); B.moveTo(sx + 3, FY - 84); B.lineTo(sx + 20, FY - 96); B.stroke();
-    B.strokeStyle = 'rgba(255,150,90,0.5)'; B.lineWidth = 0.8; B.beginPath(); B.moveTo(sx + 5, FY - 86); B.lineTo(sx + 6, FY - 52); B.stroke();
+    // right of the museum: an open field, then the Appeal to the Great Spirit mini park
+    vg(B, m + 192, FY - 12, 330, 12, ['#2a3418', '#1a2410', '#121a0c']);
+    B.fillStyle = 'rgba(255,170,110,0.12)'; B.fillRect(m + 192, FY - 12, 330, 1);
+    B.fillStyle = 'rgba(120,150,80,0.18)'; for (let i = 0; i < 120; i++) B.fillRect(m + 192 + rand() * 330, FY - 11 + rand() * 10, 1.2, 0.8);
+    { const sx = 1006, bw = 96;
+      // craftsman houses beyond the park
+      for (const [hx, hw] of [[sx - 70, 40], [sx + 38, 36]]) { B.fillStyle = '#3a2a1e'; B.fillRect(hx, FY - 40, hw, 30); B.fillStyle = '#1e3020'; B.beginPath(); B.moveTo(hx - 5, FY - 40); B.lineTo(hx + hw / 2, FY - 54); B.lineTo(hx + hw + 5, FY - 40); B.fill(); win(B, hx + 6, FY - 32, 7, 8, rand() < 0.6, '#ffc070'); win(B, hx + hw - 13, FY - 32, 7, 8, rand() < 0.6, '#ffc070'); B.fillStyle = 'rgba(30,10,30,0.4)'; B.fillRect(hx - 5, FY - 54, hw + 10, 44); }
+      tree(B, sx - 40, FY - 8, 58, '#140e0c', 'rgba(255,140,80,0.12)'); tree(B, sx + 44, FY - 8, 54, '#140e0c', 'rgba(255,140,80,0.12)');
+      // the curved limestone bench wall
+      B.fillStyle = '#9a9282'; B.beginPath(); B.ellipse(sx, FY - 8, bw / 2, 10, 0, PI, 0); B.lineTo(sx + bw / 2, FY - 2); B.ellipse(sx, FY - 2, bw / 2, 6, 0, 0, PI, true); B.fill();
+      B.fillStyle = '#b8b0a0'; B.beginPath(); B.ellipse(sx, FY - 8, bw / 2, 10, 0, PI, 0); B.lineTo(sx + bw / 2 - 3, FY - 8); B.ellipse(sx, FY - 8, bw / 2 - 3, 7.5, 0, 0, PI, true); B.fill();
+      for (const e of [-1, 1]) { B.fillStyle = '#a8a090'; B.beginPath(); B.arc(sx + e * bw / 2, FY - 6, 4, 0, PI * 2); B.fill(); }
+      // steps and pedestal
+      B.fillStyle = '#a8a090'; B.fillRect(sx - 14, FY - 4, 28, 4); B.fillStyle = '#b8b0a0'; B.fillRect(sx - 10, FY - 7, 20, 3);
+      vg(B, sx - 7, FY - 34, 14, 27, ['#c8c0b0', '#9a9282']); B.fillStyle = '#c8c0b0'; B.fillRect(sx - 8.5, FY - 36, 17, 3); B.fillStyle = '#4a3a24'; B.fillRect(sx - 4, FY - 28, 8, 5);
+      glow(B, sx, FY - 30, 40, 'rgba(255,200,130,0.35)');
+      // the bronze: the horse with its head held up and forward, the rider leaning back, arms spread wide, face to the sky
+      const Bz = '#4a3a28', Bh = 'rgba(255,190,120,0.7)', by = FY - 36;
+      B.fillStyle = Bz;
+      B.beginPath(); B.ellipse(sx, by - 14, 11, 5.5, 0, 0, PI * 2); B.fill();
+      for (const [lx, sp] of [[-8, -1], [-5, 1], [6, -1], [9, 1]]) { B.fillRect(sx + lx - 1, by - 12, 2.2, 12); }
+      B.beginPath(); B.moveTo(sx + 8, by - 17); B.lineTo(sx + 14, by - 27); B.lineTo(sx + 18, by - 28); B.lineTo(sx + 19, by - 25); B.lineTo(sx + 13, by - 14); B.fill();
+      B.beginPath(); B.moveTo(sx - 10, by - 16); B.quadraticCurveTo(sx - 15, by - 10, sx - 13, by - 3); B.lineTo(sx - 11, by - 4); B.quadraticCurveTo(sx - 12, by - 10, sx - 9, by - 14); B.fill();
+      B.beginPath(); B.moveTo(sx - 3, by - 18); B.lineTo(sx - 5, by - 33); B.lineTo(sx, by - 34); B.lineTo(sx + 2, by - 18); B.fill();
+      B.beginPath(); B.arc(sx - 4, by - 37, 2.6, 0, PI * 2); B.fill();
+      B.lineWidth = 2; B.strokeStyle = Bz; B.beginPath(); B.moveTo(sx - 4, by - 31); B.lineTo(sx - 15, by - 39); B.lineTo(sx - 20, by - 44); B.moveTo(sx - 1, by - 31); B.lineTo(sx + 10, by - 39); B.lineTo(sx + 15, by - 44); B.stroke();
+      B.strokeStyle = Bh; B.lineWidth = 0.7; B.beginPath(); B.moveTo(sx + 2, by - 19); B.lineTo(sx + 1, by - 33); B.moveTo(sx + 9, by - 18); B.lineTo(sx + 15, by - 27); B.moveTo(sx - 6, by - 18); B.lineTo(sx + 8, by - 18); B.stroke();
+    }
     fog(B, FY - 30, 36, 'rgba(120,60,50,0.35)');
     vignette(B, BW);
     pfloor(F, 'stone', '#6a5a48', '#2a2018', { rows: 9, span: 40, edge: '#7a6e5a' });
