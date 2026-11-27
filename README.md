@@ -132,16 +132,17 @@ The Tillotson Overpass stage fatality:
 
 ## How it is built
 
-Plain JavaScript and the HTML canvas, with no build step and no libraries. Every fighter, arena, sound and piece of music is drawn or synthesized in code at runtime. Open `index.html` from any static web server to run it locally.
+Plain JavaScript and the HTML canvas, with no build step and no libraries. Every fighter, arena, sound and piece of music is drawn or synthesized in code at runtime. The one exception is the announcer: a robot voice recorded ahead of time into `voice/` (the same voice as POTUS Kombat). Open `index.html` from any static web server to run it locally.
 
 Muncie Kombat runs on the shared [Kombat Engine](https://github.com/andyshearsphd/kombat-engine). The `engine/` folder is a pinned copy of the engine (its version is in `engine/VERSION`); don't edit it here, change the engine repo and copy the new release in. Muncie Kombat's own content lives in `js/`:
 
 | File | What it is |
 | --- | --- |
-| `js/fighters.js` | The sixteen fighters and four bosses |
+| `js/fighters.js` | The twenty fighters and four bosses |
 | `js/stages.js` | The arenas |
 | `js/fatalities.js` | Fatalities, stage fatalities and boss deaths |
-| `js/config.js` | Titles, the hippo emblem and every victory pose |
+| `js/config.js` | Titles, the hippo emblem, the announcer and every victory pose |
+| `tools/make_voice.py` | Rebuilds the announcer clips in `voice/` (rerun after adding a fighter) |
 
 ## Credits
 

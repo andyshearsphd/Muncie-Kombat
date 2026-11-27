@@ -9,6 +9,11 @@ window.GAME = {
   mascot: 'hippo',                                       // head on the title emblem
   toasty: { fighter: 'hippo', text: 'SQUARE SLICED!' },  // pops in after some uppercuts
 
+  // ---------- the announcer: the same recorded robot as POTUS Kombat, crackling over the radio ----------
+  // built by tools/make_voice.py (rerun it after adding a fighter or a spoken line)
+  voiceClips: 'voice/',
+  voice: { pitch: 0.85, rate: 1.12, prefer: /Daniel|Fred|Alex|Google US English|Male/i, radio: true },
+
   // ---------- game-defined projectiles ----------
   projectiles: {
     // Walmart Karen's expired coupons: three at once, fanned out
