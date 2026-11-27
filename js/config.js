@@ -10,69 +10,28 @@ window.GAME = {
   mascot: 'hippo',                                       // head on the title emblem
   toasty: { fighter: 'hippo', text: 'SQUARE SLICED!' },  // pops in after some uppercuts
 
-  // ---------- title screen: the Purple Hippo and Devil Dan square off under a blood moon over Muncie ----------
+  // ---------- title screen: the Purple Hippo and Devil Dan square off on the Tillotson Overpass ----------
   titleScene(g, W, H, t) {
-    const R = RIG, PI = Math.PI, HZ = 150;
-    const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
-    // sky
-    let gr = g.createLinearGradient(0, 0, 0, HZ);
-    gr.addColorStop(0, '#07010f'); gr.addColorStop(0.45, '#22062e'); gr.addColorStop(0.8, '#5a0a1c'); gr.addColorStop(1, '#8a1a14');
-    g.fillStyle = gr; g.fillRect(0, 0, W, HZ + 2);
-    for (let i = 0; i < 60; i++) { const a = 0.3 + 0.5 * Math.abs(Math.sin(t * 1.5 + i)); g.fillStyle = `rgba(255,230,255,${a * (1 - hash(i + 9) * 0.6)})`; g.fillRect(hash(i) * W, hash(i + 40) * 90, 1, 1); }
-    // blood moon
-    const mx = W / 2, my = 100, mr = 42;
-    gr = g.createRadialGradient(mx, my, mr * 0.6, mx, my, mr * 2.6); gr.addColorStop(0, 'rgba(255,80,40,0.45)'); gr.addColorStop(1, 'rgba(255,40,20,0)');
-    g.fillStyle = gr; g.fillRect(mx - mr * 2.6, my - mr * 2.6, mr * 5.2, mr * 5.2);
-    gr = g.createRadialGradient(mx - 12, my - 14, 4, mx, my, mr); gr.addColorStop(0, '#ff9a5a'); gr.addColorStop(0.55, '#d8301c'); gr.addColorStop(1, '#7a0c0c');
-    g.fillStyle = gr; g.beginPath(); g.arc(mx, my, mr, 0, PI * 2); g.fill();
-    g.fillStyle = 'rgba(90,0,0,0.35)'; for (const [cx, cy, cr] of [[-14, -10, 9], [12, 8, 7], [4, -20, 4], [-8, 16, 5], [20, -6, 3]]) { g.beginPath(); g.arc(mx + cx, my + cy, cr, 0, PI * 2); g.fill(); }
-    // clouds drifting across the moon
-    for (let i = 0; i < 7; i++) { const cx = ((i * 173 + t * (5 + i * 2)) % (W + 240)) - 120, cy = 64 + i * 11, rw = 60 + hash(i + 900) * 50; g.fillStyle = `rgba(16,3,20,${0.25 + hash(i + 950) * 0.25})`; for (let j = 0; j < 4; j++) { g.beginPath(); g.ellipse(cx + (j - 1.5) * rw * 0.35, cy + Math.sin(j * 2.1 + i) * 2, rw * 0.32, 1.6 + hash(i * 4 + j) * 1.8, 0, 0, PI * 2); g.fill(); } }
-    // skyline: downtown blocks, City Hall's clock tower, a steeple, the water tower and the glass works stacks
-    const SIL = '#12040c';
-    g.fillStyle = SIL;
-    for (let x = 0, i = 0; x < W; i++) { const w = 16 + hash(i + 3) * 26, h = (12 + hash(i + 70) * 34) * (Math.abs(x + w / 2 - W / 2) < 70 ? 0.45 : 1); g.fillRect(x, HZ - h, w + 1, h + 2);
-      for (let wy = HZ - h + 5; wy < HZ - 4; wy += 7) for (let wx = x + 3; wx < x + w - 3; wx += 6) { const on = hash(wx * 7 + wy * 13 + i); if (on > 0.62) { g.fillStyle = on > 0.93 && Math.sin(t * 3 + on * 40) > 0.6 ? '#ffe9a0' : 'rgba(255,190,90,0.75)'; g.fillRect(wx, wy, 2, 3); g.fillStyle = SIL; } }
-      x += w; }
-    const tw = W * 0.3;   // clock tower
-    g.fillRect(tw - 9, HZ - 92, 18, 92); g.beginPath(); g.moveTo(tw - 12, HZ - 92); g.lineTo(tw, HZ - 116); g.lineTo(tw + 12, HZ - 92); g.fill();
-    g.fillStyle = '#f2d88a'; g.beginPath(); g.arc(tw, HZ - 80, 5, 0, PI * 2); g.fill(); g.strokeStyle = SIL; g.lineWidth = 1; g.beginPath(); g.moveTo(tw, HZ - 80); g.lineTo(tw, HZ - 83.5); g.moveTo(tw, HZ - 80); g.lineTo(tw + 2.5, HZ - 80); g.stroke(); g.fillStyle = SIL;
-    const st = W * 0.62; g.fillRect(st - 6, HZ - 70, 12, 70); g.beginPath(); g.moveTo(st - 7, HZ - 70); g.lineTo(st, HZ - 104); g.lineTo(st + 7, HZ - 70); g.fill();   // steeple
-    const wt = W * 0.71;   // water tower
-    for (const lx of [-12, -4, 4, 12]) g.fillRect(wt + lx - 1, HZ - 74, 2, 74);
-    g.beginPath(); g.ellipse(wt, HZ - 84, 22, 12, 0, 0, PI * 2); g.fill(); g.beginPath(); g.moveTo(wt - 22, HZ - 88); g.lineTo(wt, HZ - 104); g.lineTo(wt + 22, HZ - 88); g.fill();
-    g.fillStyle = 'rgba(190,120,255,0.8)'; g.font = '7px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillText('MUNCIE', wt, HZ - 81); g.textAlign = 'left'; g.fillStyle = SIL;
-    for (const sx of [W * 0.05, W * 0.09]) { g.fillRect(sx - 3, HZ - 96, 6, 96);   // glass works stacks, smoking
-      for (let i = 0; i < 6; i++) { const u = ((t * 0.35 + i / 6) % 1); g.fillStyle = `rgba(60,20,40,${0.55 * (1 - u)})`; g.beginPath(); g.arc(sx + u * 26 + Math.sin(u * 6 + i) * 3, HZ - 98 - u * 40, 3 + u * 9, 0, PI * 2); g.fill(); }
-      g.fillStyle = SIL; }
-    // the railroad bridge over the river
-    const BY = HZ + 4;
-    g.fillStyle = '#3a0a1a'; g.fillRect(0, BY, W, 5); g.fillStyle = '#0a0206'; g.fillRect(0, BY + 3, W, 2);
-    g.strokeStyle = '#4a1022'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(0, BY - 16); g.lineTo(W, BY - 16);
-    for (let x = 0; x < W; x += 24) { g.moveTo(x, BY); g.lineTo(x + 12, BY - 16); g.lineTo(x + 24, BY); g.moveTo(x + 12, BY - 16); g.lineTo(x + 12, BY); }
-    g.stroke();
-    // river with the moon in it
-    gr = g.createLinearGradient(0, BY + 5, 0, 186); gr.addColorStop(0, '#2a0618'); gr.addColorStop(1, '#0c0208');
-    g.fillStyle = gr; g.fillRect(0, BY + 5, W, 186 - BY - 5);
-    for (let i = 0; i < 9; i++) { const y = BY + 8 + i * 3, w = 44 - i * 3 + Math.sin(t * 2 + i) * 4; g.fillStyle = `rgba(255,90,50,${0.5 - i * 0.045})`; g.fillRect(mx - w / 2 + Math.sin(t * 1.3 + i * 2) * 3, y, w, 1); }
-    // ground
-    gr = g.createLinearGradient(0, 184, 0, H); gr.addColorStop(0, '#1a0608'); gr.addColorStop(1, '#050102');
-    g.fillStyle = gr; g.fillRect(0, 184, W, H - 184);
-    g.fillStyle = 'rgba(120,0,10,0.5)'; for (let i = 0; i < 7; i++) { g.beginPath(); g.ellipse(hash(i + 200) * W, 200 + hash(i + 300) * 30, 14 + hash(i) * 20, 2.5, 0, 0, PI * 2); g.fill(); }
-    // the fighters: the Purple Hippo and Devil Dan, squared off
-    const pose = (ph, face) => R.P({ hy: 6 + Math.sin(t * 3 + ph) * 1.5, lean: 0.14, head: 0.05, aF: [2.05, 1.75], aB: [1.7, 2.1], fF: [13, 0], fB: [-15, 0] });
+    const R = RIG, st = STAGES.get('overpass'), FL = STAGES.FLOOR;
+    // the overpass arena itself: downtown skyline from its far layer, the tagged barrier and deck from its near layer
+    // the skyline is blown up and lifted so downtown stands clear above the barrier
+    const S = 1.5, y0 = 152 - 132 / S;
+    g.imageSmoothingEnabled = false;
+    g.drawImage(st.back, 700 - W / 2 / S, y0, W / S, H / S, 0, 0, W, H);
+    g.imageSmoothingEnabled = true;
+    g.drawImage(st.front, Math.round(560 - W / 2), 0, W, H, 0, 0, W, H);
+    // a dark band so the title reads
+    let gr = g.createLinearGradient(0, 0, 0, 70); gr.addColorStop(0, 'rgba(0,0,0,0.75)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, 70);
+    // both fighters in their fighting stance, facing each other
+    const stance = ph => R.P({ hy: 8 + Math.sin(t * 4.5 + ph) * 1.6, lean: 0.12 + Math.sin(t * 4.5 + ph) * 0.02, head: 0.05, aF: [1.0 + Math.sin(t * 4.5 + ph) * 0.05, 1.55], aB: [0.25, 2.45], fF: [17, 0], fB: [-17, 0] });
     const hip = ROSTER.FIGHTERS.find(f => f.id === 'hippo'), dan = ROSTER.BOSSES.find(f => f.id === 'dan');
-    const fs = [[hip, W * 0.15, 1, 0], [dan, W * 0.85, -1, 1.7]];
-    for (const [def, x, face, ph] of fs) { if (!def) continue; const f = { def, d: def.dk, x, y: 210, face, t: t + ph };
-      g.fillStyle = 'rgba(0,0,0,0.55)'; g.beginPath(); g.ellipse(x, 211, 34, 5, 0, 0, PI * 2); g.fill();
-      R.digi(g, x, 210, gg => R.draw(gg, f, pose(ph, face), {}), { phase: ph > 0 ? 1 : 0 }); }
-    // embers drifting up, red fog along the ground
-    for (let i = 0; i < 46; i++) { const sp = 14 + (i % 5) * 7, y = H - ((t * sp + i * 41) % (H - 40)), x = (hash(i + 500) * W + Math.sin(t * 1.3 + i) * 10 + t * 4) % W; g.fillStyle = `rgba(255,${120 + (i % 4) * 30},40,${0.25 + 0.55 * (y / H)})`; g.fillRect(x, y, i % 7 ? 1 : 2, i % 7 ? 1 : 2); }
-    for (let i = 0; i < 5; i++) { const x = ((i * 140 + t * (8 + i * 3)) % (W + 220)) - 110; gr = g.createRadialGradient(x, 206, 4, x, 206, 90); gr.addColorStop(0, 'rgba(150,10,20,0.28)'); gr.addColorStop(1, 'rgba(150,10,20,0)'); g.fillStyle = gr; g.fillRect(x - 90, 150, 180, 90); }
-    // a dark band behind the title, and the odd lightning flash
-    gr = g.createLinearGradient(0, 0, 0, 66); gr.addColorStop(0, 'rgba(0,0,0,0.7)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, 66);
-    const fl = t % 9; if (fl < 0.12 || (fl > 0.2 && fl < 0.26)) { g.fillStyle = 'rgba(255,220,255,0.14)'; g.fillRect(0, 0, W, H); }
-    gr = g.createRadialGradient(W / 2, H / 2, H * 0.4, W / 2, H / 2, W * 0.7); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,0.6)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    for (const [def, x, face, ph] of [[hip, W * 0.15, 1, 0], [dan, W * 0.85, -1, 1.7]]) {
+      if (!def) continue;
+      const f = { def, d: def.dk, x, y: FL, face, t: t + ph };
+      g.fillStyle = 'rgba(0,0,0,0.5)'; g.beginPath(); g.ellipse(x, FL + 1, 30, 4.5, 0, 0, Math.PI * 2); g.fill();
+      R.digi(g, x, FL, gg => R.draw(gg, f, stance(ph), {}), { phase: ph > 0 ? 1 : 0 });
+    }
+    gr = g.createRadialGradient(W / 2, H / 2, H * 0.45, W / 2, H / 2, W * 0.75); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,0.5)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
   },
 
   // ---------- the announcer: the same recorded robot as POTUS Kombat, crackling over the radio ----------
