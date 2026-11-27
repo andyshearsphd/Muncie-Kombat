@@ -917,7 +917,7 @@ FATAL.add(K => {
     s.at(1.75, () => { api.sfx('crunch'); api.sfx('crunch'); api.shake(4); const n = J(V, 'neck'); FX.blood(n[0], n[1], 20, -d, 1); });
     s.at(2.25, () => { holding = true; V.ro.noHead = true; api.sfx('splat'); api.sfx('scream'); api.shake(8); const n = J(V, 'neck'); FX.burst(n[0], n[1], 10, ['bone', 'chunk', 'tooth'], 0.8); });
     s.at(2.95, () => { holding = false; const h = J(A, 'handFx'); gib = headGib(V, h[0], h[1] + 4, { vx: d * 20, vy: -430, vr: 6 }); api.sfx('whoosh'); });
-    s.at(3.5, () => { if (gib) { gib.vx = d * 1150; gib.vy = -260; gib.vr = 24; } api.sfx('kick'); api.sfx('big'); api.shake(6); api.flash(); });
+    s.at(3.5, () => { if (gib) { const ft = J(A, 'toeF'); gib.x = ft[0] + d * 3; gib.y = ft[1] - 6 * V.d.k; FX.blood(ft[0], ft[1], 16, d, 1.4); gib.vx = d * 1150; gib.vy = -260; gib.vr = 24; } api.sfx('kick'); api.sfx('big'); api.shake(6); api.flash(); });
     s.at(3.95, () => api.sfx('splat'));
     s.at(4.2, () => api.bubble('GET OFF MY LAND.', A.x, F - 140, { size: 13, fill: 'gold', life: 2.1 }));
     s.at(6.3, () => { s.done = true; });
@@ -928,6 +928,8 @@ FATAL.add(K => {
       if (t < 2.9) { A.scriptPose = P({ hy: 2, lean: -0.15, head: -0.1, aF: [2.2, 0.3], aB: [0.6, 1.4], fF: [12, 0], fB: [-14, 0] }); V.scriptPose = P(Object.assign({}, KNEEL, { lean: 0.2 })); const n = J(V, 'neck'); FX.blood(n[0], n[1], 4, 0, 1.4, 1.6); return; }
       V.scriptPose = PS.down(V);
       if (t < 3.3) A.x += (V.x - d * 62 * k - A.x) * Math.min(1, dt * 6);
+      // the falling head is drawn onto her foot so the kick actually connects
+      if (gib && t > 3.25 && t < 3.5) { const ft = J(A, 'toeF'), e = t > 3.42 ? 1 : Math.min(1, dt * 12); gib.x += (ft[0] + d * 3 - gib.x) * e; gib.y += (ft[1] - 6 * V.d.k - gib.y) * e; gib.vx = 0; gib.vy = 0; }
       if (Math.random() < 0.3) { const n = J(V, 'neck'); FX.blood(n[0], n[1], 2, d, 0.8); }
       A.scriptPose = t < 3.35 ? PS.kick0 : t < 3.9 ? PS.round : PS.win(A.t);
     };
@@ -1086,33 +1088,31 @@ FATAL.add(K => {
   // ---------- CREEPY COUNCILMAN: Too Long a Hug ----------
   // cologne, arms out wide, "bring it in", then a bear hug that will not end until the ribs do
   S.councilman = (s, A, V, api) => {
-    const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face, SUIT = A.def.col.torso, SKIN = A.def.col.hand;
+    const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face, SKIN = A.def.col.hand, SUIT = A.def.col.armU;
     const OPEN = P({ hy: 2, lean: -0.15, head: -0.1, aF: [1.9, 0.15], aB: [1.95, 0.1], fF: [12, 0], fB: [-12, 0] });
-    const WRAP = P({ hy: 3, lean: 0.25, head: 0.45, aF: [1.45, 1.55], aB: [1.4, 1.6], fF: [8, 0], fB: [-12, 0] });
-    let squeeze = 0, hugging = false, card = null, wiggle = 0;
-    // his arms drawn wrapped around the victim's back, in front of everything, so the hug reads
+    // the awkward side-hug-gone-wrong: chests together, butt out, chin on the shoulder, arm around the back
+    const WRAP = P({ hy: 4, lean: 0.55, head: 0.6, aF: [0.75, 0.55], aB: [0.85, 0.45], fF: [10, 0], fB: [-20, 0] });
+    let squeeze = 0, hugging = false, card = null, pat = 0, drop = 0;
+    const hearts = [];
     prop({ layer: 'front', draw(g) {
       if (hugging) {
-        const c = J(V, 'chest'), b = J(V, 'belly'), sq = squeeze, w = (V.d.chest + V.d.back) * 0.7 * (1 - sq * 0.35);
-        for (const [p, yo] of [[c, -2], [b, 4]]) {
-          const x = p[0], y = p[1] + yo;
-          // a suit sleeve coming around the victim's far side, a hand clamped on the back
-          g.strokeStyle = SUIT; g.lineWidth = 6.5 * k; g.lineCap = 'round';
-          g.beginPath(); g.moveTo(x - d * w * 0.9, y - 1); g.quadraticCurveTo(x + d * w * 0.2, y + 5, x + d * w * 0.95, y + 1); g.stroke();
-          g.strokeStyle = 'rgba(255,255,255,0.12)'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(x - d * w * 0.8, y - 3); g.quadraticCurveTo(x + d * w * 0.2, y + 2.5, x + d * w * 0.85, y - 1.2); g.stroke();
-          g.lineCap = 'butt';
-          g.fillStyle = '#f0f0ec'; g.fillRect(x + d * w * 0.95 - 2, y - 2.5, 4, 5);
-          g.fillStyle = SKIN; g.beginPath(); g.ellipse(x + d * (w * 0.95 + 4), y + 1, 4 * k, 3 * k, 0, 0, PI * 2); g.fill();
-          for (let f2 = 0; f2 < 3; f2++) R.line(g, x + d * (w * 0.95 + 4), y - 1 + f2 * 1.6, x + d * (w * 0.95 + 8), y + f2 * 1.6, SKIN, 1.5);
-        }
-        // squeeze lines and a cartoon pressure burst on the victim
-        if (sq > 0.15) { g.strokeStyle = `rgba(255,255,255,${0.35 + sq * 0.4})`; g.lineWidth = 1.2; for (let i = 0; i < 4; i++) { const a = (i / 4) * PI * 2 + wiggle * 2, cx = c[0], cy = c[1]; g.beginPath(); g.moveTo(cx + Math.cos(a) * (w + 6), cy + Math.sin(a) * (w + 6)); g.lineTo(cx + Math.cos(a) * (w + 12), cy + Math.sin(a) * (w + 12)); g.stroke(); } }
+        // his near arm, a suit sleeve from his shoulder across the victim's chest to a hand spread on the back, patting
+        const c = J(V, 'chest'), n = J(A, 'neck'), sx = n[0] - d * 2, sy = n[1] + 7 * k;
+        const ty = c[1] - 1, bx = c[0] - V.face * (V.d.back * 0.9), by = ty + Math.max(0, Math.sin(pat * 9)) * -4;
+        g.lineCap = 'round'; g.strokeStyle = SUIT; g.lineWidth = 6 * k;
+        g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo(c[0] + d * 2, ty + 4, bx, by); g.stroke();
+        g.strokeStyle = 'rgba(255,255,255,0.14)'; g.lineWidth = 1.3; g.beginPath(); g.moveTo(sx, sy - 2.2); g.quadraticCurveTo(c[0] + d * 2, ty + 1.8, bx, by - 2.2); g.stroke(); g.lineCap = 'butt';
+        g.fillStyle = '#f0f0ec'; g.beginPath(); g.arc(bx, by, 2.8 * k, 0, PI * 2); g.fill();
+        const hx = bx + d * 3 * k;
+        g.fillStyle = SKIN; g.beginPath(); g.ellipse(hx, by, 3.4 * k, 4.4 * k, 0, 0, PI * 2); g.fill();
+        for (let f2 = 0; f2 < 4; f2++) R.line(g, hx, by - 3 + f2 * 2, hx + d * 4.5 * k, by - 4 + f2 * 2.2, SKIN, 1.6);
       }
+      for (const h of hearts) { g.save(); g.globalAlpha = Math.max(0, 1 - h.t / 1.6); g.fillStyle = '#ff5fa8'; g.translate(h.x, h.y); g.scale(h.s, h.s); g.beginPath(); g.moveTo(0, 3); g.bezierCurveTo(-5, -1, -3, -5, 0, -2.5); g.bezierCurveTo(3, -5, 5, -1, 0, 3); g.fill(); g.restore(); }
       if (card) { g.save(); g.translate(card.x, card.y); g.rotate(card.a); g.fillStyle = '#f4f0e8'; g.fillRect(-8, -5, 16, 10); g.fillStyle = '#22283a'; g.fillRect(-8, -5, 16, 2.4); g.fillStyle = '#b01848'; g.font = '4px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillText('CALL ME', 0, 3); g.textAlign = 'left'; g.restore(); }
     } });
     s.at(0.15, () => { api.sfx('hiss'); const h = J(A, 'head'); for (let i = 0; i < 5; i++) FX.puff(h[0] + rnd(-6, 6), h[1] + rnd(0, 16), 'rgba(230,150,220,0.6)', 7, 3); });
     s.at(0.85, () => api.bubble('BRING IT IN!', A.x, F - 165, { size: 13, fill: 'white', life: 1.1 }));
-    s.at(1.75, () => { hugging = true; V.ro.top = true; api.sfx('thud'); api.shake(3); });
+    s.at(1.75, () => { hugging = true; A.ro.top = true; api.sfx('thud'); api.shake(3); });
     s.at(2.05, () => api.bubble('YOU LOOK GREAT TODAY.', A.x, F - 168, { size: 11, fill: 'white', life: 1.3 }));
     s.at(2.6, () => { const h = J(A, 'head'); api.bubble('*SNIFF*', h[0] - d * 16, h[1] - 34, { size: 9, fill: 'white', life: 0.9 }); api.sfx('sniff'); });
     s.at(3.35, () => api.bubble('JUST A LITTLE LONGER.', A.x, F - 168, { size: 11, fill: 'white', life: 1.4 }));
@@ -1127,6 +1127,7 @@ FATAL.add(K => {
     s.at(6.1, () => api.bubble('CALL ME.', A.x, F - 150, { size: 13, fill: 'gold', life: 1.8 }));
     s.at(7.6, () => { s.done = true; });
     s.tick = (t, dt) => {
+      for (const h of hearts) { h.t += dt; h.y -= 22 * dt; h.x += Math.sin(h.t * 6) * 0.3; }
       if (card && card.y < F - 6) { card.y = Math.min(F - 6, card.y + 70 * dt); card.a += dt * 3; }
       if (t < 0.7) { A.scriptPose = P({ hy: 2, lean: -0.1, head: -0.2, aF: [2.4, 1.6], aB: [0.6, -1.5], fF: [12, 0], fB: [-12, 0] }); V.scriptPose = PS.dizzy(V.t); return; }
       if (t < 1.75) {
@@ -1136,16 +1137,17 @@ FATAL.add(K => {
         return;
       }
       if (hugging) {
-        squeeze = Math.min(1, (t - 1.75) / 2.6); wiggle += dt;
-        A.x += (V.x - d * 24 * k - A.x) * Math.min(1, dt * 8);
-        A.scriptPose = P(Object.assign({}, WRAP, { lean: 0.35 + squeeze * 0.15, head: 0.55 + Math.sin(t * 2) * 0.05 }));
-        // the victim, pinned: arms trapped at the sides, legs kicking, lifted off the ground as it tightens
-        V.y = F - squeeze * 14;
-        V.scriptPose = P({ hy: 2, lean: -0.25 - squeeze * 0.3, head: -0.5 - squeeze * 0.5 + Math.sin(t * 20) * 0.1, jaw: squeeze, aF: [0.15, 0.1], aB: [0.15, 0.1], fF: [6 + Math.sin(t * 16) * 5, -4 - squeeze * 6], fB: [-6 + Math.cos(t * 14) * 5, -4 - squeeze * 6] });
+        squeeze = Math.min(1, (t - 1.75) / 2.6); pat += dt;
+        A.x += (V.x - d * 27 * k - A.x) * Math.min(1, dt * 8);
+        // near arm wrapped around the victim's back, patting; hips stay well back
+        const vn = J(V, 'neck'), an = J(A, 'neck'); drop = Math.max(0, Math.min(40 * k, drop + (vn[1] + 2 - an[1]) * Math.min(1, dt * 6)));
+        A.scriptPose = P(Object.assign({}, WRAP, { hyA: drop, aF: [0.2, 1.1], aB: [0.15, 1.0] }));
+        if (Math.random() < dt * 5) { const h = J(A, 'head'); hearts.push({ x: h[0] + rnd(-6, 6), y: h[1] - 8, t: 0, s: rnd(0.8, 1.3) }); }
+        // the victim, pinned: arms clamped to the sides, hands flapping, face turned away and gasping
+        V.scriptPose = P({ hy: 2 + squeeze * 3, lean: -0.15 - squeeze * 0.15, head: -0.45 - squeeze * 0.3, jaw: 0.3 + squeeze * 0.7, aF: [0.2, 0.9 + Math.sin(t * 22) * 0.5], aB: [0.15, 0.9 + Math.cos(t * 19) * 0.5], fF: [8, 0], fB: [-10, 0] });
         return;
       }
-      V.y = Math.min(F, V.y + 300 * dt);
-      if (t < 5.0) { V.scriptPose = P({ rot: -d * 0.9 * Math.min(1, (t - 4.5) * 4), piv: 2, hy: 6, lean: -1.2, head: -1.3, aF: [3.0, 0.1], aB: [2.8, 0.2], fF: [4, 0], fB: [-4, 0] }); A.scriptPose = WRAP; return; }
+            if (t < 5.0) { V.scriptPose = P({ rot: -d * 0.9 * Math.min(1, (t - 4.5) * 4), piv: 2, hy: 6, lean: -1.2, head: -1.3, aF: [3.0, 0.1], aB: [2.8, 0.2], fF: [4, 0], fB: [-4, 0] }); A.scriptPose = WRAP; return; }
       V.scriptPose = PS.down(V);
       if (t < 5.5) { A.x += (V.x - d * 42 * k - A.x) * Math.min(1, dt * 5); A.scriptPose = P({ hy: 0, lean: -0.1, head: -0.15, aF: [2.9, 2.6], aB: [0.6, -1.5], fF: [12, 0], fB: [-12, 0] }); return; }
       A.scriptPose = t < 5.9 ? P({ hy: 6, lean: 0.6, head: 0.5, aF: [1.0, 0.3], aB: [0.6, -1.5], fF: [12, 0], fB: [-12, 0] }) : PS.win(A.t);
