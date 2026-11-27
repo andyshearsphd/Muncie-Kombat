@@ -965,9 +965,9 @@ const ROSTER = (() => {
     g.fillStyle = 'rgba(255,250,210,0.7)'; g.fillRect(x - r * 0.5, y - r * 0.6, r * 0.4, r * 0.3);
   }
   const prez = {
-    id: 'prez', name: 'PRES. NEVER LEARNS', short: 'NEVER LEARNS', him: 'HIM', k: 1.0, bicep: 0, calf: 0,
+    id: 'prez', name: 'PRES. NEVER LEARNS', short: 'NEVER LEARNS', him: 'HIM', k: 0.95, bicep: 0, calf: 0,
     bio: 'The university president. Raised tuition, cut your program and gave himself a bonus. Office hours: never.',
-    d: dims({ thigh: 32, shin: 31, torso: 38, neck: 5, upper: 22, fore: 21, hipW: 10, shW: 12, chest: 11.5, belly: 10.5, back: 9.5, thighR: 5.5, kneeR: 4, ankleR: 3, shR: 5, elbowR: 4.2, wristR: 2.8, fist: 3.4 }),
+    d: dims({ thigh: 29, shin: 28, torso: 35.5, neck: 3, upper: 20.5, fore: 19.5, hipW: 10.5, shW: 12.5, chest: 12, belly: 11, back: 10, thighR: 5.8, kneeR: 4.1, ankleR: 3.1, shR: 5.2, elbowR: 4.4, wristR: 2.9, fist: 3.5 }),
     col: { torso: PRG, armU: PRG, armL: PRG, cuff: PRG, hand: PRS, legU: '#2a2a30', legL: '#2a2a30', foot: '#0c0c0e', neck: PRS },
     mat: { torso: 'cloth', armU: 'cloth', armL: 'cloth', legU: 'cloth', legL: 'cloth' },
     stats: { speed: 1.02, power: 0.95, weight: 0.85 },
@@ -1607,7 +1607,7 @@ const ROSTER = (() => {
   Object.assign(tinkle, { arena: 'cityhall', cpuLvl: 0.34, aiStyle: { noBlock: true, quips: ['STOP RESISTING!', 'ON THE GROUND!', 'I AM THE LAW!', 'GET SOME!'] } });
   Object.assign(golem, { arena: 'glassworks', death: 'golemDie', sp2Mod: { dmg: 14, quake: 1 }, vanish: true });
   Object.assign(slumlord, { arena: 'rental', death: 'slumDie', aiStyle: { taunt: 0.12 } });
-  Object.assign(dan, { arena: 'hell', death: 'danDie', sp2Mod: { fire: 1 }, fireTrail: true, ladderOnly: true });
+  Object.assign(dan, { arena: 'hell', death: 'danDie', sp2Mod: { fire: 1 }, fireTrail: true });
 
   const PORTRAIT = { karen: [0.42, 0.98, 0.9], catbear: [0.36, 0.92, 0.85], councilman: [0.42, 0.98, 0.9], prez: [0.42, 0.98, 1.0], gertie: [0.42, 0.78, 1.5], painter: [0.5, 0.86, 0.85], hippo: [0.3, 0.9, 0.85], garf: [0.4, 0.9, 0.95], turkey: [0.36, 0.94, 1.45], chucky: [0.38, 0.95, 0.85], wolfe: [0.3, 0.92, 0.8], em: [0.42, 0.96, 0.95], slumlord: [0.42, 0.92, 0.85], tinkle: [0.42, 0.96, 0.9], golem: [0.5, 0.7, 1], dan: [0.42, 0.95, 0.85], tinman: [0.4, 1.02, 0.78], bunyon: [0.42, 0.98, 0.82], becky: [0.42, 0.94, 0.95], possum: [0.28, 0.9, 0.85] };
   return KIT.roster(FIGHTERS, BOSSES, { front: FRONT, portrait: PORTRAIT });

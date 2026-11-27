@@ -21,7 +21,7 @@ It then opens full screen like an app. On Android, use the browser menu and choo
 ## Modes
 
 - **Arcade Ladder:** pick a fighter and climb the tower. You fight every other fighter in random order on random arenas, then the four bosses: Ofc Tinkle at City Hall, Fruit Jar Golem at the Glass Works, Slum Lord at The Rental, and Devil Dan in City Hall. That is 23 fights.
-- **Single Match:** pick your fighter, your opponent and the arena. Devil Dan can only be reached through the ladder.
+- **Single Match:** pick your fighter, your opponent and the arena. Every boss, Devil Dan included, can be picked as the opponent.
 
 Matches are best of three rounds. Win the deciding round and you get FINISH HIM.
 
