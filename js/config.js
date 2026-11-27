@@ -1,29 +1,7 @@
 // Muncie Kombat: game settings for the Kombat Engine (titles, mascot, victory poses)
 'use strict';
-// the announcer: fixes how "Pres." is said, and waits for a line to finish instead of cutting it off
-if (typeof SFX !== 'undefined' && SFX.say) {
-  const say0 = SFX.say, q = [];
-  let busy = false, guard = null;
-  const free = () => { busy = false; clearTimeout(guard); while (q.length) { const it = q.shift(); if (performance.now() - it.t < 2500) { run(it.s); return; } } };
-  const run = str => { busy = true; guard = setTimeout(free, 4000); say0(String(str).replace(/\bpres\.?\s/gi, 'president '), undefined, undefined, free); };
-  SFX.say = (str, pitch, rate, done) => {
-    if (done) return say0(String(str).replace(/\bpres\.?\s/gi, 'president '), pitch, rate, done);
-    if (busy) q.push({ s: str, t: performance.now() }); else run(str);
-  };
-}
-// single match: the announcer calls the opponent's name too, the same as your own pick
-(function watchOpp() {
-  let last = null;
-  setInterval(() => {
-    const M = window.MK; if (!M) return;
-    const scr = M.screen;
-    if (last === 'opp' && scr === 'arena') {
-      const list = ROSTER.FIGHTERS.concat(ROSTER.BOSSES.filter(b => !b.ladderOnly)), f = list[M.sel.o];
-      if (f) SFX.say(f.name.replace("'", 'g').toLowerCase());
-    }
-    last = scr;
-  }, 60);
-})();
+// the announcer: say "Pres." as "President" when a line falls back to text-to-speech
+if (typeof SFX !== 'undefined' && SFX.say) { const say0 = SFX.say; SFX.say = (str, ...rest) => say0(String(str).replace(/\bpres\.?\s/gi, 'president '), ...rest); }
 window.GAME = {
   title: 'MUNCIE KOMBAT',
   subtitle: 'A PURPLE HIPPO ARCADE GAME',
