@@ -33,7 +33,7 @@ Matches are best of three rounds. Win the deciding round and you get FINISH HIM.
 
 On a phone, the joystick appears wherever your left thumb touches the left half of the screen. PUNCH, KICK and BLOCK are on the right.
 
-![Becky Hack throws Shimmer at Tin Man at Minnetrista](screenshots/fight.jpg)
+![Becky Hack throws Shimmer at Tin Man at Maxitrista](screenshots/fight.jpg)
 
 On a keyboard:
 
@@ -74,7 +74,7 @@ On a keyboard:
 | BACK, FORWARD + PUNCH | Projectile special |
 | DOWN, FORWARD + KICK | Second special |
 | FINISH: DOWN, DOWN + PUNCH | Fatality |
-| FINISH at the White River Railroad Bridge, Tillotson Overpass, McCulloch Park or Cornerstone Parking Lot: DOWN + PUNCH | Stage fatality |
+| FINISH at the Railroad Bridge, Tillotson Overpass, McCulloch Park or Cobblestone Parking Lot: DOWN + PUNCH | Stage fatality |
 
 There may be other secrets. Every fighter's moves are also listed on the MOVES screen in the game.
 
@@ -118,13 +118,13 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 
 ## Arenas
 
-Campus, White River Railroad Bridge, Minnetrista, Gillespie Tower, Wysor Street Depot, Shedtown Drive-In, Cornbread Road, City Hall, The Village, Tillotson Overpass, Prairie Creek Beach, McCulloch Park, Cornerstone Parking Lot, Southside Walmart, plus the boss arenas: the Glass Works, The Rental and Devil Dan's City Hall.
+Campus, Railroad Bridge, Maxitrista, Gillespie Tower, Wysor Street Depot, Shedtown Drive-In, Cornbread Road, City Hall, The Village, Tillotson Overpass, Prairie Creek Beach, McCulloch Park, Cobblestone Parking Lot, South Wally World, plus the boss arenas: the Glass Works, The Rental and Devil Dan's City Hall.
 
 | Prairie Creek Beach | Cornbread Road |
 | --- | --- |
 | ![Prairie Creek Beach](screenshots/arena-prairie-creek-beach.jpg) | ![Cornbread Road](screenshots/arena-cornbread-road.jpg) |
-| **The Village** | **White River Railroad Bridge** |
-| ![The Village](screenshots/arena-the-village.jpg) | ![White River Railroad Bridge](screenshots/arena-railroad-bridge.jpg) |
+| **The Village** | **Railroad Bridge** |
+| ![The Village](screenshots/arena-the-village.jpg) | ![Railroad Bridge](screenshots/arena-railroad-bridge.jpg) |
 
 The Tillotson Overpass stage fatality:
 

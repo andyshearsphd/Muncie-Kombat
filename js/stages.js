@@ -120,7 +120,7 @@
     for (const x of [200, 900]) lamp(F, x, FY + 4, 70);
   }
 
-  // ---------- WHITE RIVER RAILROAD BRIDGE: fight on the trestle, "The Pit" style ----------
+  // ---------- RAILROAD BRIDGE: fight on the trestle, "The Pit" style ----------
   function bridge(B, F) {
     vg(B, 0, 0, BW, H, ['#010208', '#060c1c', '#101a30', '#1a2236']);
     stars(B, 160, 120); moon(B, 820, 52, 22);
@@ -165,7 +165,7 @@
     const dg = F.createLinearGradient(0, FY - 6, 0, FY + 16); dg.addColorStop(0, 'rgba(0,0,0,0.6)'); dg.addColorStop(1, 'rgba(0,0,0,0)'); F.fillStyle = dg; F.fillRect(0, FY - 6, AWX, 22);
   }
 
-  // ---------- MINNETRISTA at dusk ----------
+  // ---------- MAXITRISTA at dusk ----------
   function minnetrista(B, F) {
     vg(B, 0, 0, BW, H, ['#0a0614', '#2a0e2a', '#6a2a2a', '#c86a3a']);
     clouds(B, 20, 100, 18, 'rgba(60,20,40,0.55)', 'rgba(255,150,90,0.4)', 1);
@@ -467,10 +467,7 @@
   // the crowd of bros on the sidewalk (back-layer coords), drawn faded every frame
   const BROS = (() => { const a = []; let s = 77; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; for (let i = 0; i < 16; i++) a.push({ x: 80 + i * 72 + r() * 30, h: 40 + r() * 8, ph: r() * 6, cap: r() < 0.7, can: r() < 0.75, col: ['#5a2a2a', '#2a3a5a', '#4a4a4a', '#5a4a2a', '#2a4a3a'][i % 5] }); return a; })();
   function bros(g, t) {
-    g.save(); g.globalAlpha = 0.82;
     for (const b of BROS2) person(g, b, t);
-    g.restore();
-    fog(g, FY - 56, 60, 'rgba(50,30,60,0.22)');
   }
 
   // ---------- crowds: small front-facing people, shaded and lit, for the Village and the beach ----------
@@ -526,6 +523,12 @@
     if (p.rim) { g.strokeStyle = p.rim; g.lineWidth = 0.7; g.beginPath(); g.moveTo(x + sw, ys + 1); g.quadraticCurveTo(x + sw * 0.95, yw - h * 0.08, x + ww, yw); g.lineTo(x + hw, yh); g.stroke(); g.beginPath(); g.arc(x, hy0, hr0 * 0.95, -1.2, 0.6); g.stroke(); }
   }
   const prng = s => () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  // the standard for the cheering crowds behind the fight (beach, Village, Cobblestone, Wally World)
+  function crowdStd(a, seed, n = 17) {
+    const r = prng(seed), out = a.slice(0, n);
+    out.forEach((p, i) => { p.h = (p.fem ? 56 : 62) + r() * 9; p.y = FY + 6; p.x = 30 + i * ((BW - 60) / n) + r() * 26; p.stance = 0.9 + r() * 0.5; p.rim = p.rim || 'rgba(255,220,180,0.55)'; });
+    return out;
+  }
   const SKINS = ['#e8c0a0', '#c89070', '#8a5a3a', '#5a3a26', '#f0d0b8', '#a87050'], HAIRS = ['#1a1008', '#4a2a12', '#8a6a3a', '#d8b870', '#2a1a10'];
 
   // ---------- THE OVERPASS: Tillotson Avenue over State Road 32 and the railroad ----------
@@ -622,10 +625,10 @@
       a.push({ x, y: 184 - (i % 3) * 2, h: (fem ? 40 : 44) + r() * 6, fem, ph: r() * 6, speed: 2.4 + r() * 2, stance: 0.7 + r() * 0.7, skin: pick(SKINS), hair: pick(HAIRS), longHair: fem && r() < 0.8, bald: !fem && r() < 0.15,
         topKind: fem ? (r() < 0.65 ? 'bikini' : 'one') : 'none', top: pick(suits), bottom: pick(suits), bottomLen: fem ? null : (r() < 0.55 ? 'knee' : 'mid'), stripe: r() < 0.5 ? '#f4f0e8' : null,
         style: pick(['cheer', 'cheer', 'clap', 'hip', 'stand']), shades: r() < 0.35, hat: r() < 0.12 ? '#e8d8a0' : null, cap: !fem && r() < 0.12 ? pick(suits) : null, can: r() < 0.3, canC: pick(['#c8c8d0', '#d83030', '#f0f0f0']), rim: 'rgba(255,180,120,0.75)' }); }
-    return a; })();
+    return crowdStd(a, 58); })();
   const BRO_COLS = ['#7a3a3a', '#3a4a7a', '#5a5a5a', '#7a6a3a', '#3a6a5a', '#8a2a2a'];
   const BROS2 = (() => { const r = prng(77), a = []; for (let i = 0; i < 18; i++) a.push({ x: 60 + i * 66 + r() * 26, y: FY - 1, h: 42 + r() * 7, ph: r() * 6, speed: 3 + r() * 1.5, stance: 0.8 + r() * 0.6, skin: SKINS[(r() * SKINS.length) | 0], hair: HAIRS[(r() * HAIRS.length) | 0],
-    topKind: 'shirt', sleeves: true, top: BRO_COLS[i % 6], logo: r() < 0.5 ? '#e8e0d0' : null, bottom: r() < 0.5 ? '#3a3a42' : '#6a5a3a', bottomLen: 'knee', shoes: '#e8e8e8', style: r() < 0.6 ? 'cheer' : r() < 0.5 ? 'hip' : 'stand', cap: r() < 0.7 ? BRO_COLS[(i + 3) % 6] : null, can: r() < 0.75, rim: 'rgba(255,210,150,0.6)' }); return a; })();
+    topKind: 'shirt', sleeves: true, top: BRO_COLS[i % 6], logo: r() < 0.5 ? '#e8e0d0' : null, bottom: r() < 0.5 ? '#3a3a42' : '#6a5a3a', bottomLen: 'knee', shoes: '#e8e8e8', style: r() < 0.6 ? 'cheer' : r() < 0.5 ? 'hip' : 'stand', cap: r() < 0.7 ? BRO_COLS[(i + 3) % 6] : null, can: r() < 0.75, rim: 'rgba(255,210,150,0.6)' }); return crowdStd(a, 78); })();
 
   // ---------- McCULLOCH PARK: the soapbox derby finish line at night ----------
   const MCC_LAMPS = [150, 470, 810, 1130];
@@ -681,7 +684,7 @@
     g.fillStyle = 'rgba(255,255,255,0.18)'; g.fillRect(0, FY - 13, BW, 1.5);
   }
 
-  // ---------- CORNERSTONE PARKING LOT: behind the Cornerstone Center for the Arts at night ----------
+  // ---------- COBBLESTONE PARKING LOT: behind the arts center at night ----------
   // the long back wall seen straight on: red-brown brick, cream stone bands, a gray stone base,
   // it fills the view and runs up off the top of the screen, with the curved black awning at the door
   const CS_X0 = 0, CS_X1 = BW, CS_MID = CX + 40, CS_TOPL = -40, CS_TOPR = -40;
@@ -751,7 +754,7 @@
     B.fillStyle = 'rgba(255,255,255,0.12)'; B.beginPath(); B.ellipse(ax, FY - 72, aw * 0.36, 2, 0, 0, PI * 2); B.fill();
     // a plain ring mark over the lettering (not their actual logo)
     for (const [r, c] of [[6.5, '#e070a0'], [4.6, '#ffffff'], [3, '#3aa0e0']]) { B.strokeStyle = c; B.lineWidth = 1.2; B.beginPath(); B.arc(ax, FY - 64, r, 0, PI * 2); B.stroke(); }
-    B.fillStyle = '#f0ece4'; B.font = '7px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('CORNERSTONE', ax, FY - 50); B.font = '3.6px Anton, Impact, sans-serif'; B.fillStyle = '#c8c4bc'; B.fillText('CENTER FOR THE ARTS', ax, FY - 45.5); B.textAlign = 'left';
+    B.fillStyle = '#f0ece4'; B.font = '7px Anton, Impact, sans-serif'; B.textAlign = 'center'; B.fillText('COBBLESTONE', ax, FY - 50); B.font = '3.6px Anton, Impact, sans-serif'; B.fillStyle = '#c8c4bc'; B.fillText('CENTER FOR THE ARTS', ax, FY - 45.5); B.textAlign = 'left';
     B.fillStyle = 'rgba(0,0,0,0.5)'; B.fillRect(ax - aw / 2, FY - 44, aw, 2);
     // low shrubs and stone planters along the base, benches and a trash can
     for (let i = 0; i < 12; i++) { const x = ax + 46 + i * 11; B.fillStyle = shade('#14200e', rr(-0.3, 0.1)); B.beginPath(); B.ellipse(x, FY - 4, 8, 6, 0, PI, PI * 2); B.fill(); }
@@ -786,15 +789,15 @@
       a.push({ x, y: FY + 2, h: (fem ? 38 : 42) + r() * 6, fem, ph: r() * 6, speed: 2.8 + r() * 1.6, stance: 0.8 + r() * 0.6, skin: SKINS[(r() * SKINS.length) | 0], hair: HAIRS[(r() * HAIRS.length) | 0], longHair: fem && r() < 0.7,
         topKind: 'shirt', sleeves: true, top: tops[(r() * tops.length) | 0], logo: r() < 0.3 ? '#e8e0d0' : null, bottom: pants, legs: pants, bottomLen: 'knee', shoes: r() < 0.5 ? '#d8d8d8' : '#1a1a1a',
         style: r() < 0.6 ? 'cheer' : r() < 0.6 ? 'clap' : 'stand', cap: !fem && r() < 0.35 ? tops[(r() * tops.length) | 0] : null, can: r() < 0.25, rim: 'rgba(255,200,150,0.55)' }); }
-    return a; })();
+    return crowdStd(a, 510); })();
   function csLive(g, t) {
-    g.save(); g.globalAlpha = 0.88; for (const p of CS_CROWD) person(g, p, t); g.restore();
+    for (const p of CS_CROWD) person(g, p, t);
     // phones up, filming the fight
-    for (let i = 0; i < 4; i++) { const p = CS_CROWD[i * 5 + 2]; if (Math.sin(t * 0.8 + i * 2) > 0) { const x = p.x + 4, y = p.y - p.h * 1.02; g.fillStyle = '#0a0a0c'; g.fillRect(x - 1.5, y - 3, 3, 5); glow(g, x, y - 0.5, 6, 'rgba(200,220,255,0.6)'); } }
+    for (let i = 0; i < 4; i++) { const p = CS_CROWD[i * 4 + 2]; if (Math.sin(t * 0.8 + i * 2) > 0) { const x = p.x + 4, y = p.y - p.h * 1.02; g.fillStyle = '#0a0a0c'; g.fillRect(x - 1.5, y - 3, 3, 5); glow(g, x, y - 0.5, 6, 'rgba(200,220,255,0.6)'); } }
     for (const x of [CX - 98, CX + 208, CX - 370, CX + 330]) glow(g, x, FY - 64, 20 + Math.sin(t * 9 + x) * 1.5, 'rgba(255,210,150,0.12)');
   }
 
-  // ---------- SOUTHSIDE WALMART: the fight in the action alley, aisles behind, a crowd of rednecks ----------
+  // ---------- SOUTH WALLY WORLD: the fight in the action alley, aisles behind, a crowd of rednecks ----------
   const WM_DEPTS = [['GROCERY', 110], ['HOUSEWARES', 420], ['SPORTING GOODS', 760], ['AUTOMOTIVE', 1120]];
   function walmart(B, F) {
     setSeed(613);
@@ -851,9 +854,9 @@
       a.push({ x: 30 + i * 76 + r() * 26, y: FY + 6, h: (fem ? 56 : 62) + r() * 9, fem, ph: r() * 6, speed: 3 + r() * 1.6, stance: 0.9 + r() * 0.6, skin: ['#f0c8a8', '#e8b898', '#d8a888', '#f4d0b8'][(r() * 4) | 0], hair: ['#6a4a2a', '#2a1a10', '#c8a060', '#8a6a3a'][(r() * 4) | 0],
         longHair: r() < 0.55, topKind: 'shirt', sleeves: !(kind > 0.65 && r() < 0.6), top, logo: r() < 0.25 ? '#f8f8f8' : null, bottom: r() < 0.7 ? '#3a4a6a' : '#5a5232', legs: r() < 0.7 ? '#3a4a6a' : '#5a5232', bottomLen: r() < 0.5 ? 'knee' : 'long',
         shoes: '#3a2a1a', style: r() < 0.65 ? 'cheer' : r() < 0.5 ? 'clap' : 'stand', cap: !fem && r() < 0.75 ? ['#e86a20', '#2a2a2a', '#4a5232', '#c81818', '#f0f0f0'][(r() * 5) | 0] : null, can: r() < 0.55, canC: ['#c8c8d0', '#2a4aa0', '#d8d8d8'][(r() * 3) | 0], shades: r() < 0.15, rim: 'rgba(240,250,255,0.5)' }); }
-    return a; })();
+    return crowdStd(a, 734); })();
   function wmLive(g, t) {
-    g.save(); g.globalAlpha = 1; for (const p of WM_CROWD) person(g, p, t); g.restore();
+    for (const p of WM_CROWD) person(g, p, t);
     // a fluorescent tube on its last legs
     if (Math.sin(t * 23) * Math.sin(t * 7.1) > 0.3) { g.fillStyle = 'rgba(20,24,30,0.85)'; g.fillRect(500, 38, 46, 3); }
   }
@@ -916,10 +919,10 @@
     cityhall: { name: 'CITY HALL', draw: (B, F) => cityhall(B, F, false) },
     hell: { name: 'CITY HALL', draw: (B, F) => cityhall(B, F, true) },
     benny: { name: 'CAMPUS', draw: benny },
-    bridge: { name: 'WHITE RIVER RAILROAD BRIDGE', draw: bridge, pit: 'bridge' },
+    bridge: { name: 'RAILROAD BRIDGE', draw: bridge, pit: 'bridge' },
     overpass: { name: 'TILLOTSON OVERPASS', draw: overpass, pit: 'overpass' },
     beach: { name: 'PRAIRIE CREEK BEACH', draw: beach },
-    minnetrista: { name: 'MINNETRISTA', draw: minnetrista },
+    minnetrista: { name: 'MAXITRISTA', draw: minnetrista },
     westend: { name: 'GILLESPIE TOWER', draw: westend },
     greenway: { name: 'WYSOR STREET DEPOT', draw: greenway },
     shedtown: { name: 'SHEDTOWN DRIVE-IN', draw: shedtown },
@@ -928,8 +931,8 @@
     village: { name: 'THE VILLAGE', draw: village },
     rental: { name: 'THE RENTAL', draw: rental },
     mcculloch: { name: 'McCULLOCH PARK', draw: mcculloch, pit: 'mcculloch' },
-    cornerstone: { name: 'CORNERSTONE PARKING LOT', draw: cornerstone, pit: 'cornerstone' },
-    walmart: { name: 'SOUTHSIDE WALMART', draw: walmart },
+    cornerstone: { name: 'COBBLESTONE PARKING LOT', draw: cornerstone, pit: 'cornerstone' },
+    walmart: { name: 'SOUTH WALLY WORLD', draw: walmart },
   };
 
   // animated bits drawn each frame on top of the far layer (back-layer coords)
@@ -974,7 +977,7 @@
         g.fillStyle = 'rgba(255,150,90,0.35)'; g.beginPath(); g.moveTo(x - 0.8, y - 17 * s); g.lineTo(x - 0.8, y - 1.5 * s); g.lineTo(x - 7 * s * Math.sign(b.v || 1), y - 1.5 * s); g.fill();
         g.fillStyle = 'rgba(255,200,160,0.25)'; g.fillRect(x - 8 * s, y + 3.5 * s, 16 * s, 0.8);
       }
-      g.save(); g.globalAlpha = 0.9; for (const p of SWIMMERS) person(g, p, t); g.restore();
+      for (const p of SWIMMERS) person(g, p, t);
       for (const x of TIKI) { const fl = Math.sin(t * 13 + x) * 1.5; glow(g, x, FY - 58, 26, 'rgba(255,140,40,0.5)', 0.8); g.fillStyle = '#ff8a20'; g.beginPath(); g.moveTo(x - 3, FY - 54); g.quadraticCurveTo(x - 2 + fl, FY - 64, x + fl * 0.5, FY - 69); g.quadraticCurveTo(x + 2 + fl, FY - 62, x + 3, FY - 54); g.fill(); g.fillStyle = '#ffe080'; g.beginPath(); g.ellipse(x, FY - 57, 1.6, 3, 0, 0, PI * 2); g.fill(); }
     }
     if (id === 'overpass') {
