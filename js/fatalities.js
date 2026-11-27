@@ -345,11 +345,12 @@ FATAL.add(K => {
     s.at(4.4, () => {
       V.hidden = true;
       const hh = api.hurtH(V), pose = P({ aF: [2.7, 0.3], aB: [2.4, 0.4], lF: [0.15, 0.1], lB: [-0.1, 0.15], head: 0.2 });
-      skel = FX.gib('skel', V.x, F - 6, 0, 0, { trail: false, draw: (g, o) => { g.save(); g.rotate(-o.rot); g.translate(-o.x, -o.y); g.beginPath(); g.rect(o.x - 300, o.y - 400, 600, 400 + (F - 3 - o.y)); g.clip(); g.translate(o.x, o.y); g.rotate(o.rot); R.draw(g, { def: V.def, d: V.d, x: 0, y: hh * 0.5, face: 1, t: 0 }, pose, { skeleton: true, gore: true }); g.restore(); }, follow: () => {
-        const t = s.t, hd = J(A, 'head'), over = [A.x + A.face * 6, hd[1] - 22 * k], top = [dump.x, F - DH - 26], bot = [dump.x, F + hh * 0.45];
+      skel = FX.gib('skel', V.x, F - 6, 0, 0, { trail: false, draw: (g, o) => { g.save(); g.rotate(-o.rot); g.translate(-o.x, -o.y); g.beginPath(); if (s.t < 5.0) g.rect(o.x - 300, o.y - 400, 600, 400 + (F - 3 - o.y)); else { g.rect(dump.x - 300, F - DH - 600, 600, 600); g.rect(dump.x - DW + 3, F - DH - 2, DW * 2 - 6, DH); } g.clip(); g.translate(o.x, o.y); g.rotate(o.rot); R.draw(g, { def: V.def, d: V.d, x: 0, y: hh * 0.5, face: 1, t: 0 }, pose, { skeleton: true, gore: true }); g.restore(); }, follow: () => {
+        const t = s.t, hd = J(A, 'head'), over = [A.x + A.face * 6, hd[1] - 22 * k], top = [dump.x, F - DH - hh * 0.5 - 6], bot = [dump.x, F + hh * 0.5 - 20];
         if (t < 4.85) { const u = ease((t - 4.4) / 0.45); return [lerp(V.x, over[0], u), lerp(F - 6, over[1], u), lerp(-A.face * PI / 2, A.face * PI / 2, u)]; }
-        if (t < 5.2) { const u = ease((t - 4.85) / 0.35); return [lerp(over[0], top[0], u), lerp(over[1], top[1], u), A.face * (PI / 2 + u * 0.75)]; }
-        const u = Math.min(1, ((t - 5.2) / 0.5) ** 1.6); return [top[0], lerp(top[1], bot[1], u), A.face * (PI / 2 + 0.75 + u * 0.75)];
+        if (t < 5.2) { const u = ease((t - 4.85) / 0.35); return [lerp(over[0], top[0], u), lerp(over[1], top[1], u), A.face * (PI / 2 + u * PI / 2)]; }
+        // straight down, head first, lined up with the opening
+        const u = Math.min(1, ((t - 5.2) / 0.4) ** 1.6); return [top[0], lerp(top[1], bot[1], u), A.face * PI];
       } });
     });
     s.at(5.6, () => { api.sfx('crunch'); api.shake(4); FX.blood(dump.x, F - DH, 16, 0, 0.8); FX.gib('bone', dump.x, F - DH - 4, rnd(-90, 90), -260, { s: 0.5 }); });
@@ -363,11 +364,15 @@ FATAL.add(K => {
       const cx = V.x + V.face * 8, cy = F - hh * 0.58;
       if (t < 0.55) { const u = ease((t - 0.25) / 0.3); A.x = lerp(x0, cx, u); A.y = lerp(F, cy, u) - Math.sin(u * PI) * 30; A.scriptPose = PS.jump; return; }
       if (t < 2.4) {
-        A.x = cx + rnd(-1.5, 1.5); A.y = cy + rnd(-1.5, 1.5);
-        A.scriptPose = P({ hy: -2, lean: 0.45 + Math.sin(t * 40) * 0.12, head: 0.5, aF: [2.0, 0.7], aB: [1.8, 0.8], lF: [1.4, 1.9], lB: [1.0, 2.0] });
+        // he scrambles all over the body, chewing as he goes: neck, chest, arm, gut, leg, back up to the face
+        const SPOTS = ['neck', 'chest', 'elbowF', 'belly', 'kneeF', 'hip', 'chest', 'head'], seg2 = (t - 0.55) / (1.85 / SPOTS.length);
+        const si = Math.min(SPOTS.length - 1, seg2 | 0), sp = J(V, SPOTS[si]), hd = J(A, 'head');
+        const tx = sp[0] + V.face * 10 * k, ty = Math.min(F, A.y + (sp[1] - hd[1]) + 4);
+        A.x += (tx - A.x) * Math.min(1, dt * 14) + rnd(-1.2, 1.2); A.y += (ty - A.y) * Math.min(1, dt * 14) + rnd(-1.2, 1.2);
+        A.scriptPose = P({ hy: -2, lean: 0.45 + Math.sin(t * 40) * 0.12, head: 0.5, jaw: Math.abs(Math.sin(t * 22)), aF: [2.0, 0.7], aB: [1.8, 0.8], lF: [1.4, 1.9], lB: [1.0, 2.0] });
         A.ro.claws = true;
-        const nk = J(V, 'neck'); FX.spurt(nk[0], nk[1], -A.face * 0.5, 1); if (Math.random() < 0.3) FX.blood(nk[0], nk[1], 3, -A.face, 1.2);
-        if (t > nextChomp) { nextChomp = t + 0.14; api.sfx('chomp'); if (Math.random() < 0.3) FX.gib('chunk', nk[0], nk[1], rnd(-80, 80), rnd(-200, -80)); }
+        if (Math.random() < 0.45) FX.blood(sp[0], sp[1], 3, -A.face, 1.2);
+        if (t > nextChomp) { nextChomp = t + 0.12; api.sfx('chomp'); if (Math.random() < 0.4) FX.gib('chunk', sp[0], sp[1], rnd(-80, 80), rnd(-200, -80)); }
         V.ro.dx = rnd(-1.5, 1.5);
         V.scriptPose = P({ hy: 6 + (t - 0.55) * 4, lean: -0.3, head: -0.5, aF: [2.0 + Math.sin(t * 13) * 0.6, 0.5], aB: [1.6 + Math.cos(t * 11) * 0.6, 0.6], fF: [9, 0], fB: [-10, 0] });
         return;
