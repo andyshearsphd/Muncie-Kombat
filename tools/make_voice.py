@@ -21,7 +21,7 @@ SHOUT = {'fight': (100, 12), 'fatality': (88, 8), 'finish him': (98, 10), 'finis
 # how a line should sound, when the written form trips up the voice
 def pronounce(t):
     t = re.sub(r'\bpres\.?\s', 'president ', t)
-    return t.replace('ofc ', 'officer ').replace('balling ', "ballin' ")
+    return t.replace('ofc ', 'officer ').replace('balling ', 'bawlin ')
 
 src = open(os.path.join(ROOT, 'js', 'fighters.js')).read()
 names = re.findall(r"""id: '\w+', name: (?:'([^']+)'|"([^"]+)"), short:""", src)

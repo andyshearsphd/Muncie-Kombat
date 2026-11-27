@@ -1,7 +1,7 @@
 // Muncie Kombat: game settings for the Kombat Engine (titles, mascot, victory poses)
 'use strict';
 // the announcer: say "Pres." as "President" when a line falls back to text-to-speech
-if (typeof SFX !== 'undefined' && SFX.say) { const say0 = SFX.say; SFX.say = (str, ...rest) => say0(String(str).replace(/\bpres\.?\s/gi, 'president '), ...rest); }
+if (typeof SFX !== 'undefined' && SFX.say) { const say0 = SFX.say; SFX.say = (str, ...rest) => say0(String(str).replace(/\bpres\.?\s/gi, 'president ').replace(/\bballing\b/gi, 'bawlin'), ...rest); }
 window.GAME = {
   title: 'MUNCIE KOMBAT',
   subtitle: 'A PURPLE HIPPO ARCADE GAME',

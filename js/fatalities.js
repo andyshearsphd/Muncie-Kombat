@@ -217,19 +217,22 @@ FATAL.add(K => {
     const d = -A.face, rimY = F - 176;
     const reach = F - R.jointWorld(Object.assign({}, A, { y: F }), R.resolve(A.d, P({ hy: -2, lean: -0.1, aF: [3.1, 0.05], aB: [2.6, 0.3], lF: [0.3, 0.6], lB: [-0.1, 0.4] })), 'handF')[1];
     const jumpH = Math.max(12, Math.min(90, 176 - reach + 16)), hangY = F - (176 - reach) - 4;
-    let head = null, hoopX, drop = -160, shattered = false, jumpX0;
+    let head = null, hoopX, drop = -160, shattered = false, jumpX0, fade = 1;
     s.at(0.5, () => { A.scriptPose = P({ hy: 4, lean: 0.2, aF: [2.2, 0.2], aB: [0.6, 1.9], fF: [16, 0], fB: [-13, 0] }); });
     s.at(1.1, () => {
       V.ro.noHead = true; api.sfx('crunch'); api.sfx('splat'); api.shake(5);
       head = headGib(V, 0, 0, { follow: () => { const h = J(A, 'handF'); return [h[0], h[1] - 6 * V.d.k, 0]; } });
       hoopX = Math.max(api.cam + 50, Math.min(api.cam + api.W - 50, A.x + d * 110));
       prop({ layer: 'back', draw(g) {
+        if (fade <= 0) return;
+        g.save(); g.globalAlpha = fade;
         const y = rimY + drop, bx = hoopX + d * 16;
         R.line(g, bx + d * 26, F, bx + d * 26, y - 20, '#3a3a40', 4); R.line(g, bx + d * 26, y - 10, bx, y - 10, '#3a3a40', 3);
         if (!shattered) { g.fillStyle = 'rgba(220,235,245,0.7)'; g.fillRect(bx - 2, y - 34, 4, 40); g.strokeStyle = '#f4f4f4'; g.lineWidth = 1; g.strokeRect(bx - 2, y - 34, 4, 40); }
         else { g.fillStyle = 'rgba(220,235,245,0.4)'; g.fillRect(bx - 2, y - 34, 4, 6); }
         g.strokeStyle = '#e8e8ec'; g.lineWidth = 0.7; for (let i = -3; i <= 3; i++) { g.beginPath(); g.moveTo(hoopX + i * 3, y); g.lineTo(hoopX + i * 2, y + 14); g.stroke(); }
         g.strokeStyle = '#e8601a'; g.lineWidth = 2; g.beginPath(); g.ellipse(hoopX, y, 11, 2.5, 0, 0, PI * 2); g.stroke();
+        g.restore();
       } });
       api.sfx('clang');
     });
@@ -242,12 +245,15 @@ FATAL.add(K => {
       FX.blood(hoopX, rimY + 4, 20, 0, 0.6);
     });
     s.at(2.1, () => { V.scriptPose = PS.downFace(V); api.sfx('thud'); });
+    // the whole goal vanishes in a puff once he's down
+    s.at(3.5, () => { api.sfx('whoosh'); for (let i = 0; i < 8; i++) FX.puff(hoopX + d * 20 + rnd(-14, 14), rimY + rnd(-30, 160), 'rgba(200,200,210,0.6)', 10, 4); });
     s.at(3.4, () => api.bubble('POSTERIZED!', A.x, F - 150, { size: 15, fill: 'fire', life: 1.8 }));
     s.at(4.6, () => { s.done = true; });
     s.tick = (t, dt) => {
       if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 22 * k, dt, api, 110); return; }
       if (t < 1.1) { V.ro.dx = rnd(-1.5, 1.5); A.scriptPose = P({ hy: 4, lean: lerp(0.2, -0.4, (t - 0.5) / 0.6), aF: [lerp(2.0, 2.6, (t - 0.5) / 0.6), 0.2], aB: [0.6, 1.9], fF: [16, 0], fB: [-13, 0] }); return; }
       V.ro.dx = 0;
+      if (t > 3.5) fade = Math.max(0, 1 - (t - 3.5) / 0.3);
       if (t < 2.1) { const nk = J(V, 'neck'); FX.spurt(nk[0], nk[1], V.face * 0.2, 1); }
       drop = t < 1.5 ? lerp(-160, 0, ease((t - 1.1) / 0.4)) : 0;
       if (t < 1.6) { A.scriptPose = P({ hy: 3, lean: -0.1, aF: [2.9, 0.1], aB: [0.6, 1.9], fF: [12, 0], fB: [-12, 0] }); return; }
