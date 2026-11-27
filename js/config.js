@@ -17,11 +17,11 @@ window.GAME = {
 
   // ---------- game-defined projectiles ----------
   projectiles: {
-    // Walmart Karen's expired coupons: three at once, fanned out
+    // Wally World Karen's expired coupons: three at once, fanned out
     coupons: { speed: 300, dmg: 4, w: 10, h: 7, spread: [-50, 0, 50], sfx: 'whoosh', draw(g, p, s, t) { g.rotate(Math.sin(t * 20) * 0.4); g.fillStyle = '#fff6c8'; g.fillRect(-7, -4, 14, 8); g.strokeStyle = '#2a2a2a'; g.setLineDash([1, 1]); g.lineWidth = 0.5; g.strokeRect(-7, -4, 14, 8); g.setLineDash([]); g.fillStyle = '#c81818'; g.font = '4px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillText('50¢ OFF', 0, 1.6); g.textAlign = 'left'; } },
     // Bearcat's fight song: a stack of purple sound waves that stuns
-    fightsong: { speed: 260, dmg: 7, w: 14, h: 24, fx: 'stun', sfx: 'howl', draw(g, p, s, t) { g.scale(s * 1.6, 1.6); for (let i = 0; i < 3; i++) { g.strokeStyle = `rgba(${210 - i * 30},150,255,${0.95 - i * 0.22})`; g.lineWidth = 3; g.beginPath(); g.arc(-i * 6, 0, 7 + i * 4 + Math.sin(t * 30) * 1.5, -1.0, 1.0); g.stroke(); } g.scale(s / 1.6, 1 / 1.6); g.fillStyle = '#f0e8ff'; g.font = '8px Anton, Impact, sans-serif'; g.fillText('♪', -3, -10 + Math.sin(t * 12) * 2); } },
-    // Creepy Councilman's business card: CALL ME scrawled on the back
+    fightsong: { speed: 260, dmg: 7, w: 14, h: 24, fx: 'stun', sfx: 'horn', draw(g, p, s, t) { g.scale(s * 1.6, 1.6); for (let i = 0; i < 3; i++) { g.strokeStyle = `rgba(${210 - i * 30},150,255,${0.95 - i * 0.22})`; g.lineWidth = 3; g.beginPath(); g.arc(-i * 6, 0, 7 + i * 4 + Math.sin(t * 30) * 1.5, -1.0, 1.0); g.stroke(); } g.scale(s / 1.6, 1 / 1.6); g.fillStyle = '#f0e8ff'; g.font = '8px Anton, Impact, sans-serif'; g.fillText('♪', -3, -10 + Math.sin(t * 12) * 2); } },
+    // Councilman Creep's business card: CALL ME scrawled on the back
     bizcard: { speed: 320, dmg: 7, w: 12, h: 8, sfx: 'whoosh', draw(g, p, s, t) { g.rotate(t * 16 * s); g.fillStyle = '#f4f0e8'; g.fillRect(-8, -5, 16, 10); g.fillStyle = '#22283a'; g.fillRect(-8, -5, 16, 2.4); g.fillStyle = '#b01848'; g.font = '4px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillText('CALL ME', 0, 3); g.textAlign = 'left'; } },
     // the president's diploma: a rolled scroll in a red ribbon, lobbed end over end
     diploma: { speed: 280, vy: -160, grav: 380, dmg: 9, w: 12, h: 10, fx: 'knock', launch: [180, -300], sfx: 'whoosh', hitSfx: 'thud', draw(g, p, s, t) { g.rotate(t * 13 * s); g.fillStyle = '#f2ead4'; g.fillRect(-11, -3, 22, 6); g.fillStyle = '#d8ccae'; g.beginPath(); g.ellipse(-11, 0, 1.6, 3, 0, 0, Math.PI * 2); g.fill(); g.beginPath(); g.ellipse(11, 0, 1.6, 3, 0, 0, Math.PI * 2); g.fill(); g.fillStyle = '#a8141c'; g.fillRect(-1.6, -3.4, 3.2, 6.8); } },
@@ -77,7 +77,7 @@ window.GAME = {
       possum: { fp: t => t < 1.5 ? ({ jaw: 1, aL: [1.9 + Math.sin(t * 18) * 0.15, 0.3], aR: [1.9 - Math.sin(t * 18) * 0.15, 0.3], squat: 4 }) : ({ jaw: 0.2, aL: [0.4, 0.2], aR: [0.4, 0.2], squat: 3, head: 0.25 }),
         fx(f, t) { if (once(f, 'h', t, 0.05) || once(f, 'h2', t, 0.9)) SFX.hiss(); } },
       catbear: { fp: t => t < 1.4 ? ({ jaw: 1, aL: [2.9 + Math.sin(t * 10) * 0.15, 0.2], aR: [2.9 - Math.sin(t * 10) * 0.15, 0.2], hy: -Math.abs(Math.sin(t * 5)) * 4 }) : ({ jaw: 0.3, aR: [0.45, -3.2], aL: [0.6, -1.5], squat: 2 }),
-        fx(f, t) { if (once(f, 'r', t, 0.1)) SFX.howl(); if (once(f, 'j1', t, 0.65) || once(f, 'j2', t, 1.25)) { SFX.thud(); FX.dust(f.x, FLOOR, 8); } } },
+        fx(f, t) { if (once(f, 'r', t, 0.1)) SFX.horn(); if (once(f, 'j1', t, 0.65) || once(f, 'j2', t, 1.25)) { SFX.thud(); FX.dust(f.x, FLOOR, 8); } } },
       councilman: { fp: t => t < 1.2 ? ({ aR: [0.6, -2.6], aL: [0.6, -1.5], head: 0.12 }) : ({ aL: [1.35, 1.4], aR: [1.35, 1.4], head: Math.sin(t * 2) * 0.05 }),
         fx(f, t) { if (once(f, 'w', t, 1.5)) { SFX.ding(); game.bubbles.push({ str: 'LOTS OF TALENT IN THE ROOM TODAY.', x: f.x, y: f.y - hurtH(f) - 20, t: 0, life: 2.2, size: 11, fill: 'white' }); } },
         draw(g, f, t) { if (t > 1.2) for (const hn of ['handL', 'handR']) { const h = fj(f, hn); g.fillStyle = '#e8b898'; g.fillRect(h[0] - 1, h[1] - 7, 2, 7); } } },

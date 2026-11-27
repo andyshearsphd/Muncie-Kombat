@@ -51,7 +51,7 @@ const ROSTER = (() => {
 
   const SKIN_L = '#d9a888';
   const painter = {
-    id: 'painter', name: 'PAINTER DUDE', short: 'PAINTER', him: 'HIM', k: 1.0,
+    id: 'painter', name: 'TV PAINTER', short: 'PAINTER', him: 'HIM', k: 1.0,
     bio: 'Every tree needs a friend. Every friend needs a beating.',
     d: dims({}),
     col: { torso: '#8fb0c8', armU: '#8fb0c8', armL: '#8fb0c8', cuff: '#8fb0c8', hand: SKIN_L, legU: '#344a6e', legL: '#344a6e', foot: '#4a3020', neck: SKIN_L },
@@ -301,7 +301,7 @@ const ROSTER = (() => {
 
   const RG = '#6e6e72', RGL = '#b0b0b0', RGD = '#222226';
   const rocky = {
-    id: 'rocky', name: 'ROCKY', short: 'ROCKY', him: 'HIM', k: 1.05, paws: true, claws: true, skull: 'raccoon', bicep: 0.4,
+    id: 'rocky', name: 'ROCKY ROCOCO', short: 'ROCKY', him: 'HIM', k: 1.05, paws: true, claws: true, skull: 'raccoon', bicep: 0.4,
     bio: 'Rabid, foaming and living in the dumpster behind Royal Pizza.',
     d: dims({ thigh: 20, shin: 19, torso: 33, neck: 2, upper: 18, fore: 17, hipW: 19, shW: 17, chest: 20, belly: 26, back: 19, thighR: 11, kneeR: 7, ankleR: 5, shR: 8.4, elbowR: 6.4, wristR: 5, fist: 5.4, footL: 12, footH: 4.8 }),
     col: { torso: RG, armU: RG, armL: sh(RG, -0.3), hand: RGD, legU: RG, legL: sh(RG, -0.3), foot: RGD, neck: RG },
@@ -339,7 +339,7 @@ const ROSTER = (() => {
 
   const MB = '#5a3e26', MBL = '#8a6a48', MBD = '#2a1e14';
   const millie = {
-    id: 'millie', name: 'MILLIE', short: 'MILLIE', him: 'HER', k: 1.04, paws: true, claws: true, skull: 'muskrat',
+    id: 'millie', name: 'MILLIE MUSKRAT', short: 'MILLIE', him: 'HER', k: 1.04, paws: true, claws: true, skull: 'muskrat',
     bio: 'White River muskrat. Those teeth go through bone like balsa.',
     d: dims({ thigh: 25, shin: 23, torso: 34, neck: 5, upper: 19, fore: 18, hipW: 15, shW: 13, chest: 14.5, belly: 17, back: 14, thighR: 8.5, kneeR: 5.8, ankleR: 4, shR: 6.2, elbowR: 4.6, wristR: 3.8, fist: 4.3, footL: 12, footH: 4.2 }),
     col: { torso: MB, armU: MB, armL: MB, hand: MBD, legU: MB, legL: MB, foot: MBD, neck: MB },
@@ -450,7 +450,7 @@ const ROSTER = (() => {
   // ---------- CHUCKY: an original anthropomorphic red cardinal ----------
   const CR = '#b0141c', CRD = '#6a0a10', CRL = '#d83a34';
   const chucky = {
-    id: 'chucky', name: 'CHUCKY', short: 'CHUCKY', him: 'HIM', k: 1.1, talons: true, paws: true, skull: 'cardinal', skullK: 1.0,
+    id: 'chucky', name: 'CHUCKY CARD-CARD', short: 'CHUCKY', him: 'HIM', k: 1.1, talons: true, paws: true, skull: 'cardinal', skullK: 1.0,
     bio: 'A cardinal with a chip on his shoulder and a beak like a pickaxe. Cardinal red runs in his veins. Yours too, soon.',
     bicep: 0.45, calf: 0.1,
     d: dims({ thigh: 25, shin: 24, torso: 36, neck: 3, upper: 21, fore: 20, hipW: 15, shW: 20, chest: 22, belly: 19, back: 17, thighR: 10.5, kneeR: 3.8, ankleR: 3.2, shR: 8.4, elbowR: 6.4, wristR: 4.8, fist: 5.6, footL: 14, footH: 3.8 }),
@@ -542,10 +542,10 @@ const ROSTER = (() => {
     fatal: { id: 'turkey', name: 'CARVED' }, alt: { id: 'nest', name: 'NEST' }
   };
 
-  // ---------- COKE WOLFE: a werewolf in a white 80s suit with a nose habit ----------
+  // ---------- COKE WOLF: a werewolf in a white 80s suit with a nose habit ----------
   const WF = '#6a5a4a', WFD = '#3a3028', WS = '#ece8de';
   const wolfe = {
-    id: 'wolfe', name: 'COKE WOLFE', short: 'WOLFE', him: 'HIM', k: 1.08, paws: true, claws: true, skull: 'raccoon', skullK: 1.25,
+    id: 'wolfe', name: 'COKE WOLF', short: 'WOLF', him: 'HIM', k: 1.08, paws: true, claws: true, skull: 'raccoon', skullK: 1.25,
     bio: 'Came up in a white suit and never came down. Full moon every night if you bring enough powder.',
     bicep: 0.3, calf: 0.12,
     d: dims({ thigh: 29, shin: 28, torso: 37, neck: 5, upper: 22, fore: 21, hipW: 11, shW: 17, chest: 16, belly: 11, back: 12, thighR: 7.4, kneeR: 4.8, shR: 6.6, elbowR: 4.6, wristR: 3.8, fist: 4.6, footL: 13 }),
@@ -813,7 +813,7 @@ const ROSTER = (() => {
   // ---------- POSSUM: lives under your porch ----------
   const PG = '#bab6ae', PGD = '#2a2626', PWH = '#f0ece4', PK = '#e8a8a8';
   const possum = {
-    id: 'possum', name: 'PETEY', short: 'PETEY', him: 'HIM', k: 1.0, paws: true, claws: true, skull: 'raccoon', skullK: 1.05, bicep: 0.25,
+    id: 'possum', name: 'PETEY POSSUM', short: 'PETEY', him: 'HIM', k: 1.0, paws: true, claws: true, skull: 'raccoon', skullK: 1.05, bicep: 0.25,
     bio: 'Fifty teeth and zero shame. Lives under your porch. Plays dead until you get close.',
     d: dims({ thigh: 20, shin: 19, torso: 32, neck: 2, upper: 17, fore: 16, hipW: 15, shW: 14, chest: 16, belly: 19, back: 15, thighR: 8.4, kneeR: 5.6, ankleR: 4, shR: 6.6, elbowR: 4.8, wristR: 3.8, fist: 4.2, footL: 12, footH: 4.4 }),
     col: { torso: PG, armU: PG, armL: PGD, hand: PK, legU: PG, legL: PGD, foot: PK, neck: PG },
@@ -898,10 +898,10 @@ const ROSTER = (() => {
     fatal: { id: 'catbear', name: 'SPIRIT WEEK' }
   };
 
-  // ---------- CREEPY COUNCILMAN: handsome, connected, and standing way too close ----------
+  // ---------- COUNCILMAN CREEP: handsome, connected, and standing way too close ----------
   const CCS = '#22283a', CCH = '#b8441c', CCK = '#e8b898';
   const councilman = {
-    id: 'councilman', name: 'CREEPY COUNCILMAN', short: 'COUNCILMAN', him: 'HIM', k: 1.08, bicep: 0.28, calf: 0.18,
+    id: 'councilman', name: 'COUNCILMAN CREEP', short: 'COUNCILMAN', him: 'HIM', k: 1.08, bicep: 0.28, calf: 0.18,
     bio: 'Handsome, well connected and always standing way too close. HR has a whole drawer just for him.',
     d: dims({ thigh: 30, shin: 29, torso: 36, upper: 21, fore: 20, hipW: 12.5, shW: 18.5, chest: 17.5, belly: 14, back: 13.5, thighR: 8.6, kneeR: 5.6, ankleR: 4, shR: 7.4, elbowR: 5.6, wristR: 4.2, fist: 5 }),
     col: { torso: CCS, armU: CCS, armL: CCS, cuff: '#f0f0ec', hand: CCK, legU: CCS, legL: CCS, foot: '#4a2a18', neck: CCK },
@@ -965,9 +965,9 @@ const ROSTER = (() => {
     g.fillStyle = 'rgba(255,250,210,0.7)'; g.fillRect(x - r * 0.5, y - r * 0.6, r * 0.4, r * 0.3);
   }
   const prez = {
-    id: 'prez', name: 'PRES. NEVER LEARNS', short: 'NEVER LEARNS', him: 'HIM', k: 0.9, bicep: 0, calf: 0,
+    id: 'prez', name: 'PRES. NEVER LEARNS', short: 'NEVER LEARNS', him: 'HIM', k: 1.0, bicep: 0, calf: 0,
     bio: 'The university president. Raised tuition, cut your program and gave himself a bonus. Office hours: never.',
-    d: dims({ thigh: 26, shin: 25, torso: 33, upper: 19, fore: 18, hipW: 11, shW: 13, chest: 12.5, belly: 11, back: 10, thighR: 6, kneeR: 4.2, ankleR: 3.2, shR: 5.4, elbowR: 4.6, wristR: 3, fist: 3.6 }),
+    d: dims({ thigh: 32, shin: 31, torso: 38, neck: 5, upper: 22, fore: 21, hipW: 10, shW: 12, chest: 11.5, belly: 10.5, back: 9.5, thighR: 5.5, kneeR: 4, ankleR: 3, shR: 5, elbowR: 4.2, wristR: 2.8, fist: 3.4 }),
     col: { torso: PRG, armU: PRG, armL: PRG, cuff: PRG, hand: PRS, legU: '#2a2a30', legL: '#2a2a30', foot: '#0c0c0e', neck: PRS },
     mat: { torso: 'cloth', armU: 'cloth', armL: 'cloth', legU: 'cloth', legL: 'cloth' },
     stats: { speed: 1.02, power: 0.95, weight: 0.85 },
@@ -1024,10 +1024,10 @@ const ROSTER = (() => {
     fatal: { id: 'prez', name: 'HONORARY DEGREE' }
   };
 
-  // ---------- WALMART KAREN: she would like to speak to your manager ----------
+  // ---------- WALLY WORLD KAREN: she would like to speak to your manager ----------
   const KB = '#cfe0f2', KS = '#ecc0a0', KJ = '#4e6c9c', KH = '#b88a4a', KHL = '#ecd08e', KHD = '#5a3a1c';
   const karen = {
-    id: 'karen', name: 'WALMART KAREN', short: 'KAREN', him: 'HER', k: 1.0, bicep: 0.3, calf: 0.35, sock: KS,
+    id: 'karen', name: 'WALLY WORLD KAREN', short: 'KAREN', him: 'HER', k: 1.0, bicep: 0.3, calf: 0.35, sock: KS,
     bio: 'Capris, flip-flops and a coupon that expired in 2019. She will be speaking to your manager.',
     d: dims({ thigh: 26, shin: 24, torso: 34, upper: 19, fore: 18, hipW: 15, shW: 15, chest: 17.5, belly: 18, back: 15, thighR: 9.4, kneeR: 5.6, ankleR: 3.8, shR: 6.6, elbowR: 4.6, wristR: 3.4, fist: 4, footL: 12, footH: 3.2 }),
     col: { torso: KB, armU: KB, armL: KS, hand: KS, legU: KJ, legL: KJ, foot: KS, neck: KS },
@@ -1593,7 +1593,7 @@ const ROSTER = (() => {
     },
   };
 
-  const FIGHTERS = [hippo, painter, garf, host, ballin, gertie, rocky, millie, chucky, turkey, wolfe, em, tinman, bunyon, becky, possum, catbear, councilman, prez, karen];
+  const FIGHTERS = [hippo, painter, garf, host, ballin, gertie, rocky, millie, chucky, turkey, wolfe, em, tinman, bunyon, becky, possum, catbear, councilman, prez, karen].sort((a, b) => a.name.localeCompare(b.name));   // alphabetical in the select grid
   const BOSSES = [tinkle, golem, slumlord, dan];
   // ---------- engine hooks: per-fighter behavior the Kombat Engine reads from the roster ----------
   // feathers: color of feathers that fly off on hits. glass: bleeds glass and green brine, no wounds.

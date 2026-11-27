@@ -46,7 +46,7 @@ FATAL.add(K => {
     };
   };
 
-  // ---------- PAINTER DUDE: Happy Little Accident ----------
+  // ---------- TV PAINTER: Happy Little Accident ----------
   S.painter = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR;
     const raise = a => P({ hy: 2, lean: -0.1, aF: [a, 0.1], aB: [0.55, 1.95], fF: [12, 0], fB: [-13, 0] });
@@ -866,12 +866,27 @@ FATAL.add(K => {
   // ---------- TIM BUNYON: Timber ----------
   S.bunyon = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face;
-    const CH0 = P({ hy: 6, lean: 0.3, head: 0.2, aF: [0.6, 1.6], aB: [-1.3, 0.2], fF: [16, 0], fB: [-16, 0] });
-    const CH1 = P({ hyL: 0.42, lean: 0.95, head: 0.5, aF: [0.5, 1.4], aB: [0.75, 0.05], fF: [22, 0], fB: [-16, 0] });
-    const UP = P({ hy: 2, lean: -0.25, head: -0.3, aF: [2.9, 0.2], aB: [3.05, 0.1], fF: [14, 0], fB: [-14, 0] });
-    const SLAM = P({ hyL: 0.2, lean: 0.9, head: 0.5, aF: [1.5, 0.1], aB: [1.45, 0.05], fF: [20, 0], fB: [-14, 0] });
+    // both hands on the handle: arm angles are given in the world, the lean is taken back out
+    const arms = (lean, a1, a2) => ({ aF: [a1 - lean, a2 - a1], aB: [a1 - lean - 0.08, a2 - a1 + 0.1] });
+    const CH0 = P(Object.assign({ hy: 8, lean: 0.15, head: 0.1, fF: [16, 0], fB: [-16, 0] }, arms(0.15, 2.7, 3.5)));   // wound up over the back shoulder
+    const CH1 = P(Object.assign({ hyL: 0.42, lean: 0.7, head: 0.4, fF: [22, 0], fB: [-16, 0] }, arms(0.7, 1.0, 1.15)));  // swung through low, at the ankles
+    const UP = P(Object.assign({ hy: 2, lean: -0.2, head: -0.3, fF: [14, 0], fB: [-14, 0] }, arms(-0.2, 2.95, 3.6)));    // raised high overhead
+    const SLAM = P(Object.assign({ hyL: 0.2, lean: 0.8, head: 0.5, fF: [20, 0], fB: [-14, 0] }, arms(0.8, 1.35, 1.45))); // brought straight down
     let fall = 0, falling = false, landed = false, logsOn = false, feet = null, midX = 0;
-    A.st2.axe = true;
+    A.st2.axe = false;
+    // the axe is drawn here, gripped in both fists; its angle (0 forward, -PI/2 up, PI/2 down) swings to each target
+    let axA = -2.4, axT = -2.4, axeOn = true, stuck = null;
+    const grip = () => { const a = J(A, 'handF'), b = J(A, 'handB'); return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; };
+    const aimAt = (p) => { const g0 = grip(); return Math.atan2(p[1] - g0[1], d * (p[0] - g0[0])); };
+    prop({ layer: 'front', draw(g) {
+      if (!axeOn) return;
+      const w = stuck || grip(), u = [d * Math.cos(axA), Math.sin(axA)], n = [d * Math.cos(axA + PI / 2), Math.sin(axA + PI / 2)], L = 40 * k;
+      const a0 = [w[0] - u[0] * 7 * k, w[1] - u[1] * 7 * k], b0 = [w[0] + u[0] * L, w[1] + u[1] * L];
+      R.line(g, a0[0], a0[1], b0[0], b0[1], '#5a4630', 3.4 * k); R.line(g, a0[0], a0[1], b0[0], b0[1], '#e8dcc0', 2.4 * k);
+      const h0 = [b0[0] - u[0] * 3 * k, b0[1] - u[1] * 3 * k], e1 = [h0[0] + n[0] * 11 * k + u[0] * 5 * k, h0[1] + n[1] * 11 * k + u[1] * 5 * k], e2 = [h0[0] + n[0] * 11 * k - u[0] * 8 * k, h0[1] + n[1] * 11 * k - u[1] * 8 * k];
+      g.fillStyle = '#2a2a2e'; g.beginPath(); g.moveTo(h0[0] - n[0] * 3 * k + u[0] * 2 * k, h0[1] - n[1] * 3 * k + u[1] * 2 * k); g.lineTo(e1[0], e1[1]); g.lineTo(e2[0], e2[1]); g.lineTo(h0[0] - n[0] * 3 * k - u[0] * 3 * k, h0[1] - n[1] * 3 * k - u[1] * 3 * k); g.closePath(); g.fill();
+      R.line(g, e1[0], e1[1], e2[0], e2[1], '#d8dce4', 1.3 * k);
+    } });
     const logs = [];
     prop({ layer: 'back', draw(g) {
       if (feet) for (const p of feet) { R.ball(g, p[0], F - 3, 5 * V.d.k, V.def.col.foot); R.ball(g, p[0], F - 7 * V.d.k, 3 * V.d.k, '#8a0010'); }
@@ -900,17 +915,21 @@ FATAL.add(K => {
     s.at(5.0, () => api.bubble('FIREWOOD.', A.x, F - 170, { size: 13, fill: 'gold', life: 1.8 }));
     s.at(6.6, () => { s.done = true; });
     s.tick = (t, dt) => {
-      if (t < 0.85) { walkTo(A, V.x - d * 44 * k, dt, api, 120); V.scriptPose = PS.dizzy(V.t); return; }
-      if (t < 1.85) { const ph = ((t - 0.85) / 0.4) % 1; A.scriptPose = ph < 0.6 ? CH0 : CH1; V.scriptPose = P({ hy: 6, lean: -0.1, head: -0.5, aF: [2.4, 0.4], aB: [2.1, 0.5], fF: [10, 0], fB: [-10, 0] }); return; }
+      axA += (axT - axA) * Math.min(1, dt * 22);
+      if (t < 0.85) { axT = -2.2; walkTo(A, V.x - d * 44 * k, dt, api, 120); V.scriptPose = PS.dizzy(V.t); return; }
+      if (t < 1.85) { const ph = ((t - 0.85) / 0.4) % 1; A.scriptPose = ph < 0.6 ? CH0 : CH1; axT = ph < 0.6 ? -2.5 : aimAt(J(V, 'footF')); V.scriptPose = P({ hy: 6, lean: -0.1, head: -0.5, aF: [2.4, 0.4], aB: [2.1, 0.5], fF: [10, 0], fB: [-10, 0] }); return; }
       if (falling && !landed) {
         fall = Math.min(PI / 2, fall + dt * (0.35 + fall * 3.2));
         V.scriptPose = P({ hy: 0, lean: 0, head: -0.25, aF: [2.6, 0.3], aB: [2.4, 0.3], fF: [4, 0], fB: [-4, 0], rot: -fall, piv: 1 });
-        A.scriptPose = PS.stance(A.t);
+        A.scriptPose = PS.stance(A.t); axT = 1.2;
         if (fall >= PI / 2) { landed = true; api.sfx('thud'); api.sfx('big'); api.shake(9); FX.dust(V.x + d * 40 * V.d.k, F, 26); midX = V.x + d * hurtLen() * 0.5; }
         return;
       }
-      if (t < 4.0) { walkTo(A, midX - d * 40 * k, dt, api, 110) && (A.scriptPose = t < 3.7 ? UP : SLAM); return; }
-      A.scriptPose = t < 4.6 ? SLAM : PS.win(A.t);
+      if (t < 4.0) { if (walkTo(A, midX - d * 40 * k, dt, api, 110)) { A.scriptPose = t < 3.7 ? UP : SLAM; axT = t < 3.7 ? -2.75 : aimAt([midX, F - 4]); } else axT = 1.2; return; }
+      if (t < 4.6) { A.scriptPose = SLAM; axT = aimAt([midX, F - 4]); return; }
+      // he lets go and leaves it standing in the woodpile
+      if (!stuck) { stuck = grip(); axT = axA; }
+      A.scriptPose = PS.win(A.t);
     };
     const hurtLen = () => api.hurtH(V);
   };
@@ -1078,8 +1097,7 @@ FATAL.add(K => {
       (V.st2.wounds || (V.st2.wounds = [])).push({ j: 'chest', dx: rnd(-3, 3), dy: rnd(-8, 8), r: 3.4, a: 0.7, drip: 6 });
     });
     s.at(2.25, () => { holding = true; V.ro.noHead = true; api.sfx('splat'); api.sfx('scream'); api.shake(8); const n = J(V, 'neck'); FX.burst(n[0], n[1], 10, ['bone', 'chunk', 'tooth'], 0.8); FX.blood(n[0], n[1], 40, 0, 1.8, 1.6); });
-    s.at(3.0, () => api.bubble('GIMME A B!', A.x, F - 150, { size: 12, fill: 'white', life: 1 }));
-    s.at(3.9, () => api.bubble('GO BEARCATS!', A.x, F - 160, { size: 14, fill: 'purple', life: 1.8 }));
+    s.at(3.4, () => api.bubble('EASY AS A SINGLE CLASS SECTIONAL.', A.x, F - 160, { size: 12, fill: 'purple', life: 2.6 }));
     s.at(5.0, () => { holding = false; const h = J(A, 'handF'); headGib(V, h[0], h[1], { vx: -d * 220, vy: -520, vr: 10 }); api.sfx('whoosh'); });
     s.at(6.4, () => { s.done = true; });
     s.tick = (t, dt) => {
@@ -1099,7 +1117,7 @@ FATAL.add(K => {
     };
   };
 
-  // ---------- CREEPY COUNCILMAN: Too Long a Hug ----------
+  // ---------- COUNCILMAN CREEP: Too Long a Hug ----------
   // cologne, arms out wide, "bring it in", then a bear hug that will not end until the ribs do
   S.councilman = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face, SKIN = A.def.col.hand, SUIT = A.def.col.armU;
@@ -1225,7 +1243,7 @@ FATAL.add(K => {
     };
   };
 
-  // ---------- WALMART KAREN: Manager! ----------
+  // ---------- WALLY WORLD KAREN: Manager! ----------
   // she demands the manager so loudly the victim's head swells up and bursts
   S.karen = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face;
@@ -1463,15 +1481,16 @@ FATAL.add(K => {
       A.scriptPose = api.PS.win(A.t);
     };
   };
-  // ---------- COKE WOLFE: Full Moon ----------
+  // ---------- COKE WOLF: Full Moon ----------
   S.wolfe = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR;
-    let moon = 0, bite = false, head = false, x0 = 0, nextShake = 0;
+    let moon = 0, moonFade = 1, bite = false, head = false, x0 = 0, nextShake = 0;
     const mx = () => api.cam + api.W * 0.5, my = 54;
     prop({ layer: 'back', draw(g) {
       if (moon <= 0) return;
       const y = lerp(F, my, moon);
-      g.save(); g.globalAlpha = Math.min(1, moon * 1.4);
+      if (moonFade <= 0) return;
+      g.save(); g.globalAlpha = Math.min(1, moon * 1.4) * moonFade;
       const gr = g.createRadialGradient(mx(), y, 10, mx(), y, 70); gr.addColorStop(0, 'rgba(255,250,220,0.5)'); gr.addColorStop(1, 'rgba(255,250,220,0)');
       g.fillStyle = gr; g.fillRect(mx() - 80, y - 80, 160, 160);
       R.ball(g, mx(), y, 28, '#f4efd8'); g.fillStyle = 'rgba(160,150,120,0.35)'; g.beginPath(); g.arc(mx() - 8, y - 6, 7, 0, PI * 2); g.arc(mx() + 9, y + 8, 5, 0, PI * 2); g.arc(mx() + 4, y - 12, 3, 0, PI * 2); g.fill();
@@ -1494,9 +1513,12 @@ FATAL.add(K => {
     });
     s.at(4.7, () => { head = false; const h = J(A, 'head'); headGib(V, h[0] + A.face * 20 * k, h[1] + 10, { vx: -A.face * 140, vy: -420, vr: 9 }); api.sfx('howl'); });
     s.at(5.2, () => api.bubble('AWOOOOOO!', A.x, F - 170, { size: 14, fill: 'white', life: 1.8 }));
+    // the moon goes out, like the hoop after a dunk
+    s.at(5.7, () => { api.sfx('whoosh'); const y = my; for (let i = 0; i < 8; i++) FX.puff(mx() + rnd(-26, 26), y + rnd(-26, 26), 'rgba(240,236,210,0.55)', 12, 4); });
     s.at(6.4, () => { s.done = true; });
     s.tick = (t, dt) => {
       moon = Math.min(1, Math.max(0, (t - 0.4) / 0.9));
+      if (t > 5.7) moonFade = Math.max(0, 1 - (t - 5.7) / 0.3);
       if (t < 0.6) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 34 * k, dt, api, 110); return; }
       if (t < 1.0) { A.scriptPose = P({ hy: 6, lean: 0.3, head: 0.4, aF: [2.5, 2.75], aB: [0.6, 1.9], fF: [13, 0], fB: [-13, 0] }); V.scriptPose = PS.dizzy(V.t); return; }
       if (t < 2.3) {

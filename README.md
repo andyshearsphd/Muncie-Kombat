@@ -82,26 +82,26 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 
 | Fighter | Projectile | Second special | Fatality |
 | --- | --- | --- | --- |
-| Muncie Hippo | Poop Shot | Hippo Ram | Pothole Filler |
-| Painter Dude | Palette Knife | Thinner Splash | Happy Little Accident |
-| Fat Cat | Hairball | Pounce | I Hate Mondays |
-| Late Night Host | Cue Card | Desk Slide | Top Ten List |
 | Ballin' Well | Fireball | Alley-Oop Elbow | Posterized |
-| Gertie Goose | Wing Gust | Dive-Bomb | Pecking Order |
-| Rocky | Trash Can | Claw Roll | Rabies |
-| Millie | Tail Wave | Burrow | Bone Yard |
-| Chucky | Feather Darts | Dive Peck | Bird Strike |
-| Mad Turkey | Leftovers | Turkey Trot | Carved |
-| Coke Wolfe | Howl | Nose Candy | Full Moon |
-| East End Em | Hardcover | Paper Cut | First Edition |
-| Tin Man | Oil Slick | Tin Can Charge | Heartless |
-| Tim Bunyon | Log Toss | Log Roll | Timber |
 | Becky Hack | Shimmer | Blanket Snare | Lights Out |
-| Petey | Fifty Teeth | Play Dead | Playing Possum |
-| The Bearcat | Fight Song | Bearcat Maul | Spirit Week |
-| Creepy Councilman | Business Card | Close Talker | Too Long a Hug |
+| Chucky Card-Card | Feather Darts | Dive Peck | Bird Strike |
+| Coke Wolf | Howl | Nose Candy | Full Moon |
+| Councilman Creep | Business Card | Close Talker | Too Long a Hug |
+| East End Em | Hardcover | Paper Cut | First Edition |
+| Fat Cat | Hairball | Pounce | I Hate Mondays |
+| Gertie Goose | Wing Gust | Dive-Bomb | Pecking Order |
+| Late Night Host | Cue Card | Desk Slide | Top Ten List |
+| Mad Turkey | Leftovers | Turkey Trot | Carved |
+| Millie Muskrat | Tail Wave | Burrow | Bone Yard |
+| Muncie Hippo | Poop Shot | Hippo Ram | Pothole Filler |
+| Petey Possum | Fifty Teeth | Play Dead | Playing Possum |
 | Pres. Never Learns | Diploma Toss | Tuition Hike | Honorary Degree |
-| Walmart Karen | Expired Coupons | Finger Wag | Manager! |
+| Rocky Rococo | Trash Can | Claw Roll | Rabies |
+| The Bearcat | Fight Song | Bearcat Maul | Spirit Week |
+| Tim Bunyon | Log Toss | Log Roll | Timber |
+| Tin Man | Oil Slick | Tin Can Charge | Heartless |
+| TV Painter | Palette Knife | Thinner Splash | Happy Little Accident |
+| Wally World Karen | Expired Coupons | Finger Wag | Manager! |
 
 | Timber | Heartless | Playing Possum |
 | --- | --- | --- |
