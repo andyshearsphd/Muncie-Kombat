@@ -87,7 +87,7 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 | Fat Cat | Hairball | Pounce | I Hate Mondays |
 | Late Night Host | Cue Card | Desk Slide | Top Ten List |
 | Ballin' Well | Fireball | Alley-Oop Elbow | Posterized |
-| Gertie | Wing Gust | Dive-Bomb | Honk |
+| Gertie Goose | Wing Gust | Dive-Bomb | Pecking Order |
 | Rocky | Trash Can | Claw Roll | Rabies |
 | Millie | Tail Wave | Burrow | Bone Yard |
 | Chucky | Feather Darts | Dive Peck | Bird Strike |

@@ -265,42 +265,45 @@ FATAL.add(K => {
     };
   };
 
-  // ---------- GERTIE: Honk ----------
+  // ---------- GERTIE GOOSE: Pecking Order ----------
+  // a blur of pecks strips the victim to a bloody meat skeleton, it topples, and she hisses over it
   S.gertie = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR;
-    const rings = prop({ layer: 'front', list: [], update(p, dt) { for (const r of p.list) r.t += dt; p.list = p.list.filter(r => r.t < 0.6); }, draw(g, p) {
-      for (const r of p.list) { g.strokeStyle = `rgba(255,255,255,${0.8 - r.t})`; g.lineWidth = 2; g.beginPath(); const rad = 6 + r.t * 90; g.arc(r.x, r.y, rad, A.face > 0 ? -0.6 : PI - 0.6, A.face > 0 ? 0.6 : PI + 0.6); g.stroke(); }
-    } });
-    let hs = 1, popped = false, stump = null, nextHonk = 0.5;
-    const flush = prop({ layer: 'front', draw(g) { if (popped || hs <= 1.05) return; const h = J(V, 'head'); g.fillStyle = `rgba(220,20,40,${Math.min(0.5, (hs - 1) * 0.35)})`; g.beginPath(); g.arc(h[0] + V.face * 2, h[1] - 4 * hs, 9 * V.d.k * hs, 0, PI * 2); g.fill(); } });
-    void flush;
-    s.at(2.1, () => {
-      popped = true; V.ro.noHead = true; V.ro.headScale = 1;
-      const h = J(V, 'head');
-      api.sfx('splat'); api.sfx('crunch'); api.shake(8); api.flash();
-      FX.burst(h[0], h[1], 18, ['brain', 'eye', 'skullfrag', 'chunk', 'tooth', 'skullfrag', 'chunk', 'eye', 'brain'], 1.3);
-      skullGib(V, h[0], h[1], -A.face * 90, -420);
-      FX.blood(h[0], h[1], 70, 0, 1.6, 1.4);
-      FX.drops(5);
-    });
-    s.at(3.0, () => { V.scriptPose = PS.downFace(V); api.sfx('thud'); setTimeout(() => {}, 0); });
-    s.at(3.1, () => { const nk = J(V, 'neck'); stump = nk[0]; });
-    s.at(3.9, () => { api.bubble('HSSSSSSS!', A.x, F - 120, { size: 14, fill: 'white', life: 1.4 }); api.sfx('slash'); });
-    s.at(5.0, () => { s.done = true; });
+    const TARGETS = ['head', 'chest', 'belly', 'neck', 'kneeF', 'chest', 'elbowF', 'head', 'belly', 'footF'];
+    const COCK = P({ hy: 2, lean: 0.25, head: -0.2, aF: [2.3, 0.3], aB: [2.1, 0.3], fF: [14, 0], fB: [-14, 0] });
+    const STRIKE = P({ hy: 6, lean: 1.0, head: 1.1, aF: [2.6, 0.3], aB: [2.4, 0.3], fF: [16, 0], fB: [-14, 0] });
+    let nextPeck = 0.55, pecks = 0, skel = false;
+    const fall = { t: -1 };
+    s.at(0.4, () => { api.sfx('honk'); api.bubble('HONK!', A.x, F - 130, { size: 13, fill: 'white', life: 0.8 }); });
+    s.at(1.75, () => { skel = true; V.ro.skeleton = true; V.ro.gore = true; api.sfx('splat'); api.sfx('crunch'); api.shake(7); api.flash(); const c = J(V, 'chest'); FX.burst(c[0], c[1], 22, ['chunk', 'guts', 'chunk', 'eye', 'chunk', 'lung'], 1.2); FX.blood(c[0], c[1], 60, 0, 1.6, 1.4); });
+    s.at(3.0, () => { fall.t = 0; api.sfx('crunch'); });
+    s.at(3.45, () => { api.sfx('thud'); api.shake(5); FX.dust(V.x, F, 10); const h = J(V, 'head'); for (let i = 0; i < 6; i++) FX.gib('bone', h[0] + rnd(-20, 20), F - 8, rnd(-120, 120), rnd(-200, -80)); });
+    s.at(3.8, () => { api.bubble('HSSSSSSS!', A.x, F - 120, { size: 14, fill: 'white', life: 1.6 }); api.sfx('hiss'); api.sfx('slash'); });
+    s.at(5.3, () => { s.done = true; });
     s.tick = (t, dt) => {
-      if (t < 0.5) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 44 * k, dt, api, 110); return; }
-      if (t < 2.1) {
-        A.scriptPose = P({ hy: 4, lean: 0.5 + Math.sin(t * 30) * 0.04, head: 0.7, aF: [2.3, 0.4], aB: [2.1, 0.4], fF: [14, 0], fB: [-14, 0] });
-        if (t >= nextHonk) { nextHonk = t + 0.2; api.sfx('honk'); const b = J(A, 'head'); rings.list.push({ x: b[0] + A.face * 10, y: b[1] - 4, t: 0 }); }
-        hs = 1 + 1.7 * ease((t - 0.6) / 1.5);
-        V.ro.headScale = hs; V.ro.dx = rnd(-1, 1) * hs;
-        V.scriptPose = P({ hy: 4, lean: -0.2, head: Math.sin(t * 20) * 0.3, aF: [2.4 + Math.sin(t * 17) * 0.4, 0.5], aB: [2.2 + Math.cos(t * 15) * 0.4, 0.6], fF: [9, 0], fB: [-10, 0] });
+      if (t < 0.55) { V.scriptPose = PS.dizzy(V.t); walkTo(A, V.x - A.face * 34 * k, dt, api, 120); A.scriptPose = t > 0.35 ? COCK : A.scriptPose; return; }
+      if (t < 3.0) {
+        // pecking: in and out every tenth of a second, faster as she goes
+        const rate = 0.12 - Math.min(0.05, (t - 0.55) * 0.03), ph = (t - nextPeck + rate) / rate;
+        A.scriptPose = ph > 0.45 ? STRIKE : COCK;
+        if (t >= nextPeck && t < 2.75) {
+          nextPeck = t + rate; pecks++;
+          const p = J(V, TARGETS[pecks % TARGETS.length]);
+          api.sfx(pecks % 3 ? 'slash' : 'crunch'); if (pecks % 4 === 0) api.shake(2);
+          FX.blood(p[0], p[1], 6 + Math.min(10, pecks / 2), -A.face, 1.1);
+          if (pecks % 2 === 0) FX.gib(skel ? 'bone' : 'chunk', p[0], p[1], -A.face * rnd(-40, 160), rnd(-260, -80));
+        }
+        if (t >= 2.75) A.scriptPose = COCK;
+        // the victim flails, then just stands there as a dripping skeleton
+        V.scriptPose = skel ? P({ hy: 4, lean: -0.1 + Math.sin(t * 9) * 0.04, head: -0.2, aF: [0.35, 0.3], aB: [0.25, 0.4], fF: [9, 0], fB: [-10, 0] })
+          : P({ hy: 4, lean: -0.25, head: Math.sin(t * 24) * 0.35, jaw: 1, aF: [2.3 + Math.sin(t * 19) * 0.5, 0.6], aB: [2.1 + Math.cos(t * 17) * 0.5, 0.7], fF: [8, 0], fB: [-11, 0] });
+        if (skel && Math.random() < 0.4) { const c = J(V, rnd(0, 1) < 0.5 ? 'chest' : 'belly'); FX.blood(c[0], c[1], 2, 0, 0.5); }
         return;
       }
-      V.ro.dx = 0;
-      if (t < 3.0) { const nk = J(V, 'neck'); FX.spurt(nk[0], nk[1], 0, 1.1); V.scriptPose = P({ hy: 6, lean: 0.1, aF: [0.8, 0.4], aB: [0.6, 0.4], fF: [9, 0], fB: [-10, 0] }); A.scriptPose = PS.stance(A.t); return; }
-      if (t < 3.8 && stump != null) { const tx = stump - Math.sign(stump - A.x || 1) * 30; if (Math.abs(stump - A.x) > 3) A.face = Math.sign(stump - A.x); walkTo(A, tx, dt, api, 90); return; }
-      A.scriptPose = P({ hy: 10, lean: 1.0, head: 0.9, aF: [2.6 + Math.sin(t * 12) * 0.1, 0.3], aB: [2.4, 0.3], fF: [14, 0], fB: [-14, 0] });
+      // the skeleton topples over backwards, stiff as a board
+      if (fall.t >= 0) { fall.t += dt; const u = Math.min(1, fall.t / 0.45); V.scriptPose = P({ rot: A.face * u * u * 1.5, piv: 1, hy: 4, lean: -0.1, head: -0.2, aF: [0.35, 0.3], aB: [0.25, 0.4], fF: [9, 0], fB: [-10, 0] }); }
+      // wings out, neck low, hissing at the remains
+      A.scriptPose = t < 3.7 ? COCK : P({ hy: 10, lean: 1.0, head: 0.9, jaw: 1, aF: [2.6 + Math.sin(t * 12) * 0.1, 0.3], aB: [2.4, 0.3], fF: [14, 0], fB: [-14, 0] });
     };
   };
 

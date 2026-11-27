@@ -239,7 +239,7 @@ const ROSTER = (() => {
 
   const GB = '#6a5e50', GL = '#ddd6c6';
   const gertie = {
-    id: 'gertie', name: 'GERTIE', short: 'GERTIE', him: 'HER', k: 1.1, wings: true, webbed: true, skull: 'goose', skullK: 0.8,
+    id: 'gertie', name: 'GERTIE GOOSE', short: 'GERTIE', him: 'HER', k: 1.1, wings: true, webbed: true, skull: 'goose', skullK: 0.8,
     bio: 'A Canada goose the size of a linebacker. Owns the Greenway. Will hiss at your corpse.',
     d: dims({ thigh: 14, shin: 17, torso: 30, neck: 38, hox: 12, upper: 20, fore: 21, hipW: 16, shW: 14, chest: 16, belly: 26, back: 24, thighR: 5.5, kneeR: 2.8, ankleR: 2.2, shR: 7, elbowR: 6, wristR: 4.5, fist: 4.5, footL: 15, footH: 3.2, shOff: 2 }),
     col: { torso: GB, armU: GB, hand: '#221e1a', legU: '#2a2826', legL: '#222020', foot: '#1a1a1a' },
@@ -296,7 +296,7 @@ const ROSTER = (() => {
       R.poly(g, [[-1, -11], [-5.5, -14.5], [-5.5, -8.5]], '#d8508a'); R.poly(g, [[-1, -11], [3.5, -14.5], [2.5, -8.5]], '#d8508a'); R.ball(g, -1, -11, 1.5, '#a8306a');
     },
     proj: { kind: 'gust', name: 'WING GUST' }, sp2: { kind: 'leap', name: 'DIVE-BOMB' },
-    fatal: { id: 'gertie', name: 'HONK' }, alt: { id: 'nest', name: 'NEST' }
+    fatal: { id: 'gertie', name: 'PECKING ORDER' }, alt: { id: 'nest', name: 'NEST' }
   };
 
   const RG = '#6e6e72', RGL = '#b0b0b0', RGD = '#222226';
