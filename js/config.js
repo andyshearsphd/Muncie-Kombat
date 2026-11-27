@@ -4,7 +4,8 @@
 if (typeof SFX !== 'undefined' && SFX.say) { const say0 = SFX.say; SFX.say = (str, ...rest) => say0(String(str).replace(/\bpres\.?\s/gi, 'president ').replace(/\bballing\b/gi, 'bawlin'), ...rest); }
 window.GAME = {
   title: 'MUNCIE KOMBAT',
-  subtitle: 'A PURPLE HIPPO ARCADE GAME',
+  kicker: "PURPLE HIPPO ARCADE'S",                     // small line stacked above MUNCIE KOMBAT on the title screen
+  subtitle: '',
   ladderGoal: 'CITY HALL',
   endingLine: 'Devil Dan is back in the basement of City Hall. For now.',
   mascot: 'hippo',                                       // head on the title emblem
@@ -17,11 +18,11 @@ window.GAME = {
     // the skyline is blown up and lifted so downtown stands clear above the barrier
     const S = 1.5, y0 = 152 - 132 / S;
     g.imageSmoothingEnabled = false;
-    g.drawImage(st.back, 700 - W / 2 / S, y0, W / S, H / S, 0, 0, W, H);
+    g.drawImage(st.back, 724 - W / 2 / S, y0, W / S, H / S, 0, 0, W, H);
     g.imageSmoothingEnabled = true;
     g.drawImage(st.front, Math.round(560 - W / 2), 0, W, H, 0, 0, W, H);
     // a dark band so the title reads
-    let gr = g.createLinearGradient(0, 0, 0, 70); gr.addColorStop(0, 'rgba(0,0,0,0.75)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, 70);
+    let gr = g.createLinearGradient(0, 0, 0, 80); gr.addColorStop(0, 'rgba(0,0,0,0.75)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, 80);
     // both fighters in their fighting stance, facing each other
     const stance = ph => R.P({ hy: 8 + Math.sin(t * 4.5 + ph) * 1.6, lean: 0.12 + Math.sin(t * 4.5 + ph) * 0.02, head: 0.05, aF: [1.0 + Math.sin(t * 4.5 + ph) * 0.05, 1.55], aB: [0.25, 2.45], fF: [17, 0], fB: [-17, 0] });
     const hip = ROSTER.FIGHTERS.find(f => f.id === 'hippo'), dan = ROSTER.BOSSES.find(f => f.id === 'dan');
