@@ -1,6 +1,6 @@
 # Muncie Kombat
 
-A gory, over-the-top, early-90s style arcade fighting game set in Muncie, Indiana. Sixteen Muncie fighters, four bosses, fifteen arenas, and a fatality for every one of them.
+A gory, over-the-top, early-90s style arcade fighting game set in Muncie, Indiana. Sixteen Muncie fighters, four bosses, sixteen arenas, and a fatality for every one of them.
 
 **Play it:** https://andyshearsphd.github.io/Muncie-Kombat/
 
@@ -74,7 +74,7 @@ On a keyboard:
 | BACK, FORWARD + PUNCH | Projectile special |
 | DOWN, FORWARD + KICK | Second special |
 | FINISH: DOWN, DOWN + PUNCH | Fatality |
-| FINISH at the White River Railroad Bridge, Tillotson Overpass or McCulloch Park: DOWN + PUNCH | Stage fatality |
+| FINISH at the White River Railroad Bridge, Tillotson Overpass, McCulloch Park or Cornerstone Parking Lot: DOWN + PUNCH | Stage fatality |
 
 There may be other secrets. Every fighter's moves are also listed on the MOVES screen in the game.
 
@@ -114,7 +114,7 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 
 ## Arenas
 
-Campus, White River Railroad Bridge, Minnetrista, Gillespie Tower, Wysor Street Depot, Shedtown Drive-In, Cornbread Road, City Hall, The Village, Tillotson Overpass, Prairie Creek Beach, McCulloch Park, plus the boss arenas: the Glass Works, The Rental and Devil Dan's City Hall.
+Campus, White River Railroad Bridge, Minnetrista, Gillespie Tower, Wysor Street Depot, Shedtown Drive-In, Cornbread Road, City Hall, The Village, Tillotson Overpass, Prairie Creek Beach, McCulloch Park, Cornerstone Parking Lot, plus the boss arenas: the Glass Works, The Rental and Devil Dan's City Hall.
 
 | Prairie Creek Beach | Cornbread Road |
 | --- | --- |

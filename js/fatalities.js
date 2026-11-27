@@ -1040,6 +1040,98 @@ FATAL.add(K => {
     };
   };
 
+  // ---------- CORNERSTONE PARKING LOT stage fatality: Car Alarm ----------
+  // the uppercut drops the loser onto a parked car's roof, the alarm goes off, and the winner
+  // jumps on top and stomps car and passenger flat
+  S.cornerstone = (s, A, V, api) => {
+    const PS = api.PS, F = api.FLOOR, k = A.d.k, d = A.face, hh = api.hurtH(V), glow = STAGES.kit.glow;
+    const L = hh * 1.7, CH = hh * 0.6, sx = L / 100, sy = CH / 48;
+    const CX0 = Math.max(api.cam + L * 0.55 + 10, Math.min(api.cam + api.W - L * 0.55 - 10, V.x + d * 60 * k));
+    let vy = -980, landed = false, dent = 0, crush = 0, alarm = false, alarmT = 0, fade = 0, flat = false, glass = [], stomped = false, ax0 = 0, jumpT = -1;
+    const roofY = () => F - sy * (48 - dent * 8 - crush * 34);
+    api.sfx('big'); FX.blood(V.x, V.y - 80, 30, d, 1.4); api.flash();
+    const car = g => {
+      g.save(); g.globalAlpha = fade; g.translate(CX0, F); g.scale(sx * (d > 0 ? 1 : -1), sy);
+      const top = 48 - dent * 8 - crush * 34, belt = 26 - crush * 14, blink = alarm && Math.floor(alarmT * 5) % 2 === 0;
+      g.fillStyle = 'rgba(0,0,0,0.5)'; g.beginPath(); g.ellipse(0, 0, 54, 3, 0, 0, PI * 2); g.fill();
+      // body
+      const bg = g.createLinearGradient(0, -belt, 0, -4); bg.addColorStop(0, '#5a5e6a'); bg.addColorStop(0.4, '#3a3e48'); bg.addColorStop(1, '#16181e'); g.fillStyle = bg;
+      g.beginPath(); g.moveTo(-50, -6); g.lineTo(-50, -belt + 2); g.quadraticCurveTo(-48, -belt - 2, -36, -belt - 3); g.lineTo(34, -belt - 3); g.quadraticCurveTo(48, -belt - 1, 51, -belt + 6); g.lineTo(51, -6); g.closePath(); g.fill();
+      // cabin, sagging in the middle when dented
+      g.fillStyle = '#22252e'; g.beginPath(); g.moveTo(-34, -belt - 3); g.lineTo(-22, -top); g.quadraticCurveTo(-4, -top + dent * 6, 12, -top); g.lineTo(26, -belt - 3); g.closePath(); g.fill();
+      if (crush < 0.9) { g.fillStyle = glass.length ? 'rgba(40,50,70,0.4)' : '#3a4a66'; g.beginPath(); g.moveTo(-30, -belt - 4); g.lineTo(-20, -top + 3); g.lineTo(-7, -top + 3 + dent * 4); g.lineTo(-7, -belt - 4); g.fill(); g.beginPath(); g.moveTo(-4, -belt - 4); g.lineTo(-4, -top + 3 + dent * 4); g.lineTo(10, -top + 3); g.lineTo(21, -belt - 4); g.fill(); }
+      g.fillStyle = 'rgba(255,255,255,0.18)'; g.fillRect(-44, -belt - 1, 88, 1);
+      g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(-6, -belt + 1, 0.8, belt - 8);
+      // wheels flatten as it's crushed
+      for (const wx of [-32, 32]) { g.save(); g.translate(wx, -8); g.scale(1, 1 - crush * 0.45); R.ball(g, 0, 0, 8.5, '#0c0c0e'); R.ball(g, 0, 0, 3.6, '#8a8a90'); g.restore(); }
+      // lights: hazards and headlights blink with the alarm
+      g.fillStyle = blink ? '#ffb020' : '#5a3a10'; g.fillRect(48, -belt + 4, 3, 3); g.fillStyle = blink ? '#ff2a20' : '#5a0a0a'; g.fillRect(-51, -belt + 4, 3, 4);
+      g.restore();
+      if (alarm && blink) { glow(g, CX0 + d * L * 0.5, F - CH * 0.38, 28, 'rgba(255,190,60,0.6)'); glow(g, CX0 - d * L * 0.5, F - CH * 0.38, 24, 'rgba(255,40,30,0.6)'); }
+      if (flat) {
+        // what is left of the passenger, pressed into the roof
+        const ry = roofY();
+        g.fillStyle = 'rgba(110,0,8,0.95)'; g.beginPath(); g.ellipse(CX0, ry, L * 0.32, 4, 0, 0, PI * 2); g.fill();
+        g.fillStyle = V.def.col.torso; g.fillRect(CX0 - 12, ry - 2.5, 24, 3);
+        for (const [ox, c] of [[-24, V.def.col.legL], [-17, V.def.col.legU], [18, V.def.col.armU], [26, V.def.col.hand]]) { g.fillStyle = c; g.fillRect(CX0 + ox * d - 4, ry - 1.5, 8, 2.4); }
+        for (let i = 0; i < 5; i++) R.line(g, CX0 - 20 + i * 10, ry - 1, CX0 - 16 + i * 10, ry - 4, '#ece4d0', 1.3);
+        g.fillStyle = 'rgba(110,0,8,0.85)'; for (let i = 0; i < 6; i++) g.fillRect(CX0 - L * 0.4 + i * L * 0.16, ry, 2, 6 + ((i * 7) % 11));
+      }
+    };
+    prop({ layer: 'back', draw: car });
+    s.at(1.6, () => api.sfx('whoosh'));
+    s.at(5.2, () => api.bubble('NICE PARKING JOB.', A.x, F - 150, { size: 13, fill: 'gold', life: 1.9 }));
+    s.at(7.0, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      fade = Math.min(1, fade + dt * 6);
+      if (alarm) { alarmT += dt; if (Math.floor(alarmT * 3.2) !== Math.floor((alarmT - dt) * 3.2)) api.sfx('honk'); }
+      if (!landed) {
+        vy += 1500 * dt; V.y += vy * dt; V.x += (CX0 - V.x) * Math.min(1, dt * 3.5);
+        V.scriptPose = PS.air(t * 11); A.scriptPose = t < 0.5 ? (PS.up1 || PS.stance(A.t)) : PS.stance(A.t);
+        if (t > 0.5 && vy > 0 && V.y >= roofY()) {
+          landed = true; V.y = roofY(); V.x = CX0; dent = 1; alarm = true;
+          api.sfx('crunch'); api.sfx('shatter'); api.sfx('big'); api.shake(12); api.flash();
+          FX.blood(CX0, V.y - 10, 50, 0, 1.8, 1.3); FX.burst(CX0, V.y - 8, 6, ['tooth', 'bone', 'chunk'], 0.8);
+          for (let i = 0; i < 26; i++) FX.gib('glass', CX0 + rnd(-30, 30), V.y + 8, rnd(-260, 260), rnd(-420, -120), { s: rnd(0.4, 0.9), vr: rnd(-20, 20), draw: g => { g.fillStyle = 'rgba(200,220,255,0.85)'; g.beginPath(); g.moveTo(-2, -1.5); g.lineTo(2.5, 0); g.lineTo(-1, 2); g.fill(); } });
+          glass.push(1);
+        }
+        return;
+      }
+      if (!flat) {
+        V.y = roofY(); V.scriptPose = PS.down(V);
+        if (Math.random() < 0.15) FX.blood(CX0 + rnd(-10, 10), V.y, 2, 0, 0.6);
+      }
+      // the winner walks over, hops up and stomps
+      const standX = CX0 - d * (L * 0.5 + 16 * k);
+      if (t < 2.6) { if (walkTo(A, standX, dt, api, 120)) A.scriptPose = PS.stance(A.t); return; }
+      if (jumpT < 0) { jumpT = t; ax0 = A.x; api.sfx('whoosh'); }
+      const u = Math.min(1, (t - jumpT) / 0.55);
+      if (!stomped) {
+        A.x = lerp(ax0, CX0 - d * 6 * k, u); A.y = lerp(F, roofY(), u) - Math.sin(u * PI) * 70;
+        A.scriptPose = PS.air(0, t);
+        if (u >= 1) { stomped = true; A.y = roofY(); api.sfx('crunch'); api.sfx('splat'); api.shake(9); FX.blood(CX0, roofY(), 30, d, 1.6, 1.4); }
+        return;
+      }
+      // stomp, stomp, stomp: each one crushes the roof further
+      const st = t - jumpT - 0.55, n = Math.floor(st / 0.42), ph = (st % 0.42) / 0.42;
+      if (n < 4) {
+        A.scriptPose = ph < 0.5 ? P({ hy: 4, lean: 0.1, aF: [0.9, 1.2], aB: [0.7, 1.4], fF: [8, -14], fB: [-10, 0] }) : P({ hy: 8, lean: 0.25, aF: [1.2, 0.6], aB: [1.0, 0.7], fF: [10, 0], fB: [-10, 0] });
+        if (ph >= 0.5 && (st - dt) % 0.42 / 0.42 < 0.5) {
+          crush = Math.min(1, crush + 0.25); api.sfx('crunch'); api.sfx('squish'); api.shake(7);
+          FX.blood(CX0 - L * 0.4, roofY(), 18, -1, 1.4); FX.blood(CX0 + L * 0.4, roofY(), 18, 1, 1.4);
+          if (n === 2) { flat = true; V.hidden = true; skullGib(V, CX0 + d * L * 0.3, roofY() - 6, d * 360, -560); FX.burst(CX0, roofY(), 18, ['chunk', 'guts', 'bone', 'eye', 'tooth'], 1.2); api.sfx('scream'); }
+          if (n === 3) { alarm = false; api.sfx('thud'); }
+        }
+        A.y = roofY(); return;
+      }
+      // hop down and pose
+      const v = Math.min(1, (st - 1.68) / 0.45);
+      A.x = lerp(CX0 - d * 6 * k, CX0 - d * (L * 0.5 + 22 * k), v); A.y = lerp(roofY(), F, v) - Math.sin(v * PI) * 30;
+      A.scriptPose = v < 1 ? PS.air(0, t) : PS.win(A.t);
+      if (v >= 1) A.y = F;
+    };
+  };
+
   // ---------- boss deaths ----------
   S.bridge = (s, A, V, api) => {
     const PS = api.PS, ROCK = 198;
