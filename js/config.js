@@ -8,6 +8,16 @@ window.GAME = {
   mascot: 'hippo',                                       // head on the title emblem
   toasty: { fighter: 'hippo', text: 'SQUARE SLICED!' },  // pops in after some uppercuts
 
+  // ---------- game-defined projectiles ----------
+  projectiles: {
+    // Catbear's fight song: a stack of purple sound waves that stuns
+    fightsong: { speed: 260, dmg: 7, w: 14, h: 24, fx: 'stun', sfx: 'howl', draw(g, p, s, t) { g.scale(s * 1.6, 1.6); for (let i = 0; i < 3; i++) { g.strokeStyle = `rgba(${210 - i * 30},150,255,${0.95 - i * 0.22})`; g.lineWidth = 3; g.beginPath(); g.arc(-i * 6, 0, 7 + i * 4 + Math.sin(t * 30) * 1.5, -1.0, 1.0); g.stroke(); } g.scale(s / 1.6, 1 / 1.6); g.fillStyle = '#f0e8ff'; g.font = '8px Anton, Impact, sans-serif'; g.fillText('♪', -3, -10 + Math.sin(t * 12) * 2); } },
+    // Creepy Councilman's business card: CALL ME scrawled on the back
+    bizcard: { speed: 320, dmg: 7, w: 12, h: 8, sfx: 'whoosh', draw(g, p, s, t) { g.rotate(t * 16 * s); g.fillStyle = '#f4f0e8'; g.fillRect(-8, -5, 16, 10); g.fillStyle = '#22283a'; g.fillRect(-8, -5, 16, 2.4); g.fillStyle = '#b01848'; g.font = '4px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillText('CALL ME', 0, 3); g.textAlign = 'left'; } },
+    // the president's diploma: a rolled scroll in a red ribbon, lobbed end over end
+    diploma: { speed: 280, vy: -160, grav: 380, dmg: 9, w: 12, h: 10, fx: 'knock', launch: [180, -300], sfx: 'whoosh', hitSfx: 'thud', draw(g, p, s, t) { g.rotate(t * 13 * s); g.fillStyle = '#f2ead4'; g.fillRect(-11, -3, 22, 6); g.fillStyle = '#d8ccae'; g.beginPath(); g.ellipse(-11, 0, 1.6, 3, 0, 0, Math.PI * 2); g.fill(); g.beginPath(); g.ellipse(11, 0, 1.6, 3, 0, 0, Math.PI * 2); g.fill(); g.fillStyle = '#a8141c'; g.fillRect(-1.6, -3.4, 3.2, 6.8); } },
+  },
+
   // ---------- victory poses: each winner celebrates in character ----------
   winPoses(K) {
     const { R, PI, FX, SFX, FLOOR, game, once, once2, fj, hurtH, rnd } = K;
@@ -57,6 +67,14 @@ window.GAME = {
         fx(f, t) { if (Math.random() < 0.25) { const c = fj(f, 'chest'); FX.spark(c[0] + rnd(-12, 12), c[1] + rnd(-6, 10), '#eef2ff', 2); } if (once(f, 'd', t, 0.3)) SFX.ding(); } },
       possum: { fp: t => t < 1.5 ? ({ jaw: 1, aL: [1.9 + Math.sin(t * 18) * 0.15, 0.3], aR: [1.9 - Math.sin(t * 18) * 0.15, 0.3], squat: 4 }) : ({ jaw: 0.2, aL: [0.4, 0.2], aR: [0.4, 0.2], squat: 3, head: 0.25 }),
         fx(f, t) { if (once(f, 'h', t, 0.05) || once(f, 'h2', t, 0.9)) SFX.hiss(); } },
+      catbear: { fp: t => t < 1.4 ? ({ jaw: 1, aL: [2.9 + Math.sin(t * 10) * 0.15, 0.2], aR: [2.9 - Math.sin(t * 10) * 0.15, 0.2], hy: -Math.abs(Math.sin(t * 5)) * 4 }) : ({ jaw: 0.3, aR: [0.45, -3.2], aL: [0.6, -1.5], squat: 2 }),
+        fx(f, t) { if (once(f, 'r', t, 0.1)) SFX.howl(); if (once(f, 'j1', t, 0.65) || once(f, 'j2', t, 1.25)) { SFX.thud(); FX.dust(f.x, FLOOR, 8); } } },
+      councilman: { fp: t => t < 1.2 ? ({ aR: [0.6, -2.6], aL: [0.6, -1.5], head: 0.12 }) : ({ aL: [1.35, 1.4], aR: [1.35, 1.4], head: Math.sin(t * 2) * 0.05 }),
+        fx(f, t) { if (once(f, 'w', t, 1.5)) { SFX.ding(); game.bubbles.push({ str: 'CALL ME.', x: f.x, y: f.y - hurtH(f) - 20, t: 0, life: 1.6, size: 11, fill: 'white' }); } },
+        draw(g, f, t) { if (t > 1.2) for (const hn of ['handL', 'handR']) { const h = fj(f, hn); g.fillStyle = '#e8b898'; g.fillRect(h[0] - 1, h[1] - 7, 2, 7); } } },
+      prez: { fp: t => ({ aR: [2.95, 0.05], aL: t < 1.3 ? [0.6, -1.5] : [2.5, 0.9], head: 0.05 }),
+        fx(f, t) { if (once(f, 'g', t, 0.25)) SFX.gong(); },
+        draw(g, f) { const h = fj(f, 'handR'), k = f.d.k; R.line(g, h[0], h[1] + 10 * k, h[0], h[1] - 40 * k, '#6a4a10', 3.6 * k); R.line(g, h[0], h[1] + 10 * k, h[0], h[1] - 40 * k, '#d8b040', 2.4 * k); g.fillStyle = '#d8b040'; g.beginPath(); g.ellipse(h[0], h[1] - 45 * k, 5.6 * k, 6.4 * k, 0, 0, PI * 2); g.fill(); g.fillStyle = '#a8141c'; g.beginPath(); g.arc(h[0], h[1] - 45 * k, 1.8 * k, 0, PI * 2); g.fill(); for (const sx of [-4, 0, 4]) R.poly(g, [[h[0] + (sx - 1.6) * k, h[1] - 50 * k], [h[0] + sx * k, h[1] - 55 * k], [h[0] + (sx + 1.6) * k, h[1] - 50 * k]], '#d8b040'); } },
       tinkle: { fp: t => ({ aL: [0.95, 1.25], aR: [0.95, 1.25], jaw: 0.3, head: Math.sin(t * 2) * 0.1 }),
         fx(f, t) { if (once(f, 'b', t, 0.3)) game.bubbles.push({ str: 'I FEARED FOR MY LIFE.', x: f.x, y: f.y - hurtH(f) - 20, t: 0, life: 2, size: 11, fill: 'white' }); } },
     };

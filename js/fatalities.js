@@ -1040,6 +1040,145 @@ FATAL.add(K => {
     };
   };
 
+  // ---------- MUNCIE CATBEAR: Spirit Week ----------
+  // a claw mauling, the head comes off, and it becomes a pom-pom for the cheer
+  S.catbear = (s, A, V, api) => {
+    const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face;
+    const SW0 = P({ hy: 4, lean: 0.3, head: 0.3, jaw: 1, aF: [2.6, 0.3], aB: [0.6, 1.2], fF: [14, 0], fB: [-14, 0] });
+    const SW1 = P({ hy: 6, lean: 0.55, head: 0.4, jaw: 1, aF: [0.9, 0.2], aB: [1.6, 0.4], fF: [16, 0], fB: [-14, 0] });
+    const SW2 = P({ hy: 6, lean: 0.55, head: 0.4, jaw: 1, aF: [1.7, 0.5], aB: [0.7, 0.2], fF: [16, 0], fB: [-14, 0] });
+    let holding = false, cheer = 0;
+    prop({ layer: 'front', draw(g) {
+      if (!holding) return;
+      const h1 = J(A, 'handF'), h2 = J(A, 'handB'), hx = (h1[0] + h2[0]) / 2, hy = Math.min(h1[1], h2[1]);
+      R.drawHeadAt(g, { def: V.def, d: V.d }, hx, hy - 2 + Math.sin(cheer * 30) * 2, Math.sin(cheer * 18) * 0.4, 1, { dead: true, t: 0 });
+      // the dangling neck, raggedy like pom-pom streamers
+      g.strokeStyle = '#8a0010'; g.lineWidth = 1.2; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(hx - 4 + i * 1.6, hy + 4); g.lineTo(hx - 5 + i * 2 + Math.sin(cheer * 20 + i) * 2, hy + 12 + (i % 3) * 3); g.stroke(); }
+      if (Math.random() < 0.6) FX.blood(hx, hy + 8, 1, 0, 0.4);
+    } });
+    for (let i = 0; i < 6; i++) s.at(0.75 + i * 0.22, () => {
+      api.sfx(i % 2 ? 'slash' : 'squish'); api.shake(3);
+      const c = J(V, 'chest'); FX.blood(c[0], c[1] + rnd(-12, 12), 18, d, 1.3); FX.burst(c[0], c[1], 2, ['chunk', 'chunk', 'bone'], 0.6);
+      (V.st2.wounds || (V.st2.wounds = [])).push({ j: 'chest', dx: rnd(-3, 3), dy: rnd(-8, 8), r: 3.4, a: 0.7, drip: 6 });
+    });
+    s.at(2.25, () => { holding = true; V.ro.noHead = true; api.sfx('splat'); api.sfx('scream'); api.shake(8); const n = J(V, 'neck'); FX.burst(n[0], n[1], 10, ['bone', 'chunk', 'tooth'], 0.8); FX.blood(n[0], n[1], 40, 0, 1.8, 1.6); });
+    s.at(3.0, () => api.bubble('GIMME A B!', A.x, F - 150, { size: 12, fill: 'white', life: 1 }));
+    s.at(3.9, () => api.bubble('GO BEARCATS!', A.x, F - 160, { size: 14, fill: 'purple', life: 1.8 }));
+    s.at(5.0, () => { holding = false; const h = J(A, 'handF'); headGib(V, h[0], h[1], { vx: -d * 220, vy: -520, vr: 10 }); api.sfx('whoosh'); });
+    s.at(6.4, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (t < 0.7) { walkTo(A, V.x - d * 26 * k, dt, api, 130); V.scriptPose = PS.dizzy(V.t); return; }
+      if (t < 2.25) { const n = Math.floor((t - 0.7) / 0.22); A.scriptPose = (t - 0.7) % 0.22 < 0.08 ? SW0 : n % 2 ? SW1 : SW2; V.scriptPose = P({ hy: 4, lean: -0.3 + Math.sin(t * 24) * 0.1, head: -0.6, aF: [1.6, 0.8], aB: [1.4, 0.9], fF: [10, 0], fB: [-12, 0] }); return; }
+      if (t < 2.7) { A.scriptPose = P({ hy: 2, lean: -0.1, aF: [2.6, 0.3], aB: [2.5, 0.4], fF: [12, 0], fB: [-12, 0] }); V.scriptPose = P({ hy: 6, lean: 0.2, aF: [0.4, 0.2], aB: [0.3, 0.2], fF: [8, 0], fB: [-8, 0] }); const n = J(V, 'neck'); FX.blood(n[0], n[1], 4, 0, 1.6, 1.6); return; }
+      V.scriptPose = PS.down(V);
+      if (t < 5.0) {
+        cheer += dt;
+        A.x += (V.x - d * 60 * k - A.x) * Math.min(1, dt * 3);
+        const hop = Math.abs(Math.sin(cheer * 6));
+        A.scriptPose = P({ hy: -hop * 10, lean: -0.05, head: -0.2, jaw: 0.8, aF: [2.95 + Math.sin(cheer * 18) * 0.12, 0.15], aB: [2.95 - Math.sin(cheer * 18) * 0.12, 0.15], fF: [6, -hop * 6], fB: [-6, -hop * 6] });
+        if (Math.sin((cheer - dt) * 6) * Math.sin(cheer * 6) < 0) { api.sfx('thud'); FX.dust(A.x, F, 4); }
+        return;
+      }
+      A.scriptPose = t < 5.3 ? PS.proj0 || PS.stance(A.t) : PS.win(A.t);
+    };
+  };
+
+  // ---------- CREEPY COUNCILMAN: Too Long a Hug ----------
+  // a spritz of cologne, a compliment nobody asked for, and a hug that will not end
+  S.councilman = (s, A, V, api) => {
+    const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face;
+    const HUG = sq => P({ hy: 2, lean: 0.2 + sq * 0.1, head: 0.3, aF: [1.35, 1.9 + sq * 0.4], aB: [1.25, 2.0 + sq * 0.4], fF: [8, 0], fB: [-12, 0] });
+    let squeeze = 0, card = null, sniff = 0;
+    prop({ layer: 'front', draw(g) {
+      if (!card) return;
+      g.save(); g.translate(card.x, card.y); g.rotate(card.a); g.fillStyle = '#f4f0e8'; g.fillRect(-8, -5, 16, 10); g.fillStyle = '#22283a'; g.fillRect(-8, -5, 16, 2.4);
+      g.fillStyle = '#b01848'; g.font = '4px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillText('CALL ME', 0, 3); g.textAlign = 'left'; g.restore();
+    } });
+    s.at(0.15, () => { api.sfx('hiss'); const h = J(A, 'head'); for (let i = 0; i < 4; i++) FX.puff(h[0] + rnd(-6, 6), h[1] + rnd(0, 14), 'rgba(230,150,220,0.55)', 6, 3); });
+    s.at(1.05, () => api.bubble("YOU LOOK GREAT TODAY.", A.x, F - 160, { size: 11, fill: 'white', life: 1.5 }));
+    s.at(1.7, () => { api.sfx('whoosh'); });
+    for (let i = 0; i < 5; i++) s.at(2.1 + i * 0.38, () => { api.sfx('crunch'); api.shake(3 + i); const c = J(V, 'chest'); FX.blood(c[0], c[1], 6 + i * 4, -d, 1); if (i > 1) FX.gib('bone', c[0], c[1], -d * rnd(40, 160), rnd(-260, -120)); const m = J(V, 'head'); FX.blood(m[0] + d * 6, m[1] + 4, 4 + i * 3, d, 0.8); });
+    s.at(2.9, () => api.bubble('JUST A LITTLE LONGER.', A.x, F - 165, { size: 11, fill: 'white', life: 1.6 }));
+    s.at(4.1, () => { api.sfx('crunch'); api.sfx('splat'); api.sfx('scream'); api.shake(10); api.flash(); const c = J(V, 'chest'); FX.burst(c[0], c[1], 22, ['bone', 'guts', 'chunk', 'lung', 'heart', 'bone'], 1.2); FX.blood(c[0], c[1], 60, 0, 2, 1.5); });
+    s.at(5.3, () => { const c = J(V, 'chest'); card = { x: c[0], y: c[1] - 30, a: 0 }; api.sfx('whoosh'); });
+    s.at(5.9, () => api.bubble('CALL ME.', A.x, F - 150, { size: 13, fill: 'gold', life: 1.8 }));
+    s.at(7.4, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (card && card.y < F - 6) { card.y = Math.min(F - 6, card.y + 70 * dt); card.a += dt * 3; }
+      if (t < 0.7) { A.scriptPose = P({ hy: 2, lean: -0.1, head: -0.2, aF: [2.4, 1.6], aB: [0.6, -1.5], fF: [12, 0], fB: [-12, 0] }); V.scriptPose = PS.dizzy(V.t); return; }
+      if (t < 1.7) {
+        // sidles in much, much too close and leans over the shoulder
+        if (walkTo(A, V.x - d * 12 * k, dt, api, 60)) A.scriptPose = P({ hy: 2, lean: 0.3, head: 0.35, aF: [0.5, 0.4], aB: [0.4, 0.4], fF: [10, 0], fB: [-12, 0] });
+        V.scriptPose = P({ hy: 4, lean: -0.35, head: -0.45, aF: [0.9, 1.6], aB: [0.7, 1.7], fF: [8, 0], fB: [-14, 0] });
+        return;
+      }
+      if (t < 4.1) {
+        squeeze = Math.min(1, (t - 1.7) / 2.4);
+        A.x += (V.x - d * 8 * k - A.x) * Math.min(1, dt * 8);
+        A.scriptPose = HUG(squeeze);
+        V.scriptPose = P({ hy: 2 + squeeze * 6, lean: -0.3 - squeeze * 0.25, head: -0.6 - squeeze * 0.4, jaw: squeeze, aF: [0.2, 0.1], aB: [0.2, 0.1], fF: [6, -squeeze * 6], fB: [-6, -squeeze * 6] });
+        V.y = F - squeeze * 10;
+        return;
+      }
+      V.y = Math.min(F, V.y + 300 * dt);
+      if (t < 4.6) { V.scriptPose = P({ rot: -d * 0.9 * Math.min(1, (t - 4.1) * 4), piv: 2, hy: 6, lean: -1.2, head: -1.3, aF: [3.0, 0.1], aB: [2.8, 0.2], fF: [4, 0], fB: [-4, 0] }); A.scriptPose = HUG(1); return; }
+      V.scriptPose = PS.down(V);
+      if (t < 5.2) { A.x += (V.x - d * 42 * k - A.x) * Math.min(1, dt * 5); sniff += dt; A.scriptPose = P({ hy: 0, lean: -0.1, head: -0.15, aF: [2.9, 2.6], aB: [0.6, -1.5], fF: [12, 0], fB: [-12, 0] }); return; }
+      A.scriptPose = t < 5.6 ? P({ hy: 6, lean: 0.6, head: 0.5, aF: [1.0, 0.3], aB: [0.6, -1.5], fF: [12, 0], fB: [-12, 0] }) : PS.win(A.t);
+    };
+  };
+
+  // ---------- PRES. CUCKOLD NE'ER-LEARNS: Honorary Degree ----------
+  // he caves the skull in with the ceremonial mace, caps the stump and moves the tassel
+  S.prez = (s, A, V, api) => {
+    const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face;
+    const UP = P({ hy: 2, lean: -0.3, head: -0.3, aF: [3.0, 0.2], aB: [3.1, 0.1], fF: [14, 0], fB: [-12, 0] });
+    const DOWN = P({ hy: 6, lean: 0.65, head: 0.4, aF: [1.35, 0.1], aB: [1.4, 0.05], fF: [18, 0], fB: [-14, 0] });
+    let blows = 0, capped = false, tasselL = false, capT = 0;
+    A.st2.noMace = true;
+    const maceTip = () => { const w = J(A, 'handF'), e = J(A, 'elbowF'), dx = w[0] - e[0], dy = w[1] - e[1], L = Math.hypot(dx, dy) || 1; return { w, u: [dx / L, dy / L] }; };
+    prop({ layer: 'front', draw(g) {
+      if (A.state === 'script') {
+        // the mace held like a club, out along the forearm
+        const { w, u } = maceTip(), kk = k, b = [w[0] + u[0] * 44 * kk, w[1] + u[1] * 44 * kk], a = [w[0] - u[0] * 8 * kk, w[1] - u[1] * 8 * kk];
+        R.line(g, a[0], a[1], b[0], b[1], '#6a4a10', 3.6 * kk); R.line(g, a[0], a[1], b[0], b[1], '#d8b040', 2.4 * kk);
+        g.fillStyle = '#d8b040'; g.beginPath(); g.arc(b[0], b[1], 6 * kk, 0, PI * 2); g.fill(); g.fillStyle = '#a8141c'; g.beginPath(); g.arc(b[0], b[1], 2 * kk, 0, PI * 2); g.fill();
+        if (blows > 0) { g.fillStyle = 'rgba(120,0,10,0.85)'; g.beginPath(); g.arc(b[0] + 1, b[1] + 1, 4 * kk, 0, PI * 2); g.fill(); }
+      }
+      if (capped) {
+        const n = J(V, 'neck'), cx = n[0] + d * 4, cy = n[1] - 4 - (1 - Math.min(1, capT * 3)) * 40;
+        g.save(); g.translate(cx, cy); g.scale(1.6, 1.6); g.translate(-cx, -cy);
+        g.fillStyle = '#18181c'; g.beginPath(); g.ellipse(cx, cy, 6, 3, 0, PI, PI * 2); g.fill();
+        R.poly(g, [[cx - 12, cy - 4], [cx + 10, cy - 6], [cx + 12, cy - 3], [cx - 10, cy - 1]], '#0c0c0e');
+        const tx = tasselL ? cx - 11 : cx + 11; R.line(g, cx, cy - 4, tx, cy - 3.5, '#d8b040', 0.7); R.line(g, tx, cy - 3.5, tx, cy + 4, '#d8b040', 1.1); g.fillStyle = '#d8b040'; g.fillRect(tx - 1, cy + 3.4, 2, 3);
+        g.restore();
+      }
+    } });
+    for (let i = 0; i < 4; i++) s.at(1.25 + i * 0.55, () => {
+      blows++; api.sfx('crunch'); api.sfx('thud'); api.shake(5 + i * 2);
+      const h = J(V, 'head'); FX.blood(h[0], h[1], 20 + i * 10, d, 1.4); FX.burst(h[0], h[1], 2 + i, ['tooth', 'skullfrag', 'chunk'], 0.7);
+      if (i === 3) { V.ro.noHead = true; api.sfx('splat'); api.flash(); FX.burst(h[0], h[1], 18, ['brain', 'skullfrag', 'eye', 'skullfrag', 'chunk', 'tooth'], 1.2); FX.blood(h[0], h[1], 60, 0, 2, 1.6); }
+    });
+    s.at(3.7, () => { capped = true; capT = 0; api.sfx('whoosh'); });
+    s.at(4.6, () => { tasselL = true; api.sfx('ding'); });
+    s.at(4.9, () => api.bubble('CONGRATULATIONS, GRADUATE.', A.x, F - 140, { size: 12, fill: 'gold', life: 2 }));
+    s.at(6.8, () => { s.done = true; });
+    s.tick = (t, dt) => {
+      if (capped) capT += dt;
+      if (t < 0.9) { walkTo(A, V.x - d * 46 * k, dt, api, 110); A.scriptPose = PS.stance(A.t); V.scriptPose = PS.dizzy(V.t); return; }
+      if (t < 3.45) {
+        const ph = ((t - 0.9) % 0.55) / 0.55; A.scriptPose = ph < 0.62 ? UP : DOWN;
+        V.scriptPose = blows < 4 ? P({ hyL: Math.min(0.7, 0.4 + blows * 0.1), lean: 0.1, head: 0.3 + blows * 0.12, aF: [1.0, 0.6], aB: [0.8, 0.7], fF: [12, 0], fB: [-10, 0] }) : PS.down(V);
+        if (blows >= 4) { const n = J(V, 'neck'); if (Math.random() < 0.6) FX.blood(n[0], n[1], 3, d, 1.2, 1.4); }
+        return;
+      }
+      V.scriptPose = PS.down(V);
+      if (t < 4.4) { A.scriptPose = P({ hy: 6, lean: 0.7, head: 0.5, aF: [1.0, 0.6], aB: [1.3, 0.2], fF: [16, 0], fB: [-12, 0] }); return; }
+      if (t < 4.8) { A.scriptPose = P({ hy: 6, lean: 0.6, head: 0.5, aF: [1.6, 0.4], aB: [1.3, 0.2], fF: [16, 0], fB: [-12, 0] }); return; }
+      A.scriptPose = PS.win(A.t);
+    };
+  };
+
   // ---------- CORNERSTONE PARKING LOT stage fatality: Car Alarm ----------
   // the uppercut drops the loser onto a parked car's roof, the alarm goes off, and the winner
   // jumps on top and stomps car and passenger flat

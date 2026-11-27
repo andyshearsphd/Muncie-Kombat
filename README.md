@@ -1,6 +1,6 @@
 # Muncie Kombat
 
-A gory, over-the-top, early-90s style arcade fighting game set in Muncie, Indiana. Sixteen Muncie fighters, four bosses, sixteen arenas, and a fatality for every one of them.
+A gory, over-the-top, early-90s style arcade fighting game set in Muncie, Indiana. Nineteen Muncie fighters, four bosses, sixteen arenas, and a fatality for every one of them.
 
 **Play it:** https://andyshearsphd.github.io/Muncie-Kombat/
 
@@ -20,7 +20,7 @@ It then opens full screen like an app. On Android, use the browser menu and choo
 
 ## Modes
 
-- **Arcade Ladder:** pick a fighter and climb the tower. You fight every other fighter in random order on random arenas, then the four bosses: Ofc Tinkle at City Hall, Fruit Jar Golem at the Glass Works, Slum Lord at The Rental, and Devil Dan in City Hall. That is 19 fights.
+- **Arcade Ladder:** pick a fighter and climb the tower. You fight every other fighter in random order on random arenas, then the four bosses: Ofc Tinkle at City Hall, Fruit Jar Golem at the Glass Works, Slum Lord at The Rental, and Devil Dan in City Hall. That is 22 fights.
 - **Single Match:** pick your fighter, your opponent and the arena. Devil Dan can only be reached through the ladder.
 
 Matches are best of three rounds. Win the deciding round and you get FINISH HIM.
@@ -98,6 +98,9 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 | Tim Bunyon | Log Toss | Log Roll | Timber |
 | Becky Hack | Shimmer | Blanket Snare | Lights Out |
 | Petey | Fifty Teeth | Play Dead | Playing Possum |
+| Muncie Catbear | Fight Song | Bearcat Maul | Spirit Week |
+| Creepy Councilman | Business Card | Close Talker | Too Long a Hug |
+| Pres. Cuckold Ne'er-Learns | Diploma Toss | Mace of Office | Honorary Degree |
 
 | Timber | Heartless | Playing Possum |
 | --- | --- | --- |
