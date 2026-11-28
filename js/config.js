@@ -52,7 +52,8 @@ window.GAME = {
       "• The violence in this game is not a call to violence in any way. It functions only as a parody of Mortal Kombat.",
       "• Yes, it's coded with AI. Yes, I'm aware of the ethical dilemmas posed by AI. I don't see AI itself as any more inherently evil than the conditions of late-stage capitalism that created it. No, I don't wish to have a debate about this.",
       '',
-      "• I created this to be a game. To have fun. To learn how to create this way. Please, if you want to play it, try to let go and do the same.",
+      "• I did this project to learn how to create with tools necessary to find work in my fields.",
+      "• And *I made it to have fun.* Please, if you play it, let go for a little bit and *try to do the same.*",
     ],
   },
   selectStart: 'hippo',                                  // the fighter screen always opens on the Purple Hippo
