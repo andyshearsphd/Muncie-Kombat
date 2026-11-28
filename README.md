@@ -51,7 +51,7 @@ Matches are best of three rounds. Win the deciding round and you get FINISH HIM.
 
 On a phone, the joystick appears wherever your left thumb touches the left half of the screen. PUNCH, KICK and BLOCK are on the right.
 
-![Becky Hack-Hack throws Shimmer at Kilgore Tin Man at Maxitrista](screenshots/fight.jpg)
+![Becky Becky Hack Hack throws Shimmer at Kilgore Tin Man at Maxitrista](screenshots/fight.jpg)
 
 On a keyboard:
 
@@ -101,7 +101,7 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 | Fighter | Projectile | Second special | Fatality |
 | --- | --- | --- | --- |
 | Balls So Well | Fireball | Alley-Oop Elbow | Posterized |
-| Becky Hack-Hack | Shimmer | Blanket Snare | Lights Out |
+| Becky Becky Hack Hack | Shimmer | Blanket Snare | Lights Out |
 | Chucky Redbird | Feather Darts | Dive Peck | Bird Strike |
 | Coke Wolf | Howl | Nose Candy | Full Moon |
 | Councilman Creep | Business Card | Close Talker | Too Long a Hug |

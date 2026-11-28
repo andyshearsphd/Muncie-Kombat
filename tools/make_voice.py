@@ -39,6 +39,7 @@ with tempfile.TemporaryDirectory() as tmp:
         keys = {slug(line), slug(spoken)}   # config.js rewrites "pres." before some lines reach the engine
         wav = os.path.join(tmp, 'x.wav')
         speed, pitch = SHOUT.get(line, (118, 16))
+        if line.startswith('becky becky hack hack'): speed = round(speed * 1.5)   # rattled off fast, on purpose
         subprocess.run(['espeak-ng', '-v', 'en-us+m3', '-s', str(speed), '-p', str(pitch), '-g', '4', '-w', wav, spoken], check=True)
         for k in keys:
             subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', wav, '-af', FILTER, '-b:a', '64k', os.path.join(OUT, k + '.mp3')], check=True)

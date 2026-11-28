@@ -934,7 +934,7 @@ FATAL.add(K => {
     const hurtLen = () => api.hurtH(V);
   };
 
-  // ---------- BECKY HACK-HACK: Lights Out ----------
+  // ---------- BECKY BECKY HACK HACK: Lights Out ----------
   S.becky = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR, d = A.face;
     const KNEEL = P({ hyL: 0.5, lean: 0.05, head: -0.25, aF: [0.4, 0.4], aB: [0.3, 0.5], fF: [15, 0], fB: [-12, 0] });
