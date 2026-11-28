@@ -42,6 +42,19 @@ window.GAME = {
   kicker: "PURPLE HIPPO ARCADE'S",                     // small line stacked above MUNCIE KOMBAT on the title screen
   titleStack: true,                                      // MUNCIE over KOMBAT
   titleSize: 62,
+  // the ABOUT page off the title screen, in Andy's words
+  about: {
+    title: 'ABOUT',
+    lines: [
+      "Hi there. I made this game as a parody and satire, *in good fun only*, and with that intention alone.",
+      "• I have no intention of making money from it.",
+      "• I want it to be *fun and funny*, but also *not hurtful.*",
+      "• The violence in this game is not a call to violence in any way. It functions only as a parody of Mortal Kombat.",
+      "• Yes, it's coded with AI. Yes, I'm aware of the ethical dilemmas posed by AI. I don't see AI itself as any more inherently evil than the conditions of late-stage capitalism that created it. No, I don't wish to have a debate about this.",
+      '',
+      "• I created this to be a game. To have fun. To learn how to create this way. Please, if you want to play it, try to let go and do the same.",
+    ],
+  },
   selectStart: 'hippo',                                  // the fighter screen always opens on the Purple Hippo
   subtitle: '',
   ladderGoal: 'CITY HALL',
