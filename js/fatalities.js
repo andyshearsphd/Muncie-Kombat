@@ -211,7 +211,7 @@ FATAL.add(K => {
     };
   };
 
-  // ---------- BALLIN' WELL: Posterized ----------
+  // ---------- BALLS SO WELL: Posterized ----------
   S.ballin = (s, A, V, api) => {
     const PS = api.PS, k = A.d.k, F = api.FLOOR;
     const d = -A.face, rimY = F - 176;

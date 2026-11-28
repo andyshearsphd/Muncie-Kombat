@@ -204,8 +204,8 @@ const ROSTER = (() => {
 
   const SKB = '#7a4a2a', RED = '#a8132a';
   const ballin = {
-    id: 'ballin', name: "BALLIN' WELL", short: 'BALLIN', him: 'HIM', k: 1.1,
-    bio: 'Basketball legend. Number 42. Still has the moves. Still has the elbows.',
+    id: 'ballin', name: 'BALLS SO WELL', short: 'BALLS', him: 'HIM', k: 1.1,
+    bio: 'Basketball legend. Still has the moves. Still has the elbows.',
     sock: '#ececea', sockLow: true, bicep: 0.38, calf: 0.4, stripe: RED, sleeve: '#f0efea',
     d: dims({ thigh: 31, shin: 31, torso: 37, upper: 23, fore: 22, hipW: 12, shW: 16, chest: 15.5, belly: 11, back: 11, thighR: 7.6, kneeR: 4.6, shR: 6, elbowR: 4.1 }),
     col: { torso: '#eae8e2', armU: SKB, armL: SKB, hand: SKB, legU: '#eae8e2', legL: SKB, foot: '#b8141e', neck: SKB },
@@ -216,7 +216,6 @@ const ROSTER = (() => {
       R.poly(g, [[-d.shW * 0.4, -L * 1.06], [d.shW * 0.9, -L * 1.06], [d.shW * 0.45, -L * 0.8]], SKB);
       g.strokeStyle = RED; g.lineWidth = 1.6; g.beginPath(); g.moveTo(-d.shW * 0.4, -L * 1.04); g.lineTo(d.shW * 0.45, -L * 0.8); g.lineTo(d.shW * 0.9, -L * 1.04); g.stroke();
       g.beginPath(); g.moveTo(-d.back * 0.9, -L * 0.98); g.quadraticCurveTo(-d.back * 0.1, -L * 0.7, d.shW * 0.25, -L * 0.98); g.stroke();
-      g.save(); g.translate(d.shW * 0.08, -L * 0.36); g.font = '400 13px Anton, Impact, sans-serif'; g.fillStyle = '#5a0a10'; g.fillText('42', -6.4, 0.6); g.fillStyle = RED; g.fillText('42', -7, 0); g.restore();
       g.fillStyle = RED; g.fillRect(-d.hipW * 1.1, -5, d.hipW * 2.4, 2);
     },
     head(g, st) {
@@ -1397,7 +1396,7 @@ const ROSTER = (() => {
     },
     ballin: {
       detail: (g, d, G) => { R.poly(g, [[-G.shx * 0.55, G.sY - 1], [G.shx * 0.55, G.sY - 1], [0, G.sY + 7]], SKB); g.strokeStyle = RED; g.lineWidth = 1.4; g.beginPath(); g.moveTo(-G.shx * 0.55, G.sY - 0.5); g.lineTo(0, G.sY + 7); g.lineTo(G.shx * 0.55, G.sY - 0.5); g.stroke();
-        g.save(); g.font = '400 13px Anton, Impact, sans-serif'; g.textAlign = 'center'; g.fillStyle = '#5a0a10'; g.fillText('42', 0.6, G.sY + 22.6); g.fillStyle = RED; g.fillText('42', 0, G.sY + 22); g.restore(); g.fillStyle = RED; g.fillRect(-G.shx * 2, G.hipY - 3, G.shx * 4, 2); },
+        g.fillStyle = RED; g.fillRect(-G.shx * 2, G.hipY - 3, G.shx * 4, 2); },
       collar: (g, d, G) => { for (const sd of [-1, 1]) { g.strokeStyle = RED; g.lineWidth = 1.3; g.beginPath(); g.moveTo(sd * G.shx * 0.55, G.sY - 1); g.quadraticCurveTo(sd * G.shx * 0.9, G.sY + 6, sd * G.shx * 1.02, G.sY + 13); g.stroke(); } },
       head(g, st) {
         humanFront(g, st, { skin: SKB, eyeC: '#1a0a04', browC: 'rgba(10,5,0,0.95)',

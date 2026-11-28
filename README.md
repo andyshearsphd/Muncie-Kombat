@@ -82,7 +82,7 @@ There may be other secrets. Every fighter's moves are also listed on the MOVES s
 
 | Fighter | Projectile | Second special | Fatality |
 | --- | --- | --- | --- |
-| Ballin' Well | Fireball | Alley-Oop Elbow | Posterized |
+| Balls So Well | Fireball | Alley-Oop Elbow | Posterized |
 | Becky Hack-Hack | Shimmer | Blanket Snare | Lights Out |
 | Chucky Redbird | Feather Darts | Dive Peck | Bird Strike |
 | Coke Wolf | Howl | Nose Candy | Full Moon |
