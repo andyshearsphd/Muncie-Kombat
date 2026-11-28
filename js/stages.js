@@ -482,11 +482,31 @@
       { n: 'MIDNIGHT COOKIES', aw: '#c8402a', neon: '#ffb0d0', fill: (x, w) => { for (let i = 0; i < 6; i++) { R.ball(B, x + 12 + i * (w - 24) / 5, sf + 38, 5, '#c08040'); R.ball(B, x + 11 + i * (w - 24) / 5, sf + 37, 1.2, '#3a1a08'); } B.fillStyle = '#e8e0d0'; B.fillRect(x + 6, sf + 43, w - 12, 3); } },
       { n: 'CUP HALF FULL', aw: '#2a5a3a', neon: '#a0ffc0', fill: (x, w) => { B.fillStyle = '#3a2416'; B.fillRect(x + 6, sf + 36, w - 12, 12); for (let i = 0; i < 4; i++) { B.fillStyle = '#f0ece0'; B.fillRect(x + 12 + i * 12, sf + 31, 5, 5); } B.fillStyle = '#1a1a1a'; B.fillRect(x + w - 24, sf + 22, 12, 14); } },
       { n: 'BE THERE LATER', aw: '#1a1a2a', neon: '#ff6060', fill: (x, w) => { B.fillStyle = '#1a0c10'; B.fillRect(x + 6, sf + 18, w - 12, 30); B.fillStyle = 'rgba(255,60,80,0.35)'; B.beginPath(); B.moveTo(x + w / 2, sf + 18); B.lineTo(x + w / 2 - 16, sf + 48); B.lineTo(x + w / 2 + 16, sf + 48); B.fill(); B.fillStyle = '#0a0a0a'; B.fillRect(x + w / 2 - 0.6, sf + 30, 1.2, 18); B.beginPath(); B.arc(x + w / 2, sf + 29, 2, 0, PI * 2); B.fill(); B.fillRect(x + 12, sf + 36, 8, 12); B.fillRect(x + w - 22, sf + 32, 10, 16); B.fillStyle = '#ff8080'; B.font = '7px Anton, Impact, sans-serif'; B.fillText('LIVE TONIGHT', x + 8, sf + 26); } },
-      { n: 'WE FLY HIGH', aw: '#6a2a6a', neon: '#d0a0ff', fill: (x, w) => { B.fillStyle = '#5a1a6a'; B.fillRect(x + 6, sf + 18, w * 0.4, 24); B.fillStyle = '#e0c020'; B.beginPath(); B.arc(x + 6 + w * 0.2, sf + 30, 7, 0, PI * 2); B.fill(); B.fillStyle = '#5a1a6a'; B.beginPath(); B.arc(x + 6 + w * 0.2, sf + 30, 3, 0, PI * 2); B.fill(); for (let i = 0; i < 4; i++) { B.fillStyle = 'rgba(120,220,255,0.6)'; B.fillRect(x + w * 0.55 + i * 9, sf + 30 - i * 3, 4, 16 + i * 3); } } },
+      { n: 'WE FLY HIGHER', aw: '#6a2a6a', neon: '#d0a0ff', fill: (x, w) => { B.fillStyle = '#5a1a6a'; B.fillRect(x + 6, sf + 18, w * 0.4, 24); B.fillStyle = '#e0c020'; B.beginPath(); B.arc(x + 6 + w * 0.2, sf + 30, 7, 0, PI * 2); B.fill(); B.fillStyle = '#5a1a6a'; B.beginPath(); B.arc(x + 6 + w * 0.2, sf + 30, 3, 0, PI * 2); B.fill(); for (let i = 0; i < 4; i++) { B.fillStyle = 'rgba(120,220,255,0.6)'; B.fillRect(x + w * 0.55 + i * 9, sf + 30 - i * 3, 4, 16 + i * 3); } } },
+      { n: 'PARTS FOR ART', aw: '#d87a1a', neon: '#ffe070', fill: (x, w) => {
+        // an easel with a canvas, stacked canvases, jars of brushes and a rack of paint tubes
+        B.strokeStyle = '#5a3a1a'; B.lineWidth = 2; B.beginPath(); B.moveTo(x + 20, sf + 52); B.lineTo(x + 28, sf + 16); B.lineTo(x + 36, sf + 52); B.moveTo(x + 28, sf + 16); B.lineTo(x + 28, sf + 52); B.stroke();
+        B.fillStyle = '#f4f0e4'; B.fillRect(x + 17, sf + 20, 22, 18); for (const [cx, cy, c] of [[x + 23, sf + 26, '#d83a2a'], [x + 31, sf + 29, '#2a6ad8'], [x + 27, sf + 33, '#e8c020']]) { B.fillStyle = c; B.beginPath(); B.arc(cx, cy, 3.4, 0, PI * 2); B.fill(); }
+        for (let i = 0; i < 4; i++) { B.fillStyle = ['#3a8ac8', '#c83a6a', '#4aa04a', '#e89a2a'][i]; B.fillRect(x + 48 + i * 5, sf + 28 - i * 2, 4, 24 + i * 2); }
+        for (let j = 0; j < 3; j++) { const jx = x + 76 + j * 14; B.fillStyle = 'rgba(220,230,240,0.6)'; B.fillRect(jx, sf + 40, 8, 10); for (let k = 0; k < 3; k++) { B.fillStyle = '#8a5a2a'; B.fillRect(jx + 1.5 + k * 2.2, sf + 30 + k, 1, 11); B.fillStyle = ['#d83a2a', '#2a6ad8', '#1a1a1a'][k]; B.fillRect(jx + 1.2 + k * 2.2, sf + 29 + k, 1.6, 2); } }
+        B.fillStyle = '#3a2a1e'; B.fillRect(x + 72, sf + 14, w - 80, 12); for (let k = 0; k < 9; k++) { B.fillStyle = ['#d83a2a', '#e8c020', '#2a6ad8', '#4aa04a', '#c83ac8', '#f0f0f0', '#e87a2a', '#1a1a1a', '#3ac8c8'][k]; B.fillRect(x + 75 + k * 5.4, sf + 16, 3.6, 8); }
+      } },
+      { n: 'HELLENIC PIZZA', aw: '#1a4a9a', neon: '#80c8ff', fill: (x, w) => {
+        // a counter with a whole pie and slices under the warmer, a Greek key band, and a blue-domed poster
+        B.fillStyle = '#1a3a7a'; B.fillRect(x + 6, sf + 14, w - 12, 4); B.fillStyle = '#f0f0f0'; for (let k = 0; k < (w - 12) / 6; k++) { B.fillRect(x + 7 + k * 6, sf + 15, 4, 1); B.fillRect(x + 7 + k * 6, sf + 15, 1, 2.4); }
+        B.fillStyle = '#f4f4f0'; B.fillRect(x + 10, sf + 22, 22, 16); B.fillStyle = '#2a5ac8'; B.beginPath(); B.arc(x + 21, sf + 31, 6, PI, 0); B.fill(); B.fillStyle = '#f4f4f0'; B.fillRect(x + 15, sf + 31, 12, 5);
+        B.fillStyle = '#c8c8cc'; B.fillRect(x + 40, sf + 34, w - 48, 3); B.fillStyle = 'rgba(255,200,120,0.35)'; B.fillRect(x + 40, sf + 24, w - 48, 10);
+        B.fillStyle = '#d89a3a'; B.beginPath(); B.ellipse(x + 58, sf + 32, 12, 3.4, 0, 0, PI * 2); B.fill(); B.fillStyle = '#c8401a'; B.beginPath(); B.ellipse(x + 58, sf + 31.5, 10, 2.6, 0, 0, PI * 2); B.fill();
+        for (let k = 0; k < 6; k++) { B.fillStyle = '#f0e0a0'; B.fillRect(x + 52 + k * 2.4, sf + 30.5, 1.2, 0.8); B.fillStyle = '#8a1a10'; B.fillRect(x + 51 + k * 2.6, sf + 32, 1, 0.8); }
+        for (let k = 0; k < 3; k++) { const sx = x + 80 + k * 13; B.fillStyle = '#d89a3a'; B.beginPath(); B.moveTo(sx, sf + 33); B.lineTo(sx + 10, sf + 33); B.lineTo(sx + 5, sf + 27); B.fill(); B.fillStyle = '#c8401a'; B.beginPath(); B.moveTo(sx + 1.5, sf + 32.4); B.lineTo(sx + 8.5, sf + 32.4); B.lineTo(sx + 5, sf + 28.4); B.fill(); }
+        B.fillStyle = '#e8e4dc'; B.fillRect(x + 6, sf + 38, w - 12, 10); B.fillStyle = '#1a3a7a'; B.fillRect(x + 6, sf + 38, w - 12, 1.5);
+      } }
     ];
-    let x = 12, i = 0;
+    // left to right; the far right ends with Be There Later and Hellenic Pizza
+    const ORDER = ['MIDNIGHT COOKIES', 'CUP HALF FULL', 'MIDNIGHT COOKIES', 'PARTS FOR ART', 'WE FLY HIGHER', 'BE THERE LATER', 'HELLENIC PIZZA', 'CUP HALF FULL'];
+    let x = -80, i = 0;
     while (x < BW) {
-      const s = shops[i % 4], w = 132;
+      const s = shops.find(q => q.n === ORDER[i % ORDER.length]), w = 132;
       // pilasters between storefronts
       B.fillStyle = '#4a1c16'; B.fillRect(x - 6, sf - 2, 6, 66);
       // big lit shop window
