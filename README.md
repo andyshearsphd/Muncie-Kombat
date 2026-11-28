@@ -10,6 +10,24 @@ Warning: it is very violent and very gross.
 
 ![Muncie Kombat title screen](screenshots/title.jpg)
 
+## About
+
+This is the same note as the ABOUT page off the game's title screen.
+
+Hi there. I made this game as a parody and satire, **in good fun only**, and with that intention alone.
+
+- I have no intention of making money from it.
+- I want it to be **fun and funny**, but also **not hurtful.**
+- The violence in this game is not a call to violence in any way. It functions only as a parody of Mortal Kombat.
+- **Yes, it's coded with AI.**
+  - Yes, I'm aware of the ethical dilemmas posed by AI.
+  - I don't see AI itself as any more inherently evil than the conditions of late-stage capitalism that created it.
+  - Creating with AI is now necessary to be competitive in my fields.
+  - No, I don't wish to have a debate about this.
+
+- I did this project to learn how to create with tools necessary to find work in my fields.
+- And **I made it to have fun.** Please, if you play it, let go for a little bit and **try to do the same.**
+
 ## Put it on your iPhone home screen
 
 1. Open the link in Safari.
