@@ -733,10 +733,13 @@
     B.fillStyle = '#d8d8dc'; B.fillRect(gx + 18, FY - 126, 34, 24); B.strokeStyle = '#b02020'; B.lineWidth = 1; B.strokeRect(gx + 28, FY - 116, 14, 10);
     B.strokeStyle = '#e06020'; B.lineWidth = 1.4; B.beginPath(); B.ellipse(gx + 35, FY - 104, 7, 1.8, 0, 0, PI * 2); B.stroke();
     B.strokeStyle = 'rgba(230,230,230,0.6)'; B.lineWidth = 0.5; for (let i = 0; i < 5; i++) { B.beginPath(); B.moveTo(gx + 29 + i * 3, FY - 104); B.lineTo(gx + 31 + i * 2, FY - 94); B.stroke(); }
-    // the track coming down the hill in the distance
-    B.fillStyle = '#2a2a2e'; B.beginPath(); B.moveTo(CX - 40, FY - 30); B.lineTo(CX + 40, FY - 30); B.lineTo(CX + 14, FY - 80); B.lineTo(CX - 10, FY - 80); B.fill();
-    B.strokeStyle = 'rgba(240,240,240,0.4)'; B.lineWidth = 0.8; B.beginPath(); B.moveTo(CX, FY - 30); B.lineTo(CX + 2, FY - 80); B.stroke();
-    B.fillStyle = '#1a2a16'; B.beginPath(); B.moveTo(CX - 120, FY - 30); B.quadraticCurveTo(CX, FY - 96, CX + 120, FY - 30); B.lineTo(CX + 40, FY - 30); B.lineTo(CX + 14, FY - 80); B.lineTo(CX - 10, FY - 80); B.lineTo(CX - 40, FY - 30); B.fill();
+    // the derby hill off to the right: the course runs down it and along the straight to the finish at centre
+    B.fillStyle = '#16220f'; B.beginPath(); B.moveTo(CX + 40, FY - 28); B.quadraticCurveTo(CX + 300, FY - 40, CX + 470, FY - 92); B.lineTo(CX + 560, FY - 96); B.lineTo(CX + 600, FY - 28); B.fill();
+    B.fillStyle = '#2a2a2e'; B.beginPath(); B.moveTo(CX + 40, FY - 30); B.quadraticCurveTo(CX + 300, FY - 42, CX + 470, FY - 94); B.lineTo(CX + 476, FY - 86); B.quadraticCurveTo(CX + 300, FY - 34, CX + 40, FY - 25); B.fill();
+    B.strokeStyle = 'rgba(240,240,240,0.4)'; B.lineWidth = 0.7; B.beginPath(); B.moveTo(CX + 40, FY - 27.5); B.quadraticCurveTo(CX + 300, FY - 38, CX + 473, FY - 90); B.stroke();
+    // the starting ramp at the top
+    B.fillStyle = '#3a3026'; B.beginPath(); B.moveTo(CX + 466, FY - 94); B.lineTo(CX + 500, FY - 108); B.lineTo(CX + 520, FY - 108); B.lineTo(CX + 520, FY - 92); B.fill();
+    B.fillStyle = '#c8c0a8'; B.fillRect(CX + 500, FY - 122, 2, 14); B.fillRect(CX + 518, FY - 122, 2, 14); B.fillStyle = '#a01818'; B.fillRect(CX + 500, FY - 124, 20, 5);
     // grass verge
     vg(B, 0, FY - 30, BW, 32, ['#141c10', '#0e140c']);
     for (const x of MCC_LAMPS) lamp(B, x, FY - 2, 128, 'rgba(255,215,140,0.85)');
@@ -746,11 +749,16 @@
     vg(F, 0, FY, AWX, H - FY, ['#2a2a2e', '#1c1c20', '#141416']);
     for (let i = 0; i < 2600; i++) { F.fillStyle = rand() < 0.5 ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.25)'; F.fillRect(rand() * AWX, FY + rand() * (H - FY), 1, 1); }
     const vx = AWX / 2;
-    F.strokeStyle = 'rgba(235,235,225,0.75)'; F.lineWidth = 1.6; for (const o of [-1, 0, 1]) { F.beginPath(); F.moveTo(vx + o * 110, FY); F.lineTo(vx + o * 520, H); F.stroke(); }
-    const y0 = FY + 9, y1 = FY + 19, n = 64;
-    for (let r = 0; r < 2; r++) for (let i = 0; i < n; i++) { F.fillStyle = (i + r) % 2 ? '#e8e8e0' : '#121214'; F.fillRect(i * AWX / n, r ? (y0 + y1) / 2 : y0, AWX / n + 0.5, (y1 - y0) / 2); }
-    F.fillStyle = 'rgba(0,0,0,0.25)'; for (let i = 0; i < 90; i++) F.fillRect(rand() * AWX, rr(y0, y1), rr(2, 8), 1);
-    F.fillStyle = 'rgba(240,240,230,0.6)'; F.font = '12px Anton, Impact, sans-serif'; F.textAlign = 'center'; F.fillText('FINISH', vx, y1 + 13); F.textAlign = 'left';
+    // the lanes run left to right along the straight, the way the cars come; the finish line crosses them at centre
+    F.strokeStyle = 'rgba(235,235,225,0.75)'; for (const [y, lw] of [[FY + 3, 1], [FY + 12, 1.4], [H - 4, 2]]) { F.lineWidth = lw; F.beginPath(); F.moveTo(0, y); F.lineTo(AWX, y); F.stroke(); }
+    const rows = 8;
+    for (let r = 0; r < rows; r++) {
+      const u0 = r / rows, u1 = (r + 1) / rows, ya = FY + (H - FY) * u0 * u0 * 0.35 + (H - FY) * u0 * 0.65, yb = FY + (H - FY) * u1 * u1 * 0.35 + (H - FY) * u1 * 0.65;
+      const wa = 7 + u0 * 13, wb = 7 + u1 * 13;
+      for (let c = 0; c < 2; c++) { F.fillStyle = (r + c) % 2 ? '#e8e8e0' : '#121214'; F.beginPath(); F.moveTo(vx - wa + c * wa, ya); F.lineTo(vx + c * wa, ya); F.lineTo(vx + c * wb, yb); F.lineTo(vx - wb + c * wb, yb); F.closePath(); F.fill(); }
+    }
+    F.fillStyle = 'rgba(0,0,0,0.22)'; for (let i = 0; i < 40; i++) { const y = rr(FY, H); F.fillRect(vx - 18 + rand() * 36, y, rr(2, 5), 1); }
+    F.save(); F.fillStyle = 'rgba(240,240,230,0.55)'; F.font = '11px Anton, Impact, sans-serif'; F.textAlign = 'center'; F.fillText('FINISH', vx - 46, FY + 25); F.fillText('FINISH', vx + 46, FY + 25); F.restore();
     for (const x of MCC_LAMPS) { const fx = x / BW * AWX; F.save(); F.globalCompositeOperation = 'lighter'; const gr = F.createRadialGradient(fx, FY + 18, 0, fx, FY + 18, 120); gr.addColorStop(0, 'rgba(255,210,140,0.14)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); F.fillStyle = gr; F.fillRect(fx - 120, FY, 240, H - FY); F.restore(); }
     const dg = F.createLinearGradient(0, FY, 0, FY + 16); dg.addColorStop(0, 'rgba(0,0,0,0.4)'); dg.addColorStop(1, 'rgba(0,0,0,0)'); F.fillStyle = dg; F.fillRect(0, FY, AWX, 16);
   }
